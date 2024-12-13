@@ -1,0 +1,16 @@
+name: commercium
+services:
+  postgres:
+    image: postgres:15 # Use the desired version of PostgreSQL
+    container_name: commercium
+    environment:
+      POSTGRES_USER: ${DB_USER} # Set the database user
+      POSTGRES_PASSWORD: ${DB_PASSWORD} # Set the database password
+      POSTGRES_DB: ${DB_NAME} # Set the default database name
+    ports:
+      - "${DB_PORT}:5432" # Map the container port to the host
+    volumes:
+      - postgres_data:/var/lib/postgresql/data # Persistent storage for database files
+
+volumes:
+  postgres_data:
