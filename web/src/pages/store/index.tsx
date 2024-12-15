@@ -6,28 +6,27 @@ import { Grid2 as Grid } from "@mui/material";
 import ProductItem from "./product-item";
 
 const Store = () => {
-  const { data: products } = useGetProducts();
-  const { mutate } = useAddToCart();
-  return (
-    <>
-      <HeaderBreadcrumbs
-        heading="Store"
-        links={[{ label: "home", href: "/" }, { label: "store" }]}
-      />
-
-      <Grid container spacing={2} alignItems="stretch">
-        <RenderList
-          list={products}
-          render={(product) => (
-            <ProductItem
-              product={product}
-              addToCart={(payload: NewCart) => mutate(payload)}
-            />
-          )}
-        />
-      </Grid>
-    </>
-  );
+	const { data: products } = useGetProducts();
+	const { mutate } = useAddToCart();
+	return (
+		<>
+			<HeaderBreadcrumbs
+				heading="Store"
+				links={[{ label: "home", href: "/" }, { label: "store" }]}
+			/>
+			<Grid container spacing={2} alignItems="stretch">
+				<RenderList
+					list={products}
+					render={(product) => (
+						<ProductItem
+							product={product}
+							addToCart={(payload: NewCart) => mutate(payload)}
+						/>
+					)}
+				/>
+			</Grid>
+		</>
+	);
 };
 
 export default Store;

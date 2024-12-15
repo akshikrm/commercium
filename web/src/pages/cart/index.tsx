@@ -1,4 +1,3 @@
-import HeaderBreadcrumbs from "@components/header";
 import { Currency } from "@components/prefix";
 import RenderList from "@components/render-list";
 import { BASE_URL_FILE } from "@config";
@@ -18,9 +17,10 @@ import {
 } from "@mui/material";
 import icons from "@/icons";
 import RenderIcon from "@components/render-icon";
+import HeaderBreadcrumbs from "@components/header";
 
 const Cart = () => {
-  const { data: carts, total } = useGetCart();
+  const { data: carts } = useGetCart();
   const { mutate: update } = useUpdateCart();
   const { mutate: deleteCart } = useDeleteCart();
 
@@ -113,7 +113,7 @@ const Cart = () => {
           <Button
             color="secondary"
             fullWidth
-            startIcon={<Icon icon="mdi:cash-fast" />}
+            startIcon={<RenderIcon icon="mdi:cash-fast" />}
           >
             complete your order
           </Button>
