@@ -1,4 +1,4 @@
 export const defaultHookOptions: HookOptions = {
-  showToast: true,
-  onlyErrorToast: false,
-};
+    showToast: true,
+    onlyErrorToast: false
+}

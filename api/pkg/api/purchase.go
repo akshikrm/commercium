@@ -9,13 +9,13 @@ import (
 	"net/http"
 )
 
-type PurchaseServecier interface {
+type PurchaseServicer interface {
 	Create(*types.PurchaseRequest) error
 	GetByUserID(uint32) ([]*types.Purchase, error)
 }
 
 type PurchaseApi struct {
-	service PurchaseServecier
+	service PurchaseServicer
 }
 
 func (a *PurchaseApi) GetByUserID(ctx context.Context, w http.ResponseWriter, r *http.Request) error {

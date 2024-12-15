@@ -1,7 +1,7 @@
-import { Icon } from "@iconify/react";
+import { Icon } from "@iconify/react"
 
 const RenderIcon = ({ icon }: { icon: string }) => {
-  return <Icon icon={icon} />;
-};
+    return <Icon icon={icon} />
+}
 
-export default RenderIcon;
+export default RenderIcon
