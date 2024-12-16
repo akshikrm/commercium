@@ -8,6 +8,7 @@ import (
 
 type PurchaseStorager interface {
 	GetByUserID(uint32) ([]*types.PurchaseList, error)
+	GetAll() ([]*types.PurchaseList, error)
 	Create([]*types.PurchaseRequest, uint) error
 }
 
@@ -23,7 +24,6 @@ type PurchaseService struct {
 
 func (s *PurchaseService) Create(newPurchase *types.PurchaseRequest) error {
 	carts, err := s.cartService.GetAll(newPurchase.UserID)
-
 	if err != nil {
 		return err
 	}
@@ -52,7 +52,10 @@ func (s *PurchaseService) Create(newPurchase *types.PurchaseRequest) error {
 	return s.cartService.HardDeleteByUserID(newPurchase.UserID)
 }
 
-func (s *PurchaseService) GetByUserID(userID uint32) ([]*types.PurchaseList, error) {
+func (s *PurchaseService) GetAll(userID uint32, role string) ([]*types.PurchaseList, error) {
+	if role == "admin" {
+		return s.purchaseStorage.GetAll()
+	}
 	return s.purchaseStorage.GetByUserID(userID)
 }
 

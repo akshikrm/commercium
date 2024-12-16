@@ -11,16 +11,18 @@ import (
 
 type PurchaseServeicer interface {
 	Create(*types.PurchaseRequest) error
-	GetByUserID(uint32) ([]*types.PurchaseList, error)
+	GetAll(uint32, string) ([]*types.PurchaseList, error)
 }
 
 type PurchaseApi struct {
 	service PurchaseServeicer
 }
 
-func (a *PurchaseApi) GetByUserID(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
+func (a *PurchaseApi) GetAll(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
 	id := uint32(ctx.Value("userID").(int))
-	purchases, err := a.service.GetByUserID(id)
+	role := ctx.Value("role").(string)
+
+	purchases, err := a.service.GetAll(id, role)
 
 	if err != nil {
 		return err
