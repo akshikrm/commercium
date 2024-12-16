@@ -5,7 +5,7 @@ import (
 )
 
 type PurchaseStorager interface {
-	GetByUserID(uint32) ([]*types.Purchase, error)
+	GetByUserID(uint32) ([]*types.PurchaseList, error)
 	Create([]*types.PurchaseRequest, uint) error
 }
 
@@ -47,7 +47,7 @@ func (s *PurchaseService) Create(newPurchase *types.PurchaseRequest) error {
 	return s.cartService.HardDeleteByUserID(newPurchase.UserID)
 }
 
-func (s *PurchaseService) GetByUserID(userID uint32) ([]*types.Purchase, error) {
+func (s *PurchaseService) GetByUserID(userID uint32) ([]*types.PurchaseList, error) {
 	return s.purchaseStorage.GetByUserID(userID)
 }
 
