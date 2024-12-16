@@ -2,6 +2,8 @@ package services
 
 import (
 	"akshidas/e-com/pkg/types"
+	"fmt"
+	"time"
 )
 
 type PurchaseStorager interface {
@@ -34,12 +36,15 @@ func (s *PurchaseService) Create(newPurchase *types.PurchaseRequest) error {
 	}
 
 	newPurchaseEntry := []*types.PurchaseRequest{}
+	orderID := genOrderID()
 	for _, productId := range productIds {
 		newPurchaseEntry = append(newPurchaseEntry, &types.PurchaseRequest{
 			UserID:    newPurchase.UserID,
 			ProductID: uint(productId),
+			OrderID:   orderID,
 		})
 	}
+
 	if err := s.purchaseStorage.Create(newPurchaseEntry, totalPrice); err != nil {
 		return err
 	}
@@ -53,4 +58,15 @@ func (s *PurchaseService) GetByUserID(userID uint32) ([]*types.PurchaseList, err
 
 func NewPurchaseService(purchaseStorage PurchaseStorager, cartService CartServicer) *PurchaseService {
 	return &PurchaseService{purchaseStorage: purchaseStorage, cartService: cartService}
+}
+
+func genOrderID() string {
+	date := time.Now()
+	month := date.Month().String()[0:1]
+	weekday := date.Weekday().String()[0:1]
+	second := date.Second()
+	hour := date.Hour()
+	day := date.Day()
+
+	return fmt.Sprintf("W%s%s%d%d%d", month, weekday, day, hour, second)
 }

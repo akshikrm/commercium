@@ -3,8 +3,9 @@ package types
 import "time"
 
 type PurchaseRequest struct {
-	ProductID uint `json:"product_id"`
-	UserID    uint `json:"user_id"`
+	ProductID uint   `json:"product_id"`
+	UserID    uint   `json:"user_id"`
+	OrderID   string `json:"order_id"`
 }
 
 type Purchase struct {
@@ -19,6 +20,8 @@ type Purchase struct {
 
 type PurchaseList struct {
 	ID      uint32 `json:"id"`
+	Price   uint   `json:"purchase_price"`
+	OrderID string `json:"order_id"`
 	Product struct {
 		ID    uint32 `json:"id"`
 		Name  string `json:"name"`
