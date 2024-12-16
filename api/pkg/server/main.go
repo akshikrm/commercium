@@ -51,6 +51,7 @@ func (s *APIServer) registerRoutes(r *http.ServeMux) {
 
 	// Authenticated Routes
 	r.HandleFunc("POST /purchase", api.RouteHandler(middlware.IsAuthenticated(ctx, purchaseApi.Create)))
+	r.HandleFunc("GET /purchase", api.RouteHandler(middlware.IsAuthenticated(ctx, purchaseApi.GetAll)))
 	r.HandleFunc("GET /profile", api.RouteHandler(middlware.IsAuthenticated(ctx, userApi.GetProfile)))
 	r.HandleFunc("PUT /profile", api.RouteHandler(middlware.IsAuthenticated(ctx, userApi.UpdateProfile)))
 	r.HandleFunc("POST /carts", api.RouteHandler(middlware.IsAuthenticated(ctx, cartApi.Create)))

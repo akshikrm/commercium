@@ -1,11 +1,11 @@
 type FailedResponse = {
-  status: boolean;
-  message: string;
-  data?: ValidationErrors | null;
-};
+    status: boolean
+    message: string
+    data?: ValidationErrors | null
+}
 
-type Role = "admin" | "user";
+type Role = "admin" | "user"
 type JWTPayload = {
-  role: Role;
-  sub: number;
-};
+    role: Role
+    sub: number
+}

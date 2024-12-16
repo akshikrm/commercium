@@ -9,18 +9,21 @@ import (
 	"net/http"
 )
 
-type PurchaseServecier interface {
+type PurchaseServeicer interface {
 	Create(*types.PurchaseRequest) error
-	GetByUserID(uint32) ([]*types.Purchase, error)
+	GetAll(uint32, string) ([]*types.PurchaseList, error)
 }
 
 type PurchaseApi struct {
-	service PurchaseServecier
+	service PurchaseServeicer
 }
 
-func (a *PurchaseApi) GetByUserID(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
-	id := ctx.Value("userID")
-	purchases, err := a.service.GetByUserID(id.(uint32))
+func (a *PurchaseApi) GetAll(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
+	id := uint32(ctx.Value("userID").(int))
+	role := ctx.Value("role").(string)
+
+	purchases, err := a.service.GetAll(id, role)
+
 	if err != nil {
 		return err
 	}

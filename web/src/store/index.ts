@@ -1,1 +1,1 @@
-export { default as AuthenticationProvider } from "./auth/provider";
+export { default as AuthenticationProvider } from "./auth/provider"

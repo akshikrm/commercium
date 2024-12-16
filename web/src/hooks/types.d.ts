@@ -1,4 +1,4 @@
 type HookOptions = {
-  showToast?: boolean;
-  onlyErrorToast?: boolean;
-};
+    showToast?: boolean
+    onlyErrorToast?: boolean
+}
