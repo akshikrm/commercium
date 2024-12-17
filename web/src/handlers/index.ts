@@ -16,6 +16,7 @@ import {
     productDelete,
     updateProduct
 } from "./products"
+import { getPurcahses, placeOrder } from "./purchase"
 import { profile } from "./user"
 
 export const products = {
@@ -51,4 +52,9 @@ export const cart = {
     getAll: getCart,
     update: updateCart,
     delete: deleteCart
+}
+
+export const order = {
+    placeOrder: placeOrder,
+    getMyOrders: getPurcahses
 }
