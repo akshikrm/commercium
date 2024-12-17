@@ -1,0 +1,4 @@
+INFO: 2024/12/16 22:38:32 postgres.go:35: 🗃️ connected to database
+INFO: 2024/12/16 22:38:32 main.go:29: 🚀 Server started on port :5234
+INFO: 2024/12/16 22:40:54 postgres.go:34: 🗃️ connected to database
+INFO: 2024/12/16 22:40:54 main.go:29: 🚀 Server started on port :5234

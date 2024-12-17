@@ -1,10 +1,10 @@
 package db
 
 import (
+	"akshidas/e-com/pkg"
 	"database/sql"
 	"fmt"
 	_ "github.com/lib/pq"
-	"log"
 	"os"
 )
 
@@ -23,15 +23,15 @@ func Connect(s *Storage) {
 	db, err := sql.Open("postgres", connString)
 
 	if err != nil {
-		log.Fatal(err)
+		pkg.ErrorLogger.Fatal(err)
 	}
 
 	if err := db.Ping(); err != nil {
-		log.Fatal(err)
+		pkg.ErrorLogger.Fatal(err)
 	}
 
 	s.DB = db
-	log.Println("🗃️ connected to database")
+	pkg.InfoLogger.Println("🗃️ connected to database")
 }
 
 func NewStorage() *Storage {

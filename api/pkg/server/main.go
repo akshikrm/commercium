@@ -1,10 +1,10 @@
 package server
 
 import (
+	"akshidas/e-com/pkg"
 	"akshidas/e-com/pkg/api"
 	"akshidas/e-com/pkg/db"
 	"context"
-	"log"
 	"net/http"
 )
 
@@ -26,9 +26,8 @@ func (s *APIServer) Run() {
 	s.registerRoutes(router)
 
 	wrappedRouter := NewLogger(router)
-	log.Printf("🚀 Server started on port %s", s.Port)
-
-	log.Fatal(http.ListenAndServe(s.Port, wrappedRouter))
+	pkg.InfoLogger.Printf("🚀 Server started on port %s", s.Port)
+	pkg.ErrorLogger.Fatal(http.ListenAndServe(s.Port, wrappedRouter))
 }
 
 func (s *APIServer) registerRoutes(r *http.ServeMux) {
