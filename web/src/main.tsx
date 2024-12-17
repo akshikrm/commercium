@@ -88,6 +88,10 @@ createRoot(document.getElementById("root")!).render(
                                         </>
                                     }
                                 >
+                                    <Route
+                                        path='purchase'
+                                        element={<Purchase />}
+                                    />
                                     <Route path='products'>
                                         <Route index element={<Products />} />
                                         <Route
