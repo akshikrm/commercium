@@ -2,6 +2,7 @@ import { useMutation } from "@tanstack/react-query"
 import { order } from "@api"
 import toast from "react-hot-toast"
 import { useNavigate } from "react-router"
+import { USER_PATHS } from "@/paths"
 
 const ORDER_TOAST = "order_toast"
 
@@ -18,7 +19,7 @@ const usePlaceOrder = () => {
             toast.success(data, {
                 id: ORDER_TOAST
             })
-            navigate("/purchase")
+            navigate(USER_PATHS.store.root)
         },
         onError: err => {
             console.error(err)

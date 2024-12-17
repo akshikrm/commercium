@@ -10,7 +10,7 @@ import {
     Stack,
     Typography
 } from "@mui/material"
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import QuantityField from "./quanitity-field"
 import icons from "@/icons"
 import RenderIcon from "@components/render-icon"
@@ -18,11 +18,19 @@ import RenderIcon from "@components/render-icon"
 type Props = {
     product: Product
     addToCart: (payload: NewCart) => void
+    buyNow: (payload: NewCart) => void
 }
-const ProductItem = ({ product, addToCart }: Props) => {
-    const { id, name, description, image, price } = product
-    const convertedURI = [BASE_URL_FILE, image].join("/")
 
+const useGetUri = (image: string): string => {
+    return useMemo(() => {
+        return [BASE_URL_FILE, image].join("/")
+    }, [image])
+}
+
+const ProductItem = ({ product, addToCart, buyNow }: Props) => {
+    const { id, name, description, image, price } = product
+
+    const convertedURI = useGetUri(image)
     const [quantity, setQuanitity] = useState<number>(1)
 
     return (
@@ -44,7 +52,7 @@ const ProductItem = ({ product, addToCart }: Props) => {
                 title='green iguana'
                 onError={e => {
                     e.target.onerror = null
-                    e.target.rc = "https://placehold.co/400@2x.png"
+                    e.target.src = "https://placehold.co/400@2x.png"
                 }}
             />
             <CardContent>
@@ -81,6 +89,9 @@ const ProductItem = ({ product, addToCart }: Props) => {
                 </Button>
                 <Button
                     color='success'
+                    onClick={() => {
+                        buyNow({ product_id: id, quantity })
+                    }}
                     startIcon={<RenderIcon icon={icons.buyNow} />}
                 >
                     buy now
