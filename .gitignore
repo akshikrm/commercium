@@ -43,7 +43,7 @@ dist-ssr
 dist
 seeder
 storage
-filer-server
+file-server
 **/*debug*
 
 # Test binary, built with go test -c
