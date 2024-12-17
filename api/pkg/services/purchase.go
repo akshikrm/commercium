@@ -10,6 +10,7 @@ type PurchaseStorager interface {
 	GetByUserID(uint32) ([]*types.PurchaseList, error)
 	GetAll() ([]*types.PurchaseList, error)
 	Create([]*types.PurchaseRequest, uint) error
+	GetByID(uint32) (*types.PurchaseList, error)
 }
 
 type CartServicer interface {
@@ -57,6 +58,10 @@ func (s *PurchaseService) GetAll(userID uint32, role string) ([]*types.PurchaseL
 		return s.purchaseStorage.GetAll()
 	}
 	return s.purchaseStorage.GetByUserID(userID)
+}
+
+func (s *PurchaseService) GetByID(id uint32) (*types.PurchaseList, error) {
+	return s.purchaseStorage.GetByID(id)
 }
 
 func NewPurchaseService(purchaseStorage PurchaseStorager, cartService CartServicer) *PurchaseService {

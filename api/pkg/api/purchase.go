@@ -12,6 +12,7 @@ import (
 type PurchaseServeicer interface {
 	Create(*types.PurchaseRequest) error
 	GetAll(uint32, string) ([]*types.PurchaseList, error)
+	GetByID(uint32) (*types.PurchaseList, error)
 }
 
 type PurchaseApi struct {
@@ -42,6 +43,15 @@ func (a *PurchaseApi) Create(ctx context.Context, w http.ResponseWriter, r *http
 	}
 
 	return writeJson(w, http.StatusOK, "order placed")
+}
+
+func (a *PurchaseApi) GetByID(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
+	id, err := parseId(r.PathValue("id"))
+	if err != nil {
+		return err
+	}
+	purchase, err := a.service.GetByID(uint32(id))
+	return writeJson(w, http.StatusOK, purchase)
 }
 
 func NewPurchaseApi(database *db.Storage) *PurchaseApi {
