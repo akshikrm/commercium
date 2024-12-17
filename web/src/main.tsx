@@ -21,6 +21,7 @@ import { AuthenticationProvider } from "./store/index.ts"
 import Store from "./pages/store/index.tsx"
 import Purchase from "./pages/store/purchase/index.tsx"
 import Cart from "./pages/cart/index.tsx"
+import { USER_PATHS } from "./paths.ts"
 
 const client = new QueryClient()
 
@@ -69,12 +70,16 @@ createRoot(document.getElementById("root")!).render(
                                 >
                                     <Route
                                         index
-                                        element={<Navigate to='store' />}
+                                        element={
+                                            <Navigate
+                                                to={USER_PATHS.store.root}
+                                            />
+                                        }
                                     />
-                                    <Route path='store' element={<Store />} />
-                                    <Route path='cart' element={<Cart />} />
+                                    <Route path='stores' element={<Store />} />
+                                    <Route path='carts' element={<Cart />} />
                                     <Route
-                                        path='purchase'
+                                        path='purchases'
                                         element={<Purchase />}
                                     />
                                 </Route>

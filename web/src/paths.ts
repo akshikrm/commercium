@@ -13,6 +13,15 @@ export const ADMIN_PATHS = {
     }
 }
 
+export const USER_PATHS = {
+    root: "/",
+    store: {
+        root: "/stores"
+    },
+    cart: { root: "/carts" },
+    purchases: { root: "/purchases" }
+}
+
 export const AUTH_PATHS = {
     login: {
         root: "/auth/login"

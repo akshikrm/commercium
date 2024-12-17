@@ -7,7 +7,8 @@ import ProductItem from "./product-item"
 
 const Store = () => {
     const { data: products } = useGetProducts()
-    const { mutate } = useAddToCart()
+    const { addToCart, buyNow } = useAddToCart()
+
     return (
         <>
             <HeaderBreadcrumbs
@@ -20,7 +21,8 @@ const Store = () => {
                     render={product => (
                         <ProductItem
                             product={product}
-                            addToCart={(payload: NewCart) => mutate(payload)}
+                            addToCart={addToCart}
+                            buyNow={buyNow}
                         />
                     )}
                 />
