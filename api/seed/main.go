@@ -107,48 +107,6 @@ func main() {
 // 	return nil
 // }
 
-// func seedRolesFunc(s *db.Storage, role *types.CreateRoleRequest) {
-// 	log.Println("seeding roles")
-// 	roleService := services.NewRoleService(s)
-// 	err := roleService.Create(role)
-// 	if err != nil {
-// 		log.Printf("Failed to seed role %s due to %s\n", role.Name, err)
-// 	}
-// 	log.Printf("Successfully seed role %s\n", role.Name)
-// }
-//
-// func seedResourcesFunc(s *db.Storage) {
-// 	log.Println("seeding Resource")
-// 	resourceService := services.NewResourceService(s)
-// 	resource := types.CreateResourceRequest{
-// 		Name:        "User",
-// 		Code:        "user",
-// 		Description: "resource assigned to admin",
-// 	}
-// 	err := resourceService.Create(&resource)
-// 	if err != nil {
-// 		log.Printf("Failed to seed resource %s due to %s\n", resource.Name, err)
-// 	}
-// 	log.Printf("Successfully seed resource %s\n", resource.Name)
-// }
-//
-// func seedPermissionFunc(s *db.Storage) {
-// 	log.Println("seeding permission")
-// 	permissionService := services.NewPermissionService(s)
-// 	permission := types.CreateNewPermission{
-// 		RoleCode:     "admin",
-// 		ResourceCode: "user",
-// 		R:            true,
-// 		U:            true,
-// 		D:            true,
-// 	}
-// 	err := permissionService.Create(&permission)
-// 	if err != nil {
-// 		log.Printf("Failed to seed permission due to %s\n", err)
-// 	}
-// 	log.Println("Successfully seed permission")
-// }
-//
 // func seedAdminFunc(s *db.Storage) {
 // 	log.Println("seeding admin")
 // 	userModel := storage.NewUserStorage(s.DB)
