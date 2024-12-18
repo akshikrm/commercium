@@ -69,7 +69,6 @@ func (s Seeder) seedUsers() {
 }
 
 func (s Seeder) seedProductCategories() {
-	fmt.Println("seeding products categories")
 	productStorage := storage.NewProductCategoryStorage(s.store)
 	productService := services.NewProductCategoryService(productStorage)
 	file := readFile("./seed/mock/product-categories.json")
@@ -89,7 +88,7 @@ func (s Seeder) seedProductCategories() {
 }
 
 func (s Seeder) seedProducts() {
-	fmt.Println("Seeding products...")
+	fmt.Print("Seeding products...")
 	productStorage := storage.NewProductStorage(s.store)
 	productService := services.NewProductService(productStorage)
 	file := readFile("./seed/mock/products.json")

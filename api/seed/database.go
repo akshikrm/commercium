@@ -3,8 +3,9 @@ package main
 import (
 	"database/sql"
 	"fmt"
-	_ "github.com/lib/pq"
 	"slices"
+
+	_ "github.com/lib/pq"
 )
 
 type Database struct {
@@ -39,9 +40,8 @@ func (s *Database) createTable() {
 }
 
 func (s *Database) dropTable() {
-	reversed := KEYS[:]
-	slices.Reverse(reversed)
-	for _, key := range reversed {
+	slices.Reverse(KEYS)
+	for _, key := range KEYS {
 		fmt.Printf("Dropping table %s...", key)
 		query := fmt.Sprintf("DROP TABLE IF EXISTS %s;", key)
 		_, err := s.store.Exec(query)
@@ -52,6 +52,7 @@ func (s *Database) dropTable() {
 			fmt.Println("SUCCESS")
 		}
 	}
+	slices.Reverse(KEYS)
 }
 
 func (s *Database) createFunction() {

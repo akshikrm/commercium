@@ -4,10 +4,9 @@ import (
 	"akshidas/e-com/pkg/db"
 	"flag"
 	"fmt"
-	"os"
-
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
+	"os"
 )
 
 func main() {
@@ -35,6 +34,7 @@ func main() {
 	if *nukedb {
 		database.DROP()
 	}
+
 	if *seed {
 		seeder.INIT()
 	}
@@ -42,5 +42,6 @@ func main() {
 	if *refreshdb {
 		database.DROP()
 		database.INIT()
+		seeder.INIT()
 	}
 }
