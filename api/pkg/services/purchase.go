@@ -9,7 +9,7 @@ import (
 type PurchaseStorager interface {
 	GetAllByUserID(uint32) ([]*types.PurchaseList, error)
 	GetAll() ([]*types.PurchaseList, error)
-	Create([]*types.PurchaseRequest, uint) error
+	Create([]*types.PurchaseRequest, uint64) error
 	GetByOrderID(string) (*types.OrderView, error)
 }
 
@@ -18,8 +18,13 @@ type CartServicer interface {
 	GetAll(uint) ([]*types.CartList, error)
 }
 
+type OrderServicer interface {
+	Create(*types.OrderRequest) (uint, error)
+}
+
 type PurchaseService struct {
 	purchaseStorage PurchaseStorager
+	orderService    OrderServicer
 	cartService     CartServicer
 }
 
@@ -29,15 +34,19 @@ func (s *PurchaseService) Create(newPurchase *types.PurchaseRequest) error {
 		return err
 	}
 
-	var totalPrice uint
+	var totalPrice uint64
 	var productIds []uint
 	for _, cart := range carts {
-		totalPrice += cart.Product.Price
+		totalPrice += uint64(cart.Product.Price)
 		productIds = append(productIds, cart.Product.ID)
 	}
 
 	newPurchaseEntry := []*types.PurchaseRequest{}
-	orderID := genOrderID()
+	orderID, err := s.orderService.Create(&types.OrderRequest{
+		UserID:  newPurchase.UserID,
+		OrderID: genOrderID(),
+		Price:   uint64(totalPrice),
+	})
 	for _, productId := range productIds {
 		newPurchaseEntry = append(newPurchaseEntry, &types.PurchaseRequest{
 			UserID:    newPurchase.UserID,
@@ -64,8 +73,12 @@ func (s *PurchaseService) GetByOrderID(id string) (*types.OrderView, error) {
 	return s.purchaseStorage.GetByOrderID(id)
 }
 
-func NewPurchaseService(purchaseStorage PurchaseStorager, cartService CartServicer) *PurchaseService {
-	return &PurchaseService{purchaseStorage: purchaseStorage, cartService: cartService}
+func NewPurchaseService(purchaseStorage PurchaseStorager, cartService CartServicer, orderService OrderServicer) *PurchaseService {
+	return &PurchaseService{
+		purchaseStorage: purchaseStorage,
+		cartService:     cartService,
+		orderService:    orderService,
+	}
 }
 
 func genOrderID() string {

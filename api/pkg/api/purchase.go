@@ -58,6 +58,7 @@ func (a *PurchaseApi) GetByID(ctx context.Context, w http.ResponseWriter, r *htt
 func NewPurchaseApi(database *db.Storage) *PurchaseApi {
 	purchaseStorage := storage.NewPurchaseStorage(database.DB)
 	cartStorage := storage.NewCartStorage(database.DB)
-	purchaseService := services.NewPurchaseService(purchaseStorage, cartStorage)
+	orderStorage := storage.NewOrderStorage(database.DB)
+	purchaseService := services.NewPurchaseService(purchaseStorage, cartStorage, orderStorage)
 	return &PurchaseApi{service: purchaseService}
 }
