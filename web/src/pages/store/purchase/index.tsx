@@ -11,9 +11,15 @@ import { DATE_VIEW_FORMAT } from "@config"
 import RenderList from "@components/render-list"
 import { Currency } from "@components/prefix"
 import useGetPurchases from "@hooks/purchase/use-get-purchases"
+import RenderIcon from "@components/render-icon"
+import icons from "@/icons"
+import IconButton from "@mui/material/IconButton"
+import { useNavigate } from "react-router"
+import { USER_PATHS } from "@/paths"
 
 const Purchase = () => {
     const { data: purchases } = useGetPurchases()
+    const navigate = useNavigate()
     return (
         <>
             <HeaderBreadcrumbs
@@ -32,6 +38,7 @@ const Purchase = () => {
                             <TableCell>Name</TableCell>
                             <TableCell>Price</TableCell>
                             <TableCell>Purchased On</TableCell>
+                            <TableCell>View</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -48,24 +55,34 @@ const Purchase = () => {
                                                 }
                                         }}
                                     >
-                                        <TableCell component='th' scope='row'>
-                                            {i + 1}
-                                        </TableCell>
-                                        <TableCell component='th' scope='row'>
-                                            #{row.order_id}
-                                        </TableCell>
-                                        <TableCell component='th' scope='row'>
+                                        <TableCell>{i + 1}</TableCell>
+                                        <TableCell>#{row.order_id}</TableCell>
+                                        <TableCell>
                                             {row.product.name}
                                         </TableCell>
-                                        <TableCell component='th' scope='row'>
+                                        <TableCell>
                                             <Currency>
                                                 {row.purchase_price}
                                             </Currency>
                                         </TableCell>
-                                        <TableCell component='th' scope='row'>
+                                        <TableCell>
                                             {dayjs(row.created_at).format(
                                                 DATE_VIEW_FORMAT
                                             )}
+                                        </TableCell>
+
+                                        <TableCell>
+                                            <IconButton
+                                                onClick={() => {
+                                                    navigate(
+                                                        USER_PATHS.purchases.view(
+                                                            row.order_id
+                                                        )
+                                                    )
+                                                }}
+                                            >
+                                                <RenderIcon icon={icons.view} />
+                                            </IconButton>
                                         </TableCell>
                                     </TableRow>
                                 )
