@@ -1,5 +1,12 @@
 [
   {
+    "first_name": "Admin",
+    "last_name": "Me",
+    "email": "admin@me.com",
+    "password": "root",
+    "role": "admin"
+  },
+  {
     "first_name": "Akshay",
     "last_name": "Krishna",
     "email": "akshay@test.com",
@@ -72,4 +79,3 @@
     "password": "root"
   }
 ]
-

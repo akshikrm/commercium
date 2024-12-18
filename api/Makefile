@@ -2,6 +2,10 @@ build:
 	@go build -o dist cmd/main.go 
 	@go build -o file-server ./storage.go
 		
+build-seeder:
+	rm ./seeder
+	@go build -o seeder ./seed
+
 run: build
 	@clear
 	@./dist
@@ -10,36 +14,8 @@ run-file: build
 		@clear
 		@./file-server
 
-build-seeder:
-	@go build -o seeder seed/main.go 
-
 init-db: build-seeder
 	@./seeder --init-db 
 
-seed-users: build-seeder
-	@./seeder --seed-users
-
-seed-groups: build-seeder
-	@./seeder --seed-groups
-
-seed-roles: build-seeder
-	@./seeder --seed-roles
-
-seed-resources: build-seeder
-	@./seeder --seed-resources
-
-seed-products: build-seeder
-	@./seeder --seed-products
-
-
-seed-product-categories: build-seeder
-	@./seeder --seed-product-categories
-
-seed-permission: build-seeder
-		@./seeder --seed-permission
-
-nuke-db: build-seeder
-	@./seeder --nuke-db
-
-refresh-db: build-seeder 
-	@./seeder --refresh-db
+seed-db: build-seeder
+	@./seeder --seed
