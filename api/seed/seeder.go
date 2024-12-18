@@ -29,11 +29,11 @@ type Seeder struct {
 }
 
 func (s *Seeder) INIT() {
-	s.SeedRole()
-	s.seedUsersFunc()
+	s.seedRoles()
+	s.seedUsers()
 }
 
-func (s *Seeder) SeedRole() {
+func (s *Seeder) seedRoles() {
 	roleStorage := storage.NewRoleStorage(s.store)
 	roleService := services.NewRoleService(roleStorage)
 	fmt.Print("Seeding Role...")
@@ -46,7 +46,7 @@ func (s *Seeder) SeedRole() {
 	fmt.Println("SUCCESS")
 }
 
-func (s Seeder) seedUsersFunc() {
+func (s Seeder) seedUsers() {
 	fmt.Print("Seeding Users...")
 	userModel := storage.NewUserStorage(s.store)
 	profileModel := storage.NewProfileStorage(s.store)
