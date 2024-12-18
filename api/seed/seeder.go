@@ -31,6 +31,8 @@ type Seeder struct {
 func (s *Seeder) INIT() {
 	s.seedRoles()
 	s.seedUsers()
+	s.seedProductCategories()
+	s.seedProducts()
 }
 
 func (s *Seeder) seedRoles() {
@@ -51,29 +53,74 @@ func (s Seeder) seedUsers() {
 	userModel := storage.NewUserStorage(s.store)
 	profileModel := storage.NewProfileStorage(s.store)
 	userService := services.NewUserService(userModel, profileModel)
-	userFile, err := os.Open("./seed/mock/users.json")
-	if err != nil {
-		fmt.Println("FAILED")
-		fmt.Printf("ERR: %s\n", err)
-		os.Exit(1)
-	}
-	defer userFile.Close()
 
-	byteValue, err := io.ReadAll(userFile)
-	if err != nil {
-		fmt.Println("FAILED")
-		fmt.Printf("ERR: %s\n", err)
-		os.Exit(1)
-	}
-
+	byteValue := readFile("./seed/mock/users.json")
 	users := []types.CreateUserRequest{}
 	json.Unmarshal(byteValue, &users)
+
 	for _, element := range users {
 		if _, err := userService.Create(element); err != nil {
 			fmt.Println("FAILED")
 			fmt.Printf("ERR: %s\n", err)
-			continue
+			os.Exit(1)
 		}
 	}
 	fmt.Println("SUCCESS")
+}
+
+func (s Seeder) seedProductCategories() {
+	fmt.Println("seeding products categories")
+	productStorage := storage.NewProductCategoryStorage(s.store)
+	productService := services.NewProductCategoryService(productStorage)
+	file := readFile("./seed/mock/product-categories.json")
+	productCategories := []types.NewProductCategoryRequest{}
+	json.Unmarshal(file, &productCategories)
+
+	fmt.Print("Seeding product categories...")
+	for _, product := range productCategories {
+		if _, err := productService.Create(&product); err != nil {
+			fmt.Println("FAILED")
+			fmt.Printf("ERR: %s\n", err)
+			os.Exit(1)
+		}
+	}
+	fmt.Println("SUCCESS")
+
+}
+
+func (s Seeder) seedProducts() {
+	fmt.Println("Seeding products...")
+	productStorage := storage.NewProductStorage(s.store)
+	productService := services.NewProductService(productStorage)
+	file := readFile("./seed/mock/products.json")
+	products := []types.CreateNewProduct{}
+	json.Unmarshal(file, &products)
+
+	for _, product := range products {
+		if err := productService.Create(&product); err != nil {
+			fmt.Println("FAILED")
+			fmt.Printf("ERR: %s\n", err)
+			os.Exit(1)
+		}
+	}
+	fmt.Println("SUCCESS")
+}
+
+func readFile(filePath string) []byte {
+	file, err := os.Open(filePath)
+	if err != nil {
+		fmt.Println("FAILED")
+		fmt.Printf("ERR: %s\n", err)
+		os.Exit(1)
+	}
+	defer file.Close()
+
+	byteValue, err := io.ReadAll(file)
+	if err != nil {
+		fmt.Println("FAILED")
+		fmt.Printf("ERR: %s\n", err)
+		os.Exit(1)
+	}
+	return byteValue
+
 }
