@@ -37,3 +37,22 @@ type OrderView struct {
 	} `json:"product"`
 	CreatedAt time.Time `json:"created_at"`
 }
+
+type OrderView struct {
+	ID      uint32 `json:"id"`
+	Price   uint   `json:"purchase_price"`
+	OrderID string `json:"order_id"`
+	Product struct {
+		ID          uint32 `json:"id"`
+		Name        string `json:"name"`
+		Slug        string `json:"slug"`
+		Image       string `json:"image"`
+		Description string `json:"description"`
+		Category    struct {
+			ID   uint32 `json:"id"`
+			Name string `json:"name"`
+			Slug string `json:"slug"`
+		} `json:"category"`
+	} `json:"product"`
+	CreatedAt time.Time `json:"created_at"`
+}
