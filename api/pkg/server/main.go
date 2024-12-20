@@ -50,9 +50,9 @@ func (s *APIServer) registerRoutes(r *http.ServeMux) {
 	r.HandleFunc("POST /upload", api.RouteHandler(uploadApi.Upload))
 
 	// Authenticated Routes
-	r.HandleFunc("POST /purchase", api.RouteHandler(middlware.IsAuthenticated(ctx, purchaseApi.Create)))
-	r.HandleFunc("GET /purchase", api.RouteHandler(middlware.IsAuthenticated(ctx, purchaseApi.GetAll)))
-	r.HandleFunc("GET /purchase/{id}", api.RouteHandler(middlware.IsAuthenticated(ctx, purchaseApi.GetByID)))
+	r.HandleFunc("POST /orders", api.RouteHandler(middlware.IsAuthenticated(ctx, purchaseApi.Create)))
+	// r.HandleFunc("GET /orders", api.RouteHandler(middlware.IsAuthenticated(ctx, purchaseApi.GetAll)))
+	// r.HandleFunc("GET /orders/{id}", api.RouteHandler(middlware.IsAuthenticated(ctx, purchaseApi.GetByID)))
 	r.HandleFunc("GET /profile", api.RouteHandler(middlware.IsAuthenticated(ctx, userApi.GetProfile)))
 	r.HandleFunc("PUT /profile", api.RouteHandler(middlware.IsAuthenticated(ctx, userApi.UpdateProfile)))
 	r.HandleFunc("POST /carts", api.RouteHandler(middlware.IsAuthenticated(ctx, cartApi.Create)))
