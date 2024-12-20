@@ -4,6 +4,7 @@ import (
 	"akshidas/e-com/pkg/types"
 	"akshidas/e-com/pkg/utils"
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"log"
 )
@@ -47,7 +48,31 @@ func (m *OrdersStorage) GetPurchaseByOrderID(id uint) ([]*types.PurchaseList, er
 }
 
 func (m *OrdersStorage) GetOrdersByUserID(id uint) ([]*types.OrderList, error) {
-	query := `select id, order_id, price, created_at from orders where user_id = $1`
+	query := `SELECT
+	    o.id AS order_id,
+	    o.order_id AS external_order_id,
+	    o.price AS total_price,
+	    o.created_at AS order_date,
+	    JSON_AGG(
+	        JSON_BUILD_OBJECT(
+	            'id', p.id,
+	            'name', p.name,
+	            'slug', p.slug,
+	            'price', oi.price,
+	            'quantity', oi.quantity
+	        )
+	    ) AS products
+	FROM
+	    orders o
+	JOIN
+	    purchases oi ON o.id = oi.order_id
+	JOIN
+	    products p ON oi.product_id = p.id
+	WHERE
+	    o.user_id = $1
+	GROUP BY
+	    o.id;
+`
 
 	rows, err := m.store.Query(query, id)
 	if err != nil {
@@ -59,17 +84,23 @@ func (m *OrdersStorage) GetOrdersByUserID(id uint) ([]*types.OrderList, error) {
 	orders := []*types.OrderList{}
 	for rows.Next() {
 		order := types.OrderList{}
+		var products string
 		if err := rows.Scan(
 			&order.ID,
 			&order.OrderID,
 			&order.Price,
 			&order.CreatedAt,
+			&products,
 		); err != nil {
 			if err == sql.ErrNoRows {
 				log.Println("row cannot be read")
 				return nil, utils.NotFound
 			}
 			return nil, utils.ServerError
+		}
+		err = json.Unmarshal([]byte(products), &order.Products)
+		if err != nil {
+			log.Fatalf("Failed to unmarshal JSON: %v", err)
 		}
 		orders = append(orders, &order)
 	}
