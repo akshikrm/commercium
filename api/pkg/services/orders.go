@@ -6,12 +6,11 @@ import (
 	"time"
 )
 
-type PurchaseStorager interface {
-	// GetAllByUserID(uint32) ([]*types.PurchaseList, error)
-	// GetAll() ([]*types.PurchaseList, error)
+type OrdersStorager interface {
 	NewPurchase([]*types.PurchaseRequest) error
 	NewOrder(*types.OrderRequest) (uint, error)
-	// GetByOrderID(string) (*types.OrderView, error)
+	GetOrdersByUserID(uint) ([]*types.OrderList, error)
+	GetPurchaseByOrderID(uint) ([]*types.PurchaseList, error)
 }
 
 type CartServicer interface {
@@ -19,12 +18,12 @@ type CartServicer interface {
 	GetAll(uint) ([]*types.CartList, error)
 }
 
-type PurchaseService struct {
-	purchaseStorage PurchaseStorager
-	cartService     CartServicer
+type OrderService struct {
+	ordersStorage OrdersStorager
+	cartService   CartServicer
 }
 
-func (s *PurchaseService) PlaceOrder(userID uint) error {
+func (s *OrderService) PlaceOrder(userID uint) error {
 	carts, err := s.cartService.GetAll(userID)
 	if err != nil {
 		return err
@@ -35,7 +34,7 @@ func (s *PurchaseService) PlaceOrder(userID uint) error {
 		totalPrice += uint64(cart.Product.Price)
 	}
 
-	orderID, err := s.purchaseStorage.NewOrder(&types.OrderRequest{
+	orderID, err := s.ordersStorage.NewOrder(&types.OrderRequest{
 		UserID:  userID,
 		OrderID: genOrderID(),
 		Price:   totalPrice,
@@ -51,11 +50,15 @@ func (s *PurchaseService) PlaceOrder(userID uint) error {
 		})
 	}
 
-	if err := s.purchaseStorage.NewPurchase(purchaseRequests); err != nil {
+	if err := s.ordersStorage.NewPurchase(purchaseRequests); err != nil {
 		return err
 	}
 
 	return s.cartService.HardDeleteByUserID(userID)
+}
+
+func (s *OrderService) GetOrdersByUserID(id uint) ([]*types.OrderList, error) {
+	return s.ordersStorage.GetOrdersByUserID(id)
 }
 
 // func (s *PurchaseService) GetAll(userID uint32, role string) ([]*types.PurchaseList, error) {
@@ -70,10 +73,10 @@ func (s *PurchaseService) PlaceOrder(userID uint) error {
 // 	return s.purchaseStorage.GetByOrderID(id)
 // }
 
-func NewPurchaseService(purchaseStorage PurchaseStorager, cartService CartServicer) *PurchaseService {
-	return &PurchaseService{
-		purchaseStorage: purchaseStorage,
-		cartService:     cartService,
+func NewOrderService(ordersStorage OrdersStorager, cartService CartServicer) *OrderService {
+	return &OrderService{
+		ordersStorage: ordersStorage,
+		cartService:   cartService,
 	}
 }
 
