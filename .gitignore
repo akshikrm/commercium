@@ -42,7 +42,7 @@ dist-ssr
 *.dylib
 dist
 seeder
-storage
+# storage
 file-server
 **/*debug*
 
