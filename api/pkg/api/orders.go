@@ -12,6 +12,7 @@ import (
 type PurchaseServeicer interface {
 	PlaceOrder(uint) error
 	GetOrdersByUserID(uint) ([]*types.OrderList, error)
+	GetPurchaseByOrderID(id uint) ([]*types.PurchaseList, error)
 	// GetAll(uint32, string) ([]*types.PurchaseList, error)
 	// GetByOrderID(string) (*types.OrderView, error)
 }
@@ -39,8 +40,20 @@ func (a *PurchaseApi) GetMyOrders(ctx context.Context, w http.ResponseWriter, r 
 		return err
 	}
 	return writeJson(w, http.StatusOK, orders)
-
 }
+
+func (a *PurchaseApi) GetPurchasesByOrderID(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
+	orderID, err := parseId(r.PathValue("id"))
+	if err != nil {
+		return err
+	}
+	purchases, err := a.service.GetPurchaseByOrderID(uint(orderID))
+	if err != nil {
+		return err
+	}
+	return writeJson(w, http.StatusOK, purchases)
+}
+
 func (a *PurchaseApi) Create(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
 	userID := uint(ctx.Value("userID").(int))
 	err := a.service.PlaceOrder(userID)

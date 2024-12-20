@@ -28,9 +28,14 @@ type PurchaseList struct {
 }
 
 type OrderList struct {
-	ID        uint32    `json:"id"`
-	Price     uint      `json:"purchase_price"`
-	OrderID   string    `json:"order_id"`
+	ID      uint32 `json:"id"`
+	Price   uint   `json:"purchase_price"`
+	OrderID string `json:"order_id"`
+	Product []*struct {
+		ID   uint32 `json:"id"`
+		Name string `json:"name"`
+		Slug string `json:"slug"`
+	} `json:"product"`
 	CreatedAt time.Time `json:"created_at"`
 }
 

@@ -57,8 +57,27 @@ func (s *OrderService) PlaceOrder(userID uint) error {
 	return s.cartService.HardDeleteByUserID(userID)
 }
 
+func (s *OrderService) GetPurchaseByOrderID(id uint) ([]*types.PurchaseList, error) {
+	return s.ordersStorage.GetPurchaseByOrderID(id)
+}
+
 func (s *OrderService) GetOrdersByUserID(id uint) ([]*types.OrderList, error) {
-	return s.ordersStorage.GetOrdersByUserID(id)
+	orders, err := s.ordersStorage.GetOrdersByUserID(id)
+	if err != nil {
+		return nil, err
+	}
+
+	// for _, order := range orders {
+	// 	purchases, err := s.ordersStorage.GetPurchaseByOrderID(uint(order.ID))
+	// 	if err == nil {
+	// 		for _, purchase := range purchases {
+	//
+	// 		}
+	// 	}
+	//
+	// }
+
+	return orders, nil
 }
 
 // func (s *PurchaseService) GetAll(userID uint32, role string) ([]*types.PurchaseList, error) {
