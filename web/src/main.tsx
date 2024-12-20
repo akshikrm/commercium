@@ -22,6 +22,7 @@ import Store from "./pages/store/index.tsx"
 import Purchase from "./pages/store/purchase/index.tsx"
 import Cart from "./pages/cart/index.tsx"
 import { USER_PATHS } from "./paths.ts"
+import OrderView from "./pages/store/purchase/view/index.tsx"
 
 const client = new QueryClient()
 
@@ -78,10 +79,16 @@ createRoot(document.getElementById("root")!).render(
                                     />
                                     <Route path='stores' element={<Store />} />
                                     <Route path='carts' element={<Cart />} />
-                                    <Route
-                                        path='purchases'
-                                        element={<Purchase />}
-                                    />
+                                    <Route path='purchases'>
+                                        <Route
+                                            index={true}
+                                            element={<Purchase />}
+                                        />
+                                        <Route
+                                            path=':id'
+                                            element={<OrderView />}
+                                        />
+                                    </Route>
                                 </Route>
                                 <Route
                                     path='admin'

@@ -1,7 +1,8 @@
 const icons = {
     delete: "mdi:delete-empty",
     addToCart: "tdesign:cart-add",
-    buyNow: "fluent-mdl2:shop"
+    buyNow: "fluent-mdl2:shop",
+    view: "lsicon:view-outline"
 }
 
 export default icons

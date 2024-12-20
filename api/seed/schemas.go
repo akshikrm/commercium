@@ -9,9 +9,19 @@ var SCHEMA = map[string]string{
 	"product_categories": "id SERIAL PRIMARY KEY, name VARCHAR(30) NOT NULL, slug VARCHAR(30) NOT NULL,enabled BOOLEAN DEFAULT true, description VARCHAR(120) NOT NULL, created_at TIMESTAMP DEFAULT NOW() NOT NULL, updated_at TIMESTAMP DEFAULT NOW() NOT NULL, deleted_at TIMESTAMP DEFAULT NULL",
 	"products":           "id SERIAL PRIMARY KEY, name VARCHAR(50), slug VARCHAR(50), price INTEGER NOT NULL DEFAULT 0, image VARCHAR(100),  description VARCHAR(300) NOT NULL, category_id INTEGER NOT NULL, created_at TIMESTAMP DEFAULT NOW() NOT NULL, updated_at TIMESTAMP DEFAULT NOW() NOT NULL, deleted_at TIMESTAMP DEFAULT NULL, CONSTRAINT fk_category FOREIGN KEY (category_id) REFERENCES product_categories(id)",
 	"carts":              "id SERIAL PRIMARY KEY, user_id INTEGER NOT NULL, product_id INTEGER NOT NULL, quantity INTEGER DEFAULT 1 NOT NULL, created_at TIMESTAMP DEFAULT NOW() NOT NULL, updated_at TIMESTAMP DEFAULT NOW() NOT NULL, deleted_at TIMESTAMP DEFAULT NULL, CONSTRAINT fk_user FOREIGN KEY(user_id) REFERENCES users(id), CONSTRAINT fk_product FOREIGN KEY(product_id) REFERENCES products(id)",
-	"purchases":          "id SERIAL PRIMARY KEY, user_id INTEGER NOT NULL, product_id INT NOT NULL, price INTEGER NOT NULL DEFAULT 0, order_id VARCHAR(20) NOT NULL, created_at TIMESTAMP DEFAULT NOW() NOT NULL, updated_at TIMESTAMP DEFAULT NOW() NOT NULL, deleted_at TIMESTAMP DEFAULT NULL, CONSTRAINT fk_user FOREIGN KEY(user_id) REFERENCES users(id), CONSTRAINT fk_product FOREIGN KEY(product_id) REFERENCES products(id)",
-	"orders":             "id SERIAL PRIMARY KEY, price INTEGER NOT NULL DEFAULT 0, created_at TIMESTAMP DEFAULT NOW() NOT NULL, updated_at TIMESTAMP DEFAULT NOW() NOT NULL, deleted_at TIMESTAMP DEFAULT NULL",
-	"uploads":            "id SERIAL PRIMARY KEY, path VARCHAR(200) NOT NULL, created_at TIMESTAMP DEFAULT NOW() NOT NULL, updated_at TIMESTAMP DEFAULT NOW() NOT NULL, deleted_at TIMESTAMP DEFAULT NULL",
+
+	"orders": `id SERIAL PRIMARY KEY, user_id INTEGER NOT NULL,
+	order_id VARCHAR(20) NOT NULL, price INTEGER NOT NULL DEFAULT 0, created_at
+	TIMESTAMP DEFAULT NOW() NOT NULL, updated_at TIMESTAMP DEFAULT NOW() NOT
+	NULL, deleted_at TIMESTAMP DEFAULT NULL`,
+
+	"purchases": `id SERIAL PRIMARY KEY, 
+	product_id INTEGER NOT NULL, order_id INTEGER NOT NULL, 
+	quantity INTEGER DEFAULT 1 NOT NULL, price INTEGER NOT NULL,
+	created_at TIMESTAMP DEFAULT NOW() NOT NULL, updated_at TIMESTAMP DEFAULT NOW() NOT NULL, deleted_at TIMESTAMP DEFAULT NULL, 
+	CONSTRAINT fk_order FOREIGN KEY(order_id) REFERENCES orders(id), CONSTRAINT fk_product FOREIGN KEY(product_id) REFERENCES products(id)`,
+
+	"uploads": "id SERIAL PRIMARY KEY, path VARCHAR(200) NOT NULL, created_at TIMESTAMP DEFAULT NOW() NOT NULL, updated_at TIMESTAMP DEFAULT NOW() NOT NULL, deleted_at TIMESTAMP DEFAULT NULL",
 }
 
 var KEYS = []string{
@@ -23,7 +33,7 @@ var KEYS = []string{
 	"product_categories",
 	"products",
 	"carts",
-	"purchases",
 	"orders",
+	"purchases",
 	"uploads",
 }

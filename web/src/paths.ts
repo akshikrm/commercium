@@ -19,7 +19,10 @@ export const USER_PATHS = {
         root: "/stores"
     },
     cart: { root: "/carts" },
-    purchases: { root: "/purchases" }
+    purchases: {
+        root: "/purchases",
+        view: (orderID: string) => `/purchases/${orderID}`
+    }
 }
 
 export const AUTH_PATHS = {

@@ -22,3 +22,14 @@ export const placeOrder = async () => {
         return Promise.reject({ messate: "failed to place order" })
     }
 }
+
+export const getByOrderID = async (orderID: string): Promise<OrderView> => {
+    try {
+        const { data } = await server.get(`purchase/${orderID}`)
+        return data.data
+    } catch (err) {
+        const { data } = err as AxiosResponse
+        console.error(data)
+        return Promise.reject({ messate: "failed to place order" })
+    }
+}
