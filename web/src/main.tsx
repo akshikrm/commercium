@@ -19,10 +19,10 @@ import "./index.css"
 import Layout from "@components/layout.tsx"
 import { AuthenticationProvider } from "./store/index.ts"
 import Store from "./pages/store/index.tsx"
-import Purchase from "./pages/store/purchase/index.tsx"
+import Orders from "./pages/store/orders/index.tsx"
 import Cart from "./pages/cart/index.tsx"
 import { USER_PATHS } from "./paths.ts"
-import OrderView from "./pages/store/purchase/view/index.tsx"
+import OrderView from "./pages/store/orders/view/index.tsx"
 
 const client = new QueryClient()
 
@@ -79,10 +79,10 @@ createRoot(document.getElementById("root")!).render(
                                     />
                                     <Route path='stores' element={<Store />} />
                                     <Route path='carts' element={<Cart />} />
-                                    <Route path='purchases'>
+                                    <Route path='orders'>
                                         <Route
                                             index={true}
-                                            element={<Purchase />}
+                                            element={<Orders />}
                                         />
                                         <Route
                                             path=':id'
@@ -100,10 +100,7 @@ createRoot(document.getElementById("root")!).render(
                                         </>
                                     }
                                 >
-                                    <Route
-                                        path='purchase'
-                                        element={<Purchase />}
-                                    />
+                                    <Route path='orders' element={<Orders />} />
                                     <Route path='products'>
                                         <Route index element={<Products />} />
                                         <Route

@@ -3,9 +3,9 @@ import { useQuery } from "@tanstack/react-query"
 import { useEffect } from "react"
 import toast from "react-hot-toast"
 
-const useGetPurchases = () => {
+const useGetOrders = () => {
     const query = useQuery({
-        queryKey: ["purchaseList"],
+        queryKey: ["ordersList"],
         queryFn: () => {
             return order.getMyOrders()
         }
@@ -14,11 +14,11 @@ const useGetPurchases = () => {
 
     useEffect(() => {
         if (status === "error") {
-            toast.error("failed to load purchases")
+            toast.error("failed to load orders")
         }
     }, [status])
 
     return query
 }
 
-export default useGetPurchases
+export default useGetOrders

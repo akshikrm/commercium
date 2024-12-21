@@ -19,9 +19,9 @@ export const USER_PATHS = {
         root: "/stores"
     },
     cart: { root: "/carts" },
-    purchases: {
-        root: "/purchases",
-        view: (orderID: string) => `/purchases/${orderID}`
+    orders: {
+        root: "/orders",
+        view: (orderID: string) => `/orders/${orderID}`
     }
 }
 
