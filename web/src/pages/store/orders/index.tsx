@@ -10,15 +10,15 @@ import dayjs from "dayjs"
 import { DATE_VIEW_FORMAT } from "@config"
 import RenderList from "@components/render-list"
 import { Currency } from "@components/prefix"
-import useGetPurchases from "@hooks/purchase/use-get-purchases"
+import useGetOrders from "@hooks/orders/use-get-orders"
 import RenderIcon from "@components/render-icon"
 import icons from "@/icons"
 import IconButton from "@mui/material/IconButton"
 import { useNavigate } from "react-router"
 import { USER_PATHS } from "@/paths"
 
-const Purchase = () => {
-    const { data: purchases } = useGetPurchases()
+const Orders = () => {
+    const { data: orders } = useGetOrders()
     const navigate = useNavigate()
     return (
         <>
@@ -35,7 +35,7 @@ const Purchase = () => {
                         <TableRow>
                             <TableCell>SI.No</TableCell>
                             <TableCell>Order ID</TableCell>
-                            <TableCell>Name</TableCell>
+                            <TableCell>Items</TableCell>
                             <TableCell>Price</TableCell>
                             <TableCell>Purchased On</TableCell>
                             <TableCell>View</TableCell>
@@ -43,7 +43,7 @@ const Purchase = () => {
                     </TableHead>
                     <TableBody>
                         <RenderList
-                            list={purchases}
+                            list={orders}
                             render={(row, i: number) => {
                                 return (
                                     <TableRow
@@ -58,7 +58,7 @@ const Purchase = () => {
                                         <TableCell>{i + 1}</TableCell>
                                         <TableCell>#{row.order_id}</TableCell>
                                         <TableCell>
-                                            {row.product.name}
+                                            {row.products.length}
                                         </TableCell>
                                         <TableCell>
                                             <Currency>
@@ -75,7 +75,7 @@ const Purchase = () => {
                                             <IconButton
                                                 onClick={() => {
                                                     navigate(
-                                                        USER_PATHS.purchases.view(
+                                                        USER_PATHS.orders.view(
                                                             row.order_id
                                                         )
                                                     )
@@ -95,4 +95,4 @@ const Purchase = () => {
     )
 }
 
-export default Purchase
+export default Orders

@@ -1,12 +1,12 @@
-type Purchases = {
+type Order = {
     id: number
     purchase_price: number
     order_id: string
-    product: {
+    products: {
         id: number
         name: string
         price: number
-    }
+    }[]
     created_at: string
 }
 

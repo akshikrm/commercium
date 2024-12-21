@@ -1,7 +1,7 @@
 import { Currency } from "@components/prefix"
 import { Button, Card, CardContent, Typography } from "@mui/material"
 import RenderIcon from "@components/render-icon"
-import usePlaceOrder from "@hooks/purchase/use-place-order"
+import usePlaceOrder from "@hooks/orders/use-place-order"
 
 type Props = {
     total: number
