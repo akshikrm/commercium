@@ -2,7 +2,12 @@ package services
 
 import (
 	"akshidas/e-com/pkg/types"
+	"context"
+	"fmt"
 	"net/url"
+	"os"
+
+	"github.com/PaddleHQ/paddle-go-sdk"
 )
 
 type ProductStorager interface {
@@ -22,7 +27,24 @@ func (r *ProductService) Get(filter url.Values) ([]*types.ProductsList, error) {
 }
 
 func (r *ProductService) Create(newProduct *types.CreateNewProduct) error {
-	_, err := r.productModel.Create(newProduct)
+	ctx := context.Background()
+	paddle_key := os.Getenv("PADDLE_API_KEY")
+	client, err := paddle.New(paddle_key, paddle.WithBaseURL(paddle.SandboxBaseURL))
+	pProduct, err := client.CreateProduct(ctx, &paddle.CreateProductRequest{
+		Name:        newProduct.Name,
+		TaxCategory: paddle.TaxCategoryStandard,
+		Description: &newProduct.Description,
+	})
+	if err != nil {
+		return err
+	}
+
+	newProduct.ProductID = pProduct.ID
+	product, err := r.productModel.Create(newProduct)
+	fmt.Println(product.Name)
+	if err != nil {
+		return (err)
+	}
 	return err
 }
 
