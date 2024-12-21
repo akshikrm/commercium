@@ -75,6 +75,14 @@ func (u *UserService) Create(user types.CreateUserRequest) (string, error) {
 		return "", utils.Conflict
 	}
 	user.Password = hashedPassword
+	paddlePayment := new(PaddlePayment)
+	if err := paddlePayment.Init(); err != nil {
+		return "", err
+	}
+
+	if err := paddlePayment.CreateCustomer(&user); err != nil {
+		return "", err
+	}
 	savedUser, err := u.userModel.Create(user)
 	if err != nil {
 		return "", err

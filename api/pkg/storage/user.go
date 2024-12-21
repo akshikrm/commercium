@@ -84,8 +84,8 @@ func (m *UserStorage) GetUserByEmail(email string) (*types.User, error) {
 
 func (m *UserStorage) Create(user types.CreateUserRequest) (*types.User, error) {
 	query := `insert into 
-	users (password, role_code)
-	values($1, $2)
+	users (password, role_code, customer_id)
+	values($1, $2, $3)
 	returning id, role_code
 	`
 	role := "user"
@@ -95,6 +95,7 @@ func (m *UserStorage) Create(user types.CreateUserRequest) (*types.User, error) 
 	row := m.store.QueryRow(query,
 		user.Password,
 		role,
+		user.CustomerID,
 	)
 	log.Printf("Created user %v", user)
 

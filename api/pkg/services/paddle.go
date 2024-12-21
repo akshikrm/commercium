@@ -4,10 +4,12 @@ import (
 	"akshidas/e-com/pkg/types"
 	"akshidas/e-com/pkg/utils"
 	"context"
-	"github.com/PaddleHQ/paddle-go-sdk"
+	"fmt"
 	"log"
 	"os"
 	"strconv"
+
+	"github.com/PaddleHQ/paddle-go-sdk"
 )
 
 type PaddlePayment struct {
@@ -24,6 +26,25 @@ func (p *PaddlePayment) Init() error {
 	}
 	p.client = client
 	return nil
+}
+
+func (p *PaddlePayment) CreateCustomer(newUser *types.CreateUserRequest) error {
+	ctx := context.Background()
+
+	customerName := fmt.Sprintf("%s %s", newUser.FirstName, newUser.LastName)
+	customer, err := p.client.CreateCustomer(ctx, &paddle.CreateCustomerRequest{
+		Name:  &customerName,
+		Email: newUser.Email,
+	})
+
+	if err != nil {
+		log.Printf("failed to add customer to paddle due to %s", err)
+		return utils.ServerError
+	}
+
+	newUser.CustomerID = customer.ID
+	return nil
+
 }
 
 func (p *PaddlePayment) CreateProduct(newProduct *types.CreateNewProduct) error {

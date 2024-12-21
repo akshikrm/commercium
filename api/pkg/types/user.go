@@ -3,11 +3,12 @@ package types
 import "time"
 
 type CreateUserRequest struct {
-	FirstName string `json:"first_name"`
-	LastName  string `json:"last_name"`
-	Email     string `json:"email"`
-	Password  string `json:"password"`
-	Role      string `json:"role"`
+	FirstName  string `json:"first_name"`
+	LastName   string `json:"last_name"`
+	CustomerID string `json:"customer_id"`
+	Email      string `json:"email"`
+	Password   string `json:"password"`
+	Role       string `json:"role"`
 }
 
 type UpdateUserRequest struct {
