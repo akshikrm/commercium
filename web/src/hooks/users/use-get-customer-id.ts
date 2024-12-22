@@ -5,18 +5,14 @@ import toast from "react-hot-toast"
 
 const CUSTOMER_TOAST_ID = "CUSTOMER_TOAST_ID"
 
-const useGetCustomerID = (): {
-    customerID: string
-    getCustomerID: () => void
-} => {
+const useGetCustomerID = (): string => {
     const query = useQuery({
         queryKey: ["customer-id"],
         queryFn: () => user.getCustomerId(),
-        initialData: "",
-        enabled: false
+        initialData: ""
     })
 
-    const { data, status, refetch } = query
+    const { data, status } = query
 
     useEffect(() => {
         if (status === "error") {
@@ -26,9 +22,7 @@ const useGetCustomerID = (): {
         }
     }, [status])
 
-    const getCustomerID = () => refetch()
-
-    return { customerID: data, getCustomerID }
+    return data
 }
 
 export default useGetCustomerID

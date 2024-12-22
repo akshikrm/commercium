@@ -18,6 +18,7 @@ import {
 } from "./products"
 import { getByOrderID, getOrders, placeOrder } from "./orders.ts"
 import { getCustomerId, profile } from "./user"
+import { connectToPaddle } from "./paddle.ts"
 
 export const products = {
     getAll: getProducts,
@@ -59,4 +60,8 @@ export const order = {
     placeOrder: placeOrder,
     getMyOrders: getOrders,
     gerOrderByID: getByOrderID
+}
+
+export const paddle = {
+    connect: connectToPaddle
 }
