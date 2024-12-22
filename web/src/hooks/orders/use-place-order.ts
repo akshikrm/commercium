@@ -1,18 +1,22 @@
 import useGetCustomerID from "@hooks/users/use-get-customer-id"
-import { useCallback } from "react"
+import { useCallback, useEffect } from "react"
 import toast from "react-hot-toast"
-import { paddle } from "@api"
+import { useNavigate } from "react-router"
+import { USER_PATHS } from "@/paths"
+import useConnectPaddle from "./use-connect-paddle"
 
 const ORDER_TOAST = "order_toast"
 
 const usePlaceOrder = (purchaseItems: PaddlePurchaseItem[]) => {
     const customerID = useGetCustomerID()
+    const navigate = useNavigate()
+
+    const { paddle, event } = useConnectPaddle(customerID)
 
     const placeOrder = useCallback(async () => {
         try {
-            const paddleInstance = await paddle.connect(customerID)
-            if (paddleInstance) {
-                paddleInstance.Checkout.open({
+            if (paddle) {
+                paddle.Checkout.open({
                     settings: {
                         displayMode: "overlay",
                         variant: "one-page"
@@ -28,7 +32,16 @@ const usePlaceOrder = (purchaseItems: PaddlePurchaseItem[]) => {
             toast.error(err.message, { id: ORDER_TOAST })
             console.log(err)
         }
-    }, [customerID, purchaseItems])
+    }, [customerID, purchaseItems, paddle])
+
+    useEffect(() => {
+        if (event.name === "checkout.completed") {
+            setTimeout(() => {
+                navigate(USER_PATHS.orders.root)
+                paddle?.Checkout.close()
+            }, 1000)
+        }
+    }, [event, paddle])
 
     return placeOrder
 }

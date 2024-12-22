@@ -61,7 +61,3 @@ export const order = {
     getMyOrders: getOrders,
     gerOrderByID: getByOrderID
 }
-
-export const paddle = {
-    connect: connectToPaddle
-}
