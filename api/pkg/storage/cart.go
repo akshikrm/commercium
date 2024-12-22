@@ -13,7 +13,7 @@ type CartStorage struct {
 }
 
 func (c *CartStorage) GetAll(userID uint) ([]*types.CartList, error) {
-	query := "SELECT c.id, c.quantity, p.id, p.name, p.slug, p.price, p.description, p.image, c.created_at FROM carts c INNER JOIN products p ON c.product_id=p.id WHERE c.user_id=$1 AND c.deleted_at IS NULL"
+	query := "SELECT c.id, c.quantity, p.price_id, p.id, p.name, p.slug, p.price, p.description, p.image, c.created_at FROM carts c INNER JOIN products p ON c.product_id=p.id WHERE c.user_id=$1 AND c.deleted_at IS NULL"
 	rows, err := c.store.Query(query, userID)
 	if err == sql.ErrNoRows {
 		return nil, utils.NotFound
@@ -28,6 +28,7 @@ func (c *CartStorage) GetAll(userID uint) ([]*types.CartList, error) {
 		err := rows.Scan(
 			&cart.ID,
 			&cart.Quantity,
+			&cart.PriceID,
 			&cart.Product.ID,
 			&cart.Product.Name,
 			&cart.Product.Slug,

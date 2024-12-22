@@ -23,8 +23,9 @@ type Cart struct {
 }
 
 type CartList struct {
-	ID       uint `json:"id"`
-	Quantity uint `json:"quantity"`
+	ID       uint   `json:"id"`
+	Quantity uint   `json:"quantity"`
+	PriceID  string `json:"price_id"`
 	Product  struct {
 		ID          uint   `json:"id"`
 		Name        string `json:"name"`
