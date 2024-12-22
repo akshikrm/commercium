@@ -14,6 +14,7 @@ type UserModeler interface {
 	Create(user types.CreateUserRequest) (*types.User, error)
 	Update(id int, user types.UpdateUserRequest) error
 	Delete(id int) error
+	GetCustomerID(uint) *string
 }
 
 type ProfileModeler interface {
@@ -49,6 +50,14 @@ func (u *UserService) Login(payload *types.LoginUserRequest) (string, error) {
 
 func (u *UserService) Get() ([]*types.User, error) {
 	return u.userModel.Get()
+}
+
+func (u *UserService) GetCustomerID(id uint) (*string, error) {
+	customerID := u.userModel.GetCustomerID(id)
+	if customerID == nil {
+		return nil, utils.ServerError
+	}
+	return customerID, nil
 }
 
 func (u *UserService) GetProfile(userId int) (*types.Profile, error) {

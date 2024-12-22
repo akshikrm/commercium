@@ -77,9 +77,18 @@ func (m *UserStorage) GetUserByEmail(email string) (*types.User, error) {
 		log.Printf("user with email %s not found due to %s", email, err)
 		return nil, utils.NotFound
 	}
-
 	return user, nil
+}
 
+func (m *UserStorage) GetCustomerID(id uint) *string {
+	query := "select customer_id from users where id=$1"
+	row := m.store.QueryRow(query, id)
+	var customer_id string
+	if err := row.Scan(&customer_id); err != nil {
+		log.Printf("failed to get customer_id due to %s", err)
+		return nil
+	}
+	return &customer_id
 }
 
 func (m *UserStorage) Create(user types.CreateUserRequest) (*types.User, error) {
