@@ -25,6 +25,19 @@ const useGetCart = (opts: HookOptions = defaultHookOptions) => {
         }, 0)
     }, [carts])
 
+    const paddlePurchaseItems: PaddlePurchaseItem[] = useMemo(() => {
+        if (carts?.length) {
+            return carts.map(cart => {
+                return {
+                    priceId: cart.price_id,
+                    quantity: cart.quantity
+                }
+            })
+        }
+
+        return []
+    }, [carts])
+
     useEffect(() => {
         if (opts.showToast) {
             switch (status) {
@@ -44,7 +57,7 @@ const useGetCart = (opts: HookOptions = defaultHookOptions) => {
         }
     }, [status, error, opts.showToast])
 
-    return { ...query, total }
+    return { ...query, total, paddlePurchaseItems }
 }
 
 export default useGetCart
