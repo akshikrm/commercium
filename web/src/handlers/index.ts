@@ -17,7 +17,7 @@ import {
     updateProduct
 } from "./products"
 import { getByOrderID, getOrders, placeOrder } from "./orders.ts"
-import { profile } from "./user"
+import { getCustomerId, profile } from "./user"
 
 export const products = {
     getAll: getProducts,
@@ -40,7 +40,8 @@ export const auth = {
 }
 
 export const user = {
-    profile: profile
+    profile: profile,
+    getCustomerId: getCustomerId
 }
 
 export const files = {

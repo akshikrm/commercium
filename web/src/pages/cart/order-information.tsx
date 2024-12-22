@@ -1,13 +1,23 @@
 import { Currency } from "@components/prefix"
 import { Button, Card, CardContent, Typography } from "@mui/material"
 import RenderIcon from "@components/render-icon"
-import usePlaceOrder from "@hooks/orders/use-place-order"
+import useGetCustomerID from "@hooks/users/use-get-customer-id"
+import { useEffect } from "react"
 
 type Props = {
     total: number
 }
+
 const OrderInformation = ({ total }: Props) => {
-    const mutation = usePlaceOrder()
+    // const mutation = usePlaceOrder()
+    const { customerID, getCustomerID } = useGetCustomerID()
+
+    useEffect(() => {
+        if (customerID) {
+            console.log(customerID)
+        }
+    }, [customerID])
+
     return (
         <>
             <Card sx={{ mb: 3 }}>
@@ -26,7 +36,7 @@ const OrderInformation = ({ total }: Props) => {
                 fullWidth
                 startIcon={<RenderIcon icon='mdi:cash-fast' />}
                 onClick={() => {
-                    mutation.mutate()
+                    getCustomerID()
                 }}
             >
                 complete your order
