@@ -8,6 +8,7 @@ type CreateNewProduct struct {
 	CategoryID  uint   `json:"category_id"`
 	Slug        string `json:"slug"`
 	Price       uint   `json:"price"`
+	PriceID     string `json:"price_id"`
 	Image       string `json:"image"`
 	Description string `json:"description"`
 }
