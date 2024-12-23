@@ -41,9 +41,10 @@ type Price struct {
 	BillingCycle       BillingCycle `json:"billing_cycle"`
 	UnitPriceOverrides []any        `json:"unit_price_overrides"`
 }
+
 type Items struct {
 	Price     Price `json:"price"`
-	Quantity  int   `json:"quantity"`
+	Quantity  uint  `json:"quantity"`
 	Proration any   `json:"proration"`
 }
 

@@ -107,6 +107,43 @@ func (m *OrdersStorage) GetOrdersByUserID(id uint) ([]*types.OrderList, error) {
 	return orders, nil
 }
 
+func (m *OrdersStorage) CreateOrder(orders []*types.NewOrder) error {
+	query := "INSERT INTO orders(transaction_id, quantity, price_id, product_id, amount) VALUES"
+
+	ordersLength := len(orders)
+	for i, order := range orders {
+		query = fmt.Sprintf("%s (%d, %d, '%s', '%s', '%s')", query,
+			order.TransactionID,
+			order.Quantity,
+			order.PriceID,
+			order.ProductID,
+			order.Amount,
+		)
+		if i == ordersLength-1 {
+			query = fmt.Sprintf("%s;", query)
+		} else {
+			query = fmt.Sprintf("%s,", query)
+		}
+	}
+	result, err := m.store.Exec(query)
+	if err != nil {
+		log.Printf("failed to create orders %s", err)
+		return utils.ServerError
+	}
+
+	affected, err := result.RowsAffected()
+	if err != nil {
+		return utils.ServerError
+	}
+
+	if affected != int64(len(orders)) {
+		return utils.ServerError
+	}
+
+	return nil
+
+}
+
 func (m *OrdersStorage) NewOrder(orderRequest *types.OrderRequest) (uint, error) {
 	query := "INSERT INTO orders(order_id, user_id, price) VALUES($1, $2, $3) RETURNING(id)"
 

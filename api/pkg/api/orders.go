@@ -93,7 +93,8 @@ func NewOrdersApi(database *db.Storage) *OrdersApi {
 	purchaseStorage := storage.NewOrdersStorage(database.DB)
 	cartStorage := storage.NewCartStorage(database.DB)
 	transactionStorage := storage.NewTransactionsStorage(database.DB)
+	orderStorage := storage.NewOrdersStorage(database.DB)
 	purchaseService := services.NewOrderService(purchaseStorage, cartStorage)
-	transactionService := services.NewTransactionService(transactionStorage)
+	transactionService := services.NewTransactionService(transactionStorage, orderStorage)
 	return &OrdersApi{service: purchaseService, transactionService: transactionService}
 }

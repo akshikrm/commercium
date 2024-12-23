@@ -9,6 +9,14 @@ type PurchaseRequest struct {
 	Price     uint `json:"price"`
 }
 
+type NewOrder struct {
+	TransactionID uint   `json:"transaction_id"`
+	PriceID       string `json:"price_id"`
+	ProductID     string `json:"product_id"`
+	Quantity      uint   `json:"quantity"`
+	Amount        string `json:"amount"`
+}
+
 type OrderRequest struct {
 	UserID  uint   `json:"user_id"`
 	OrderID string `json:"order_id"`

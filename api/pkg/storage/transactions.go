@@ -41,14 +41,17 @@ func (m *TransactionsStorage) TransactionReady(transaction *types.TransactionRea
 	return nil
 }
 
-func (m *TransactionsStorage) NewTransaction(newTransaction *types.NewTransaction) error {
-	query := "INSERT INTO transactions(transaction_id, status, created_at) VALUES($1, $2, $3)"
-	_, err := m.store.Exec(query, newTransaction.TransactionID, newTransaction.Status, newTransaction.CreatedAt)
+func (m *TransactionsStorage) NewTransaction(newTransaction *types.NewTransaction) *uint {
+	query := "INSERT INTO transactions(transaction_id, status, created_at) VALUES($1, $2, $3) returning id;"
+	row := m.store.QueryRow(query, newTransaction.TransactionID, newTransaction.Status, newTransaction.CreatedAt)
+	var id uint
+	err := row.Scan(&id)
+
 	if err != nil {
 		log.Printf("failed to create transaction due to %s", err)
-		return utils.ServerError
+		return nil
 	}
-	return nil
+	return &id
 }
 
 func NewTransactionsStorage(store *sql.DB) *TransactionsStorage {
