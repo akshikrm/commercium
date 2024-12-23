@@ -40,7 +40,7 @@ func (s *APIServer) registerRoutes(r *http.ServeMux) {
 	cartApi := api.NewCartApi(s.Store)
 	productCategoryApi := api.NewProductCategoriesApi(s.Store)
 	uploadApi := api.NewUploadApi(s.Store)
-	purchaseApi := api.NewPurchaseApi(s.Store)
+	purchaseApi := api.NewOrdersApi(s.Store)
 
 	// Middle wares
 	middlware := api.NewMiddleWare(userApi.UserService)

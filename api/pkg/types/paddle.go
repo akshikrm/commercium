@@ -9,6 +9,7 @@ type Body struct {
 	NotificationID string    `json:"notification_id"`
 	Data           Data      `json:"data"`
 }
+
 type Quantity struct {
 	Maximum int `json:"maximum"`
 	Minimum int `json:"minimum"`

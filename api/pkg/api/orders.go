@@ -6,29 +6,28 @@ import (
 	"akshidas/e-com/pkg/storage"
 	"akshidas/e-com/pkg/types"
 	"context"
-	"log"
 	"net/http"
 )
 
-type PurchaseServeicer interface {
+type PurchaseServicer interface {
 	PlaceOrder(uint) error
 	GetOrdersByUserID(uint) ([]*types.OrderList, error)
 	GetPurchaseByOrderID(id uint) ([]*types.PurchaseList, error)
 }
 
-type TransactionStorage interface {
-	NewTransaction(*types.NewTransaction) error
-	TransactionReady(*types.TransactionReady) error
-	UpdateStatus(string, string) error
-	TransactionCompleted(*types.TransactionCompleted) error
+type TransactionService interface {
+	CreateTransaction(*types.Data) error
+	ReadyTransaction(*types.Data) error
+	CompleteTransaction(*types.Data) error
+	FailedTransaction(*types.Data) error
 }
 
-type PurchaseApi struct {
-	service      PurchaseServeicer
-	transactions TransactionStorage
+type OrdersApi struct {
+	service            PurchaseServicer
+	transactionService TransactionService
 }
 
-func (a *PurchaseApi) TransactionComplete(w http.ResponseWriter, r *http.Request) error {
+func (a *OrdersApi) TransactionComplete(w http.ResponseWriter, r *http.Request) error {
 	body := new(types.Body)
 
 	if err := DecodeBody(r.Body, &body); err != nil {
@@ -38,49 +37,29 @@ func (a *PurchaseApi) TransactionComplete(w http.ResponseWriter, r *http.Request
 	switch body.EventType {
 	case "transaction.created":
 		{
-			transaction := types.NewTransaction{
-				TransactionID: body.Data.ID,
-				Status:        body.Data.Status,
-				CreatedAt:     body.Data.CreatedAt,
-			}
-			a.transactions.NewTransaction(&transaction)
-			log.Printf("transaction %s", transaction.Status)
+			a.transactionService.CreateTransaction(&body.Data)
 			return writeJson(w, http.StatusOK, "transaction created...")
 		}
 	case "transaction.ready":
 		{
-			transaction := types.TransactionReady{
-				TransactionID: body.Data.ID,
-				Status:        body.Data.Status,
-				CustomerID:    body.Data.CustomerID,
-			}
-			a.transactions.TransactionReady(&transaction)
-			log.Printf("transaction %s", transaction.Status)
+			a.transactionService.ReadyTransaction(&body.Data)
 			return writeJson(w, http.StatusOK, "transaction ready...")
 		}
 	case "transaction.completed":
 		{
-			transaction := types.TransactionCompleted{
-				TransactionID: body.Data.ID,
-				Status:        body.Data.Status,
-				InvoiceNumber: body.Data.InvoiceNumber,
-			}
-			a.transactions.TransactionCompleted(&transaction)
-			log.Printf("transaction %s", body.Data.Status)
+			a.transactionService.CompleteTransaction(&body.Data)
 			return writeJson(w, http.StatusOK, "transaction completed...")
 		}
 	case "transaction.payment_failed":
 		{
-			a.transactions.UpdateStatus(body.Data.ID, "failed")
-			log.Printf("transaction %s", "failed")
+			a.transactionService.FailedTransaction(&body.Data)
 			return writeJson(w, http.StatusOK, "transaction failed...")
-
 		}
 	}
 	return writeJson(w, http.StatusOK, "waiting...")
 }
 
-func (a *PurchaseApi) GetMyOrders(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
+func (a *OrdersApi) GetMyOrders(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
 	userID := uint(ctx.Value("userID").(int))
 	orders, err := a.service.GetOrdersByUserID(userID)
 	if err != nil {
@@ -89,7 +68,7 @@ func (a *PurchaseApi) GetMyOrders(ctx context.Context, w http.ResponseWriter, r 
 	return writeJson(w, http.StatusOK, orders)
 }
 
-func (a *PurchaseApi) GetPurchasesByOrderID(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
+func (a *OrdersApi) GetPurchasesByOrderID(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
 	orderID, err := parseId(r.PathValue("id"))
 	if err != nil {
 		return err
@@ -101,7 +80,7 @@ func (a *PurchaseApi) GetPurchasesByOrderID(ctx context.Context, w http.Response
 	return writeJson(w, http.StatusOK, purchases)
 }
 
-func (a *PurchaseApi) Create(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
+func (a *OrdersApi) Create(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
 	userID := uint(ctx.Value("userID").(int))
 	err := a.service.PlaceOrder(userID)
 	if err != nil {
@@ -110,10 +89,11 @@ func (a *PurchaseApi) Create(ctx context.Context, w http.ResponseWriter, r *http
 	return writeJson(w, http.StatusOK, "order placed")
 }
 
-func NewPurchaseApi(database *db.Storage) *PurchaseApi {
+func NewOrdersApi(database *db.Storage) *OrdersApi {
 	purchaseStorage := storage.NewOrdersStorage(database.DB)
 	cartStorage := storage.NewCartStorage(database.DB)
 	transactionStorage := storage.NewTransactionsStorage(database.DB)
 	purchaseService := services.NewOrderService(purchaseStorage, cartStorage)
-	return &PurchaseApi{service: purchaseService, transactions: transactionStorage}
+	transactionService := services.NewTransactionService(transactionStorage)
+	return &OrdersApi{service: purchaseService, transactionService: transactionService}
 }
