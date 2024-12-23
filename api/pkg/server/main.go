@@ -45,6 +45,7 @@ func (s *APIServer) registerRoutes(r *http.ServeMux) {
 	// Middle wares
 	middlware := api.NewMiddleWare(userApi.UserService)
 	// Public Routes
+	r.HandleFunc("POST /hook-test", api.RouteHandler(purchaseApi.TransactionComplete))
 	r.HandleFunc("POST /users", api.RouteHandler(userApi.Create))
 	r.HandleFunc("POST /login", api.RouteHandler(userApi.Login))
 	r.HandleFunc("POST /upload", api.RouteHandler(uploadApi.Upload))

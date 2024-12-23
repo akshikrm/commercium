@@ -6,6 +6,8 @@ import (
 	"akshidas/e-com/pkg/storage"
 	"akshidas/e-com/pkg/types"
 	"context"
+	"fmt"
+	"log"
 	"net/http"
 )
 
@@ -19,6 +21,19 @@ type PurchaseServeicer interface {
 
 type PurchaseApi struct {
 	service PurchaseServeicer
+}
+
+func (a *PurchaseApi) TransactionComplete(w http.ResponseWriter, r *http.Request) error {
+	log.Println("transaction is being completed")
+	body := new(types.Body)
+
+	if err := DecodeBody(r.Body, &body); err != nil {
+		return err
+	}
+
+	fmt.Println(body.EventID, body.EventType, body.NotificationID, body.Data.ID, body.Data.InvoiceID, body.Data.InvoiceNumber)
+	return writeJson(w, http.StatusOK, "transaction completed...")
+
 }
 
 // func (a *PurchaseApi) GetAll(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
