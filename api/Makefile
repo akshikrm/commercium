@@ -1,4 +1,5 @@
 build:
+	@rm ./dist
 	@go build -o dist cmd/main.go 
 	@go build -o file-server ./storage.go
 		
@@ -6,8 +7,7 @@ build-seeder:
 	@go build -o seeder ./seed
 
 run: build
-	@clear
-	@./dist
+	@ls dist | entr -cr ./dist
 
 run-file: build
 		@clear
