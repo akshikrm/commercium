@@ -13,3 +13,9 @@ type TransactionReady struct {
 	Status        string `json:"status"`
 	CustomerID    string `json:"customer_id"`
 }
+
+type TransactionCompleted struct {
+	TransactionID string `json:"transaction_id"`
+	Status        string `json:"status"`
+	InvoiceNumber string `json:"invoice_number"`
+}

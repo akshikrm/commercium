@@ -20,6 +20,7 @@ type TransactionStorage interface {
 	NewTransaction(*types.NewTransaction) error
 	TransactionReady(*types.TransactionReady) error
 	UpdateStatus(string, string) error
+	TransactionCompleted(*types.TransactionCompleted) error
 }
 
 type PurchaseApi struct {
@@ -59,7 +60,12 @@ func (a *PurchaseApi) TransactionComplete(w http.ResponseWriter, r *http.Request
 		}
 	case "transaction.completed":
 		{
-			a.transactions.UpdateStatus(body.Data.ID, body.Data.Status)
+			transaction := types.TransactionCompleted{
+				TransactionID: body.Data.ID,
+				Status:        body.Data.Status,
+				InvoiceNumber: body.Data.InvoiceNumber,
+			}
+			a.transactions.TransactionCompleted(&transaction)
 			log.Printf("transaction %s", body.Data.Status)
 			return writeJson(w, http.StatusOK, "transaction completed...")
 		}
