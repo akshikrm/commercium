@@ -27,7 +27,8 @@ var SCHEMA = map[string]string{
 	created_at TIMESTAMP DEFAULT NOW() NOT NULL, updated_at TIMESTAMP DEFAULT NOW() NOT NULL, deleted_at TIMESTAMP DEFAULT NULL, 
 	CONSTRAINT fk_order FOREIGN KEY(order_id) REFERENCES orders(id), CONSTRAINT fk_product FOREIGN KEY(product_id) REFERENCES products(id)`,
 
-	"uploads": "id SERIAL PRIMARY KEY, path VARCHAR(200) NOT NULL, created_at TIMESTAMP DEFAULT NOW() NOT NULL, updated_at TIMESTAMP DEFAULT NOW() NOT NULL, deleted_at TIMESTAMP DEFAULT NULL",
+	"uploads":      "id SERIAL PRIMARY KEY, path VARCHAR(200) NOT NULL, created_at TIMESTAMP DEFAULT NOW() NOT NULL, updated_at TIMESTAMP DEFAULT NOW() NOT NULL, deleted_at TIMESTAMP DEFAULT NULL",
+	"transactions": "id SERIAL PRIMARY KEY, transaction_id VARCHAR(30) NOT NULL, status VARCHAR(30) NOT NULL, customer_id VARCHAR(30) NOT NULL, created_at TIMESTAMP DEFAULT NOW() NOT NULL",
 }
 
 var KEYS = []string{
@@ -42,4 +43,5 @@ var KEYS = []string{
 	"orders",
 	"purchases",
 	"uploads",
+	"transactions",
 }
