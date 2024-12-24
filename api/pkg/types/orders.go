@@ -36,18 +36,21 @@ type PurchaseList struct {
 }
 
 type OrderProduct struct {
-	ID       uint32 `json:"id"`
-	Name     string `json:"name"`
-	Slug     string `json:"slug"`
-	Price    uint   `json:"price"`
-	Quantity uint   `json:"quantity"`
+	ID        uint32 `json:"id"`
+	ProductID uint32 `json:"product_id"`
+	Name      string `json:"name"`
+	Price     uint   `json:"price"`
+	Quantity  uint   `json:"quantity"`
 }
+
 type OrderList struct {
-	ID        uint32         `json:"id"`
-	Price     uint           `json:"purchase_price"`
-	OrderID   string         `json:"order_id"`
-	Products  []OrderProduct `json:"products"`
-	CreatedAt time.Time      `json:"created_at"`
+	ID            uint           `json:"id"`
+	TxnID         string         `json:"transaction_id"`
+	InvoiceNumber string         `json:"invoice_number"`
+	Total         string         `json:"total"`
+	PaymentStatus string         `json:"payment_status"`
+	Products      []OrderProduct `json:"products"`
+	CreatedAt     time.Time      `json:"created_at"`
 }
 
 type OrderView struct {

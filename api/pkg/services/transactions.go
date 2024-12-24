@@ -27,6 +27,9 @@ func (t *TransactionService) CreateTransaction(data *types.Data) error {
 		TransactionID: data.ID,
 		Status:        data.Status,
 		CreatedAt:     data.CreatedAt,
+		Tax:           data.Details.Totals.Tax,
+		SubTotal:      data.Details.Totals.Subtotal,
+		GrandTotal:    data.Details.Totals.GrandTotal,
 	}
 	id := t.store.NewTransaction(&transaction)
 	if id == nil {

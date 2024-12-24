@@ -42,8 +42,21 @@ func (m *TransactionsStorage) TransactionReady(transaction *types.TransactionRea
 }
 
 func (m *TransactionsStorage) NewTransaction(newTransaction *types.NewTransaction) *uint {
-	query := "INSERT INTO transactions(transaction_id, status, created_at) VALUES($1, $2, $3) returning id;"
-	row := m.store.QueryRow(query, newTransaction.TransactionID, newTransaction.Status, newTransaction.CreatedAt)
+	query := `INSERT INTO 
+			transactions
+				(transaction_id, status, created_at, tax, sub_total, grand_total) 
+			VALUES
+				($1, $2, $3, $4, $5, $6) 
+			RETURNING id;
+	`
+	row := m.store.QueryRow(query,
+		newTransaction.TransactionID,
+		newTransaction.Status,
+		newTransaction.CreatedAt,
+		newTransaction.Tax,
+		newTransaction.SubTotal,
+		newTransaction.GrandTotal,
+	)
 	var id uint
 	err := row.Scan(&id)
 
