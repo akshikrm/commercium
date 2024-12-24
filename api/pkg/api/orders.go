@@ -68,26 +68,37 @@ func (a *OrdersApi) GetMyOrders(ctx context.Context, w http.ResponseWriter, r *h
 	return writeJson(w, http.StatusOK, orders)
 }
 
-func (a *OrdersApi) GetPurchasesByOrderID(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
-	orderID, err := parseId(r.PathValue("id"))
-	if err != nil {
+func (a *OrdersApi) GetInvoice(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
+	txnId := r.PathValue("txnId")
+	paddle := new(services.PaddlePayment)
+	if err := paddle.Init(); err != nil {
 		return err
 	}
-	purchases, err := a.service.GetPurchaseByOrderID(uint(orderID))
-	if err != nil {
-		return err
-	}
-	return writeJson(w, http.StatusOK, purchases)
+
+	invoiceURL := paddle.GetInvoice(txnId)
+	return writeJson(w, http.StatusOK, *invoiceURL)
 }
 
-func (a *OrdersApi) Create(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
-	userID := uint(ctx.Value("userID").(int))
-	err := a.service.PlaceOrder(userID)
-	if err != nil {
-		return err
-	}
-	return writeJson(w, http.StatusOK, "order placed")
-}
+// func (a *OrdersApi) GetPurchasesByOrderID(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
+// 	orderID, err := parseId(r.PathValue("id"))
+// 	if err != nil {
+// 		return err
+// 	}
+// 	purchases, err := a.service.GetPurchaseByOrderID(uint(orderID))
+// 	if err != nil {
+// 		return err
+// 	}
+// 	return writeJson(w, http.StatusOK, purchases)
+// }
+
+// func (a *OrdersApi) Create(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
+// 	userID := uint(ctx.Value("userID").(int))
+// 	err := a.service.PlaceOrder(userID)
+// 	if err != nil {
+// 		return err
+// 	}
+// 	return writeJson(w, http.StatusOK, "order placed")
+// }
 
 func NewOrdersApi(database *db.Storage) *OrdersApi {
 	purchaseStorage := storage.NewOrdersStorage(database.DB)

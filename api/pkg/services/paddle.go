@@ -45,6 +45,19 @@ func (p *PaddlePayment) CreateCustomer(newUser *types.CreateUserRequest) error {
 
 	newUser.CustomerID = customer.ID
 	return nil
+}
+
+func (p *PaddlePayment) GetInvoice(txnId string) *string {
+	ctx := context.Background()
+	res, err := p.Client.GetTransactionInvoice(ctx, &paddle.GetTransactionInvoiceRequest{
+		TransactionID: txnId,
+	})
+
+	if err != nil {
+		log.Printf("failed to get invoice due to %s", err)
+		return nil
+	}
+	return &res.URL
 
 }
 

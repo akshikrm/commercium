@@ -16,9 +16,8 @@ import {
     productDelete,
     updateProduct
 } from "./products"
-import { getByOrderID, getOrders, placeOrder } from "./orders.ts"
+import { getByOrderID, getInvoiceURI, getOrders, placeOrder } from "./orders.ts"
 import { getCustomerId, profile } from "./user"
-import { connectToPaddle } from "./paddle.ts"
 
 export const products = {
     getAll: getProducts,
@@ -59,5 +58,6 @@ export const cart = {
 export const order = {
     placeOrder: placeOrder,
     getMyOrders: getOrders,
-    gerOrderByID: getByOrderID
+    gerOrderByID: getByOrderID,
+    getInvoiceURI: getInvoiceURI
 }
