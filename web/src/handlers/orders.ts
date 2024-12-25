@@ -46,3 +46,13 @@ export const getInvoiceURI = async (txnId: string) => {
         console.error(err)
     }
 }
+
+export const isOrderComplete = async (txnId: string): Promise<boolean> => {
+    try {
+        const { data } = await server.get(`/orders/status/${txnId}`)
+        return data.data === "completed"
+    } catch (err) {
+        console.log(err)
+        return false
+    }
+}

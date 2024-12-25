@@ -4,6 +4,8 @@ import toast from "react-hot-toast"
 import { useNavigate } from "react-router"
 import { USER_PATHS } from "@/paths"
 import useConnectPaddle from "./use-connect-paddle"
+import server from "@utils/server"
+import { order } from "@api"
 
 const ORDER_TOAST = "order_toast"
 
@@ -34,14 +36,30 @@ const usePlaceOrder = (purchaseItems: PaddlePurchaseItem[]) => {
         }
     }, [customerID, purchaseItems, paddle])
 
+    const { name, data } = event || {}
+    const { transaction_id } = data || {}
+
     useEffect(() => {
-        if (event.name === "checkout.completed") {
-            setTimeout(() => {
-                navigate(USER_PATHS.orders.root)
-                paddle?.Checkout.close()
-            }, 1000)
+        if (name === "checkout.completed") {
+            const checkStatus = async (txnId: string) => {
+                const isComplete = await order.isOrderComplete(txnId)
+                if (isComplete) {
+                    navigate(USER_PATHS.orders.root)
+                    paddle?.Checkout.close()
+                }
+            }
+
+            if (!transaction_id) return
+
+            const intervalID = setInterval(() => {
+                checkStatus(transaction_id)
+            }, 3000)
+
+            return () => {
+                clearInterval(intervalID)
+            }
         }
-    }, [event, paddle])
+    }, [name, transaction_id, paddle])
 
     return placeOrder
 }

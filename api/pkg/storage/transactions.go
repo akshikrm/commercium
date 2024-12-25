@@ -67,6 +67,19 @@ func (m *TransactionsStorage) NewTransaction(newTransaction *types.NewTransactio
 	return &id
 }
 
+func (m *TransactionsStorage) GetOrderStatus(txnId string) string {
+	query := "SELECT status from transactions where transaction_id=$1"
+	row := m.store.QueryRow(query, txnId)
+
+	var transactionStatus string
+	err := row.Scan(&transactionStatus)
+	if err != nil {
+		log.Printf("query failed %s", err)
+		return ""
+	}
+	return transactionStatus
+}
+
 func NewTransactionsStorage(store *sql.DB) *TransactionsStorage {
 	return &TransactionsStorage{store: store}
 }

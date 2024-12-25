@@ -53,6 +53,7 @@ func (s *APIServer) registerRoutes(r *http.ServeMux) {
 	// Authenticated Routes
 	r.HandleFunc("GET /users/my-customer-id", api.RouteHandler(middlware.IsAuthenticated(ctx, userApi.GetCustomerID)))
 	r.HandleFunc("GET /orders/invoice/{txnId}", api.RouteHandler(middlware.IsAuthenticated(ctx, purchaseApi.GetInvoice)))
+	r.HandleFunc("GET /orders/status/{txnId}", api.RouteHandler(middlware.IsAuthenticated(ctx, purchaseApi.GetOrderStatus)))
 	r.HandleFunc("GET /orders", api.RouteHandler(middlware.IsAuthenticated(ctx, purchaseApi.GetMyOrders)))
 	// r.HandleFunc("POST /orders", api.RouteHandler(middlware.IsAuthenticated(ctx, purchaseApi.Create)))
 	// r.HandleFunc("GET /orders/{id}", api.RouteHandler(middlware.IsAuthenticated(ctx, purchaseApi.GetPurchasesByOrderID)))

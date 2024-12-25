@@ -4,7 +4,7 @@ import RenderIcon from "@components/render-icon"
 import usePlaceOrder from "@hooks/orders/use-place-order"
 
 type Props = {
-    total: number
+    total: number | string
     paddlePurchaseItems: PaddlePurchaseItem[]
 }
 

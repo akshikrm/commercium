@@ -47,9 +47,6 @@ func (m *OrdersStorage) GetPurchaseByOrderID(id uint) ([]*types.PurchaseList, er
 	return purchases, nil
 }
 
-// TODO: Add updated price to paddle and database without changing the price_id
-// TODO: Change the static id to passed in id
-// TODO: Change the static id to passed in id
 func (m *OrdersStorage) GetOrdersByUserID(id uint) ([]*types.OrderList, error) {
 	query := `
 	 SELECT 
@@ -192,6 +189,19 @@ func (m *OrdersStorage) NewPurchase(newPurchases []*types.PurchaseRequest) error
 	}
 	return nil
 
+}
+
+func (m *ProductStorage) GetOrderStatus(txnId string) string {
+	query := "SELECT payment_status from transactions where transaction_id=$1"
+	row := m.store.QueryRow(query, txnId)
+
+	var transactionStatus string
+	err := row.Scan(&transactionStatus)
+	if err != nil {
+		log.Printf("query failed %s", err)
+		return ""
+	}
+	return transactionStatus
 }
 
 // func (m *PurchaseStorage) Update() {}

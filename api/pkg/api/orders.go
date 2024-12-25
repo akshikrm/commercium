@@ -20,6 +20,7 @@ type TransactionService interface {
 	ReadyTransaction(*types.Data) error
 	CompleteTransaction(*types.Data) error
 	FailedTransaction(*types.Data) error
+	GetOrderStatus(string) (string, error)
 }
 
 type OrdersApi struct {
@@ -66,6 +67,21 @@ func (a *OrdersApi) GetMyOrders(ctx context.Context, w http.ResponseWriter, r *h
 		return err
 	}
 	return writeJson(w, http.StatusOK, orders)
+}
+
+func (a *OrdersApi) GetOrderStatus(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
+	txnId := r.PathValue("txnId")
+	paddle := new(services.PaddlePayment)
+	if err := paddle.Init(); err != nil {
+		return err
+	}
+
+	transactionStatus, err := a.transactionService.GetOrderStatus(txnId)
+	if err != nil {
+		return err
+	}
+
+	return writeJson(w, http.StatusOK, transactionStatus)
 }
 
 func (a *OrdersApi) GetInvoice(ctx context.Context, w http.ResponseWriter, r *http.Request) error {

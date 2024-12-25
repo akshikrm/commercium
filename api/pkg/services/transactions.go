@@ -11,6 +11,7 @@ type TransactionStorager interface {
 	TransactionReady(*types.TransactionReady) error
 	UpdateStatus(string, string) error
 	TransactionCompleted(*types.TransactionCompleted) error
+	GetOrderStatus(string) string
 }
 
 type OrderStorager interface {
@@ -89,6 +90,14 @@ func (t *TransactionService) CompleteTransaction(data *types.Data) error {
 func (t *TransactionService) FailedTransaction(data *types.Data) error {
 	log.Println("transaction failed")
 	return t.store.UpdateStatus(data.ID, "failed")
+}
+
+func (t *TransactionService) GetOrderStatus(txnID string) (string, error) {
+	status := t.store.GetOrderStatus(txnID)
+	if status == "" {
+		return "", utils.NotFound
+	}
+	return status, nil
 }
 
 func NewTransactionService(storage TransactionStorager, order OrderStorager) *TransactionService {
