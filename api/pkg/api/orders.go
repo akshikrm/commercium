@@ -10,12 +10,11 @@ import (
 )
 
 type PurchaseServicer interface {
-	PlaceOrder(uint) error
 	GetOrdersByUserID(uint) ([]*types.OrderList, error)
 	GetPurchaseByOrderID(id uint) ([]*types.PurchaseList, error)
 }
 
-type TransactionService interface {
+type TransactionServicer interface {
 	CreateTransaction(*types.Data) error
 	ReadyTransaction(*types.Data) error
 	CompleteTransaction(*types.Data) error
@@ -25,10 +24,10 @@ type TransactionService interface {
 
 type OrdersApi struct {
 	service            PurchaseServicer
-	transactionService TransactionService
+	transactionService TransactionServicer
 }
 
-func (a *OrdersApi) TransactionComplete(w http.ResponseWriter, r *http.Request) error {
+func (a *OrdersApi) HandleTransactionHook(w http.ResponseWriter, r *http.Request) error {
 	body := new(types.Body)
 
 	if err := DecodeBody(r.Body, &body); err != nil {
@@ -95,33 +94,21 @@ func (a *OrdersApi) GetInvoice(ctx context.Context, w http.ResponseWriter, r *ht
 	return writeJson(w, http.StatusOK, *invoiceURL)
 }
 
-// func (a *OrdersApi) GetPurchasesByOrderID(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
-// 	orderID, err := parseId(r.PathValue("id"))
-// 	if err != nil {
-// 		return err
-// 	}
-// 	purchases, err := a.service.GetPurchaseByOrderID(uint(orderID))
-// 	if err != nil {
-// 		return err
-// 	}
-// 	return writeJson(w, http.StatusOK, purchases)
-// }
-
-// func (a *OrdersApi) Create(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
-// 	userID := uint(ctx.Value("userID").(int))
-// 	err := a.service.PlaceOrder(userID)
-// 	if err != nil {
-// 		return err
-// 	}
-// 	return writeJson(w, http.StatusOK, "order placed")
-// }
-
 func NewOrdersApi(database *db.Storage) *OrdersApi {
 	purchaseStorage := storage.NewOrdersStorage(database.DB)
 	cartStorage := storage.NewCartStorage(database.DB)
 	transactionStorage := storage.NewTransactionsStorage(database.DB)
 	orderStorage := storage.NewOrdersStorage(database.DB)
-	purchaseService := services.NewOrderService(purchaseStorage, cartStorage)
-	transactionService := services.NewTransactionService(transactionStorage, orderStorage)
-	return &OrdersApi{service: purchaseService, transactionService: transactionService}
+
+	purchaseService := services.NewOrderService(purchaseStorage)
+	cartService := services.NewCartService(cartStorage)
+	transactionService := services.NewTransactionService(
+		transactionStorage,
+		orderStorage,
+		cartService,
+	)
+	return &OrdersApi{
+		service:            purchaseService,
+		transactionService: transactionService,
+	}
 }

@@ -18,9 +18,19 @@ type OrderStorager interface {
 	CreateOrder([]*types.NewOrder) error
 }
 
+type CartServicer interface {
+	// GetAll(uint) ([]*types.CartList, error)
+	// GetOne(uint) (*types.CartList, error)
+	// Create(*types.CreateCartRequest) error
+	// Update(uint, *types.UpdateCartRequest) (*types.CartList, error)
+	// Delete(uint) error
+	HardDeleteByUserID(string) error
+}
+
 type TransactionService struct {
-	store TransactionStorager
-	order OrderStorager
+	store       TransactionStorager
+	order       OrderStorager
+	cartService CartServicer
 }
 
 func (t *TransactionService) CreateTransaction(data *types.Data) error {
@@ -32,11 +42,14 @@ func (t *TransactionService) CreateTransaction(data *types.Data) error {
 		SubTotal:      data.Details.Totals.Subtotal,
 		GrandTotal:    data.Details.Totals.GrandTotal,
 	}
+
+	log.Println("adding transaction")
 	id := t.store.NewTransaction(&transaction)
 	if id == nil {
 		log.Println("transaction create failed")
 		return utils.ServerError
 	}
+	log.Println("transaction added")
 
 	orders := []*types.NewOrder{}
 	for _, item := range data.Items {
@@ -55,6 +68,13 @@ func (t *TransactionService) CreateTransaction(data *types.Data) error {
 		log.Println(err)
 		return utils.ServerError
 	}
+	log.Println("orders added")
+
+	log.Println("deleting cart")
+	if err := t.cartService.HardDeleteByUserID(data.CustomerID); err != nil {
+		return utils.ServerError
+	}
+	log.Println("cart deleted")
 
 	log.Println("transaction created")
 	return nil
@@ -100,9 +120,14 @@ func (t *TransactionService) GetOrderStatus(txnID string) (string, error) {
 	return status, nil
 }
 
-func NewTransactionService(storage TransactionStorager, order OrderStorager) *TransactionService {
+func NewTransactionService(
+	storage TransactionStorager,
+	order OrderStorager,
+	cartService CartServicer,
+) *TransactionService {
 	return &TransactionService{
-		store: storage,
-		order: order,
+		store:       storage,
+		order:       order,
+		cartService: cartService,
 	}
 }

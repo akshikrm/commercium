@@ -164,10 +164,17 @@ func (c *CartStorage) Delete(cid uint) error {
 	return nil
 }
 
-func (c *CartStorage) HardDeleteByUserID(userID uint) error {
-	query := "DELETE FROM carts WHERE user_id=$1 AND deleted_at IS NULL"
+func (c *CartStorage) HardDeleteByUserID(userID string) error {
+	query := `
+	DELETE FROM carts
+	WHERE user_id IN (
+	    SELECT u.id
+	    FROM users u
+	    WHERE u.customer_id = $1
+	) AND deleted_at IS NULL;
+	`
 	if _, err := c.store.Exec(query, userID); err != nil {
-		log.Printf("failed to delete cart item with user_id %d due to %s", userID, err)
+		log.Printf("failed to delete cart item for customer %s due to %s", userID, err)
 		return utils.ServerError
 	}
 	return nil

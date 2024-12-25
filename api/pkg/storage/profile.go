@@ -4,7 +4,6 @@ import (
 	"akshidas/e-com/pkg/types"
 	"akshidas/e-com/pkg/utils"
 	"database/sql"
-	"fmt"
 	"log"
 )
 
@@ -37,7 +36,6 @@ func (p *ProfileStorage) GetByUserId(userId int) (*types.Profile, error) {
 		log.Printf("failed to get profile of user with id: %d due to: %s", userId, err)
 		return nil, utils.ServerError
 	}
-	fmt.Println(*savedProfile)
 	return savedProfile, nil
 }
 
