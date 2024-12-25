@@ -13,7 +13,7 @@ type CartModeler interface {
 	Delete(uint) error
 	CheckIfEntryExist(uint, uint) (bool, error)
 	UpdateQuantity(uint, uint, uint) error
-	HardDeleteByUserID(uint) error
+	HardDeleteByUserID(string) error
 }
 
 type CartService struct {
@@ -51,8 +51,8 @@ func (c *CartService) Delete(cid uint) error {
 	return c.cartModel.Delete(cid)
 }
 
-func (c *CartService) HardDeleteByUserID(userID uint) error {
-	return c.cartModel.HardDeleteByUserID(userID)
+func (c *CartService) HardDeleteByUserID(customerId string) error {
+	return c.cartModel.HardDeleteByUserID(customerId)
 }
 
 func NewCartService(cartModel CartModeler) *CartService {

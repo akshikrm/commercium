@@ -25,10 +25,10 @@ func (s *APIServer) Run() {
 
 	s.registerRoutes(router)
 
-	wrappedRouter := NewLogger(router)
+	// wrappedRouter := NewLogger(router)
 	log.Printf("🚀 Server started on port %s", s.Port)
 
-	log.Fatal(http.ListenAndServe(s.Port, wrappedRouter))
+	log.Fatal(http.ListenAndServe(s.Port, router))
 }
 
 func (s *APIServer) registerRoutes(r *http.ServeMux) {
@@ -40,19 +40,23 @@ func (s *APIServer) registerRoutes(r *http.ServeMux) {
 	cartApi := api.NewCartApi(s.Store)
 	productCategoryApi := api.NewProductCategoriesApi(s.Store)
 	uploadApi := api.NewUploadApi(s.Store)
-	purchaseApi := api.NewPurchaseApi(s.Store)
+	purchaseApi := api.NewOrdersApi(s.Store)
 
 	// Middle wares
 	middlware := api.NewMiddleWare(userApi.UserService)
 	// Public Routes
+	r.HandleFunc("POST /transactions", api.RouteHandler(purchaseApi.HandleTransactionHook))
 	r.HandleFunc("POST /users", api.RouteHandler(userApi.Create))
 	r.HandleFunc("POST /login", api.RouteHandler(userApi.Login))
 	r.HandleFunc("POST /upload", api.RouteHandler(uploadApi.Upload))
 
 	// Authenticated Routes
-	r.HandleFunc("POST /orders", api.RouteHandler(middlware.IsAuthenticated(ctx, purchaseApi.Create)))
+	r.HandleFunc("GET /users/my-customer-id", api.RouteHandler(middlware.IsAuthenticated(ctx, userApi.GetCustomerID)))
+	r.HandleFunc("GET /orders/invoice/{txnId}", api.RouteHandler(middlware.IsAuthenticated(ctx, purchaseApi.GetInvoice)))
+	r.HandleFunc("GET /orders/status/{txnId}", api.RouteHandler(middlware.IsAuthenticated(ctx, purchaseApi.GetOrderStatus)))
 	r.HandleFunc("GET /orders", api.RouteHandler(middlware.IsAuthenticated(ctx, purchaseApi.GetMyOrders)))
-	r.HandleFunc("GET /orders/{id}", api.RouteHandler(middlware.IsAuthenticated(ctx, purchaseApi.GetPurchasesByOrderID)))
+	// r.HandleFunc("POST /orders", api.RouteHandler(middlware.IsAuthenticated(ctx, purchaseApi.Create)))
+	// r.HandleFunc("GET /orders/{id}", api.RouteHandler(middlware.IsAuthenticated(ctx, purchaseApi.GetPurchasesByOrderID)))
 	r.HandleFunc("GET /profile", api.RouteHandler(middlware.IsAuthenticated(ctx, userApi.GetProfile)))
 	r.HandleFunc("PUT /profile", api.RouteHandler(middlware.IsAuthenticated(ctx, userApi.UpdateProfile)))
 	r.HandleFunc("POST /carts", api.RouteHandler(middlware.IsAuthenticated(ctx, cartApi.Create)))

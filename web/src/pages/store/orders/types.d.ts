@@ -1,13 +1,19 @@
 type Order = {
     id: number
-    purchase_price: number
-    order_id: string
-    products: {
-        id: number
-        name: string
-        price: number
-    }[]
+    transaction_id: string
+    invoice_number: string
+    total: string
+    payment_status: string
+    products: OrderItems[]
     created_at: string
+}
+
+type OrderItems = {
+    id: number
+    product_id: number
+    name: string
+    price: string
+    quantity: number
 }
 
 type OrderView = {

@@ -6,7 +6,6 @@ import (
 	"akshidas/e-com/pkg/storage"
 	"akshidas/e-com/pkg/types"
 	"context"
-	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -20,6 +19,7 @@ type UserServicer interface {
 	Create(types.CreateUserRequest) (string, error)
 	Update(int, *types.UpdateProfileRequest) (*types.Profile, error)
 	Delete(int) error
+	GetCustomerID(id uint) (*string, error)
 }
 
 type UserApi struct {
@@ -41,6 +41,15 @@ func (u *UserApi) GetProfile(ctx context.Context, w http.ResponseWriter, r *http
 		return err
 	}
 	return writeJson(w, http.StatusOK, userProfile)
+}
+
+func (u *UserApi) GetCustomerID(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
+	id := ctx.Value("userID").(int)
+	customerID, err := u.UserService.GetCustomerID(uint(id))
+	if err != nil {
+		return err
+	}
+	return writeJson(w, http.StatusOK, customerID)
 }
 
 func (u *UserApi) UpdateProfile(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
@@ -81,7 +90,6 @@ func (u *UserApi) Login(w http.ResponseWriter, r *http.Request) error {
 		return err
 	}
 	token, err := u.UserService.Login(&a)
-	fmt.Println(err)
 	if err != nil {
 		return err
 	}

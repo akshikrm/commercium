@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query"
 import { cart } from "@api"
 import toast from "react-hot-toast"
 import { defaultHookOptions } from "@hooks/defaults"
+import parseToLocaleAmount from "@utils/convert-to-locale-amount"
 
 const TOAST_ID = "carts_get_toast"
 
@@ -19,10 +20,27 @@ const useGetCart = (opts: HookOptions = defaultHookOptions) => {
             return 0
         }
 
-        return carts?.reduce((acc, curr) => {
-            acc += curr.product.price * curr.quantity
+        const total = carts?.reduce((acc, curr) => {
+            acc += parseFloat(curr.product.price) * curr.quantity
             return acc
         }, 0)
+        if (total) {
+            return parseToLocaleAmount(total.toString())
+        }
+        return ""
+    }, [carts])
+
+    const paddlePurchaseItems: PaddlePurchaseItem[] = useMemo(() => {
+        if (carts?.length) {
+            return carts.map(cart => {
+                return {
+                    priceId: cart.price_id,
+                    quantity: cart.quantity
+                }
+            })
+        }
+
+        return []
     }, [carts])
 
     useEffect(() => {
@@ -44,7 +62,7 @@ const useGetCart = (opts: HookOptions = defaultHookOptions) => {
         }
     }, [status, error, opts.showToast])
 
-    return { ...query, total }
+    return { ...query, total, paddlePurchaseItems }
 }
 
 export default useGetCart

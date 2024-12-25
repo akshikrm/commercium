@@ -14,12 +14,14 @@ import useGetOrders from "@hooks/orders/use-get-orders"
 import RenderIcon from "@components/render-icon"
 import icons from "@/icons"
 import IconButton from "@mui/material/IconButton"
-import { useNavigate } from "react-router"
-import { USER_PATHS } from "@/paths"
+import { useMemo } from "react"
+import { Typography } from "@mui/material"
+import server from "@utils/server"
+import parseToLocaleAmount from "@utils/convert-to-locale-amount"
+import { order } from "@api"
 
 const Orders = () => {
     const { data: orders } = useGetOrders()
-    const navigate = useNavigate()
     return (
         <>
             <HeaderBreadcrumbs
@@ -33,18 +35,18 @@ const Orders = () => {
                 <Table sx={{ minWidth: 650 }} aria-label='simple table'>
                     <TableHead>
                         <TableRow>
-                            <TableCell>SI.No</TableCell>
-                            <TableCell>Order ID</TableCell>
+                            <TableCell>Invoice Number</TableCell>
+                            <TableCell>Payment Status</TableCell>
                             <TableCell>Items</TableCell>
                             <TableCell>Price</TableCell>
                             <TableCell>Purchased On</TableCell>
-                            <TableCell>View</TableCell>
+                            <TableCell>Download</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         <RenderList
                             list={orders}
-                            render={(row, i: number) => {
+                            render={row => {
                                 return (
                                     <TableRow
                                         key={row.id}
@@ -55,14 +57,20 @@ const Orders = () => {
                                                 }
                                         }}
                                     >
-                                        <TableCell>{i + 1}</TableCell>
-                                        <TableCell>#{row.order_id}</TableCell>
                                         <TableCell>
-                                            {row.products.length}
+                                            #{row.invoice_number}
+                                        </TableCell>
+                                        <TableCell>
+                                            {row.payment_status}
+                                        </TableCell>
+                                        <TableCell>
+                                            <PurchaseItem
+                                                products={row.products}
+                                            />
                                         </TableCell>
                                         <TableCell>
                                             <Currency>
-                                                {row.purchase_price}
+                                                {parseToLocaleAmount(row.total)}
                                             </Currency>
                                         </TableCell>
                                         <TableCell>
@@ -73,15 +81,15 @@ const Orders = () => {
 
                                         <TableCell>
                                             <IconButton
-                                                onClick={() => {
-                                                    navigate(
-                                                        USER_PATHS.orders.view(
-                                                            row.order_id
-                                                        )
+                                                onClick={() =>
+                                                    order.gerOrderByID(
+                                                        row.transaction_id
                                                     )
-                                                }}
+                                                }
                                             >
-                                                <RenderIcon icon={icons.view} />
+                                                <RenderIcon
+                                                    icon={icons.download}
+                                                />
                                             </IconButton>
                                         </TableCell>
                                     </TableRow>
@@ -92,6 +100,22 @@ const Orders = () => {
                 </Table>
             </TableContainer>
         </>
+    )
+}
+
+const PurchaseItem = ({ products }: { products: OrderItems[] }) => {
+    const [name, moreCount] = useMemo(() => {
+        const [firstProduct, ...rest] = products
+        return [firstProduct.name, rest.length]
+    }, [products])
+
+    return (
+        <Typography>
+            {name}
+            <Typography variant='caption'>
+                {moreCount > 0 ? `(+${moreCount}more)` : null}
+            </Typography>
+        </Typography>
     )
 }
 

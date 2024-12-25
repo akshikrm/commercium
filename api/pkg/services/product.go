@@ -2,6 +2,7 @@ package services
 
 import (
 	"akshidas/e-com/pkg/types"
+	"fmt"
 	"net/url"
 )
 
@@ -22,7 +23,20 @@ func (r *ProductService) Get(filter url.Values) ([]*types.ProductsList, error) {
 }
 
 func (r *ProductService) Create(newProduct *types.CreateNewProduct) error {
-	_, err := r.productModel.Create(newProduct)
+	paddlePayment := new(PaddlePayment)
+	if err := paddlePayment.Init(); err != nil {
+		return err
+	}
+
+	if err := paddlePayment.CreateProduct(newProduct); err != nil {
+		return err
+	}
+
+	product, err := r.productModel.Create(newProduct)
+	fmt.Println(product.Name)
+	if err != nil {
+		return (err)
+	}
 	return err
 }
 

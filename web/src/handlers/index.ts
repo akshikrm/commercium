@@ -16,8 +16,14 @@ import {
     productDelete,
     updateProduct
 } from "./products"
-import { getByOrderID, getOrders, placeOrder } from "./orders.ts"
-import { profile } from "./user"
+import {
+    getByOrderID,
+    getInvoiceURI,
+    getOrders,
+    isOrderComplete,
+    placeOrder
+} from "./orders.ts"
+import { getCustomerId, profile } from "./user"
 
 export const products = {
     getAll: getProducts,
@@ -40,7 +46,8 @@ export const auth = {
 }
 
 export const user = {
-    profile: profile
+    profile: profile,
+    getCustomerId: getCustomerId
 }
 
 export const files = {
@@ -57,5 +64,7 @@ export const cart = {
 export const order = {
     placeOrder: placeOrder,
     getMyOrders: getOrders,
-    gerOrderByID: getByOrderID
+    gerOrderByID: getByOrderID,
+    getInvoiceURI: getInvoiceURI,
+    isOrderComplete: isOrderComplete
 }

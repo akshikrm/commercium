@@ -9,31 +9,57 @@ import (
 	"net/http"
 )
 
-type PurchaseServeicer interface {
-	PlaceOrder(uint) error
+type PurchaseServicer interface {
 	GetOrdersByUserID(uint) ([]*types.OrderList, error)
 	GetPurchaseByOrderID(id uint) ([]*types.PurchaseList, error)
-	// GetAll(uint32, string) ([]*types.PurchaseList, error)
-	// GetByOrderID(string) (*types.OrderView, error)
 }
 
-type PurchaseApi struct {
-	service PurchaseServeicer
+type TransactionServicer interface {
+	CreateTransaction(*types.Data) error
+	ReadyTransaction(*types.Data) error
+	CompleteTransaction(*types.Data) error
+	FailedTransaction(*types.Data) error
+	GetOrderStatus(string) (string, error)
 }
 
-// func (a *PurchaseApi) GetAll(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
-// 	id := uint32(ctx.Value("userID").(int))
-// 	role := ctx.Value("role").(string)
-//
-// 	purchases, err := a.service.GetAll(id, role)
-//
-// 	if err != nil {
-// 		return err
-// 	}
-// 	return writeJson(w, http.StatusOK, purchases)
-// }
+type OrdersApi struct {
+	service            PurchaseServicer
+	transactionService TransactionServicer
+}
 
-func (a *PurchaseApi) GetMyOrders(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
+func (a *OrdersApi) HandleTransactionHook(w http.ResponseWriter, r *http.Request) error {
+	body := new(types.Body)
+
+	if err := DecodeBody(r.Body, &body); err != nil {
+		return err
+	}
+
+	switch body.EventType {
+	case "transaction.created":
+		{
+			a.transactionService.CreateTransaction(&body.Data)
+			return writeJson(w, http.StatusOK, "transaction created...")
+		}
+	case "transaction.ready":
+		{
+			a.transactionService.ReadyTransaction(&body.Data)
+			return writeJson(w, http.StatusOK, "transaction ready...")
+		}
+	case "transaction.completed":
+		{
+			a.transactionService.CompleteTransaction(&body.Data)
+			return writeJson(w, http.StatusOK, "transaction completed...")
+		}
+	case "transaction.payment_failed":
+		{
+			a.transactionService.FailedTransaction(&body.Data)
+			return writeJson(w, http.StatusOK, "transaction failed...")
+		}
+	}
+	return writeJson(w, http.StatusOK, "waiting...")
+}
+
+func (a *OrdersApi) GetMyOrders(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
 	userID := uint(ctx.Value("userID").(int))
 	orders, err := a.service.GetOrdersByUserID(userID)
 	if err != nil {
@@ -42,40 +68,47 @@ func (a *PurchaseApi) GetMyOrders(ctx context.Context, w http.ResponseWriter, r 
 	return writeJson(w, http.StatusOK, orders)
 }
 
-func (a *PurchaseApi) GetPurchasesByOrderID(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
-	orderID, err := parseId(r.PathValue("id"))
+func (a *OrdersApi) GetOrderStatus(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
+	txnId := r.PathValue("txnId")
+	paddle := new(services.PaddlePayment)
+	if err := paddle.Init(); err != nil {
+		return err
+	}
+
+	transactionStatus, err := a.transactionService.GetOrderStatus(txnId)
 	if err != nil {
 		return err
 	}
-	purchases, err := a.service.GetPurchaseByOrderID(uint(orderID))
-	if err != nil {
-		return err
-	}
-	return writeJson(w, http.StatusOK, purchases)
+
+	return writeJson(w, http.StatusOK, transactionStatus)
 }
 
-func (a *PurchaseApi) Create(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
-	userID := uint(ctx.Value("userID").(int))
-	err := a.service.PlaceOrder(userID)
-	if err != nil {
+func (a *OrdersApi) GetInvoice(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
+	txnId := r.PathValue("txnId")
+	paddle := new(services.PaddlePayment)
+	if err := paddle.Init(); err != nil {
 		return err
 	}
-	return writeJson(w, http.StatusOK, "order placed")
+
+	invoiceURL := paddle.GetInvoice(txnId)
+	return writeJson(w, http.StatusOK, *invoiceURL)
 }
 
-// func (a *PurchaseApi) GetByID(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
-// 	id := r.PathValue("id")
-//
-// 	purchase, err := a.service.GetByOrderID(id)
-// 	if err != nil {
-// 		return err
-// 	}
-// 	return writeJson(w, http.StatusOK, purchase)
-// }
-
-func NewPurchaseApi(database *db.Storage) *PurchaseApi {
+func NewOrdersApi(database *db.Storage) *OrdersApi {
 	purchaseStorage := storage.NewOrdersStorage(database.DB)
 	cartStorage := storage.NewCartStorage(database.DB)
-	purchaseService := services.NewOrderService(purchaseStorage, cartStorage)
-	return &PurchaseApi{service: purchaseService}
+	transactionStorage := storage.NewTransactionsStorage(database.DB)
+	orderStorage := storage.NewOrdersStorage(database.DB)
+
+	purchaseService := services.NewOrderService(purchaseStorage)
+	cartService := services.NewCartService(cartStorage)
+	transactionService := services.NewTransactionService(
+		transactionStorage,
+		orderStorage,
+		cartService,
+	)
+	return &OrdersApi{
+		service:            purchaseService,
+		transactionService: transactionService,
+	}
 }

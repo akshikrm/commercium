@@ -13,12 +13,18 @@ type Cart = {
     user_id: number
     quantity: number
     created_at: string
+    price_id: string
     product: {
         id: number
         name: string
         slug: string
-        price: number
+        price: string
         description: string
         image: string
     }
+}
+
+type PaddlePurchaseItem = {
+    priceId: string
+    quantity: number
 }

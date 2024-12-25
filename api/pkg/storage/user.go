@@ -77,15 +77,24 @@ func (m *UserStorage) GetUserByEmail(email string) (*types.User, error) {
 		log.Printf("user with email %s not found due to %s", email, err)
 		return nil, utils.NotFound
 	}
-
 	return user, nil
+}
 
+func (m *UserStorage) GetCustomerID(id uint) *string {
+	query := "select customer_id from users where id=$1"
+	row := m.store.QueryRow(query, id)
+	var customer_id string
+	if err := row.Scan(&customer_id); err != nil {
+		log.Printf("failed to get customer_id due to %s", err)
+		return nil
+	}
+	return &customer_id
 }
 
 func (m *UserStorage) Create(user types.CreateUserRequest) (*types.User, error) {
 	query := `insert into 
-	users (password, role_code)
-	values($1, $2)
+	users (password, role_code, customer_id)
+	values($1, $2, $3)
 	returning id, role_code
 	`
 	role := "user"
@@ -95,6 +104,7 @@ func (m *UserStorage) Create(user types.CreateUserRequest) (*types.User, error) 
 	row := m.store.QueryRow(query,
 		user.Password,
 		role,
+		user.CustomerID,
 	)
 	log.Printf("Created user %v", user)
 

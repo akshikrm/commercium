@@ -4,10 +4,12 @@ import RenderIcon from "@components/render-icon"
 import usePlaceOrder from "@hooks/orders/use-place-order"
 
 type Props = {
-    total: number
+    total: number | string
+    paddlePurchaseItems: PaddlePurchaseItem[]
 }
-const OrderInformation = ({ total }: Props) => {
-    const mutation = usePlaceOrder()
+
+const OrderInformation = ({ total, paddlePurchaseItems }: Props) => {
+    const placeOrder = usePlaceOrder(paddlePurchaseItems)
     return (
         <>
             <Card sx={{ mb: 3 }}>
@@ -25,9 +27,7 @@ const OrderInformation = ({ total }: Props) => {
                 color='secondary'
                 fullWidth
                 startIcon={<RenderIcon icon='mdi:cash-fast' />}
-                onClick={() => {
-                    mutation.mutate()
-                }}
+                onClick={() => placeOrder()}
             >
                 complete your order
             </Button>

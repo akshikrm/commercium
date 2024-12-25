@@ -48,32 +48,37 @@ func (m *OrdersStorage) GetPurchaseByOrderID(id uint) ([]*types.PurchaseList, er
 }
 
 func (m *OrdersStorage) GetOrdersByUserID(id uint) ([]*types.OrderList, error) {
-	query := `SELECT
-	    o.id AS order_id,
-	    o.order_id AS external_order_id,
-	    o.price AS total_price,
-	    o.created_at AS order_date,
-	    JSON_AGG(
-	        JSON_BUILD_OBJECT(
-	            'id', p.id,
-	            'name', p.name,
-	            'slug', p.slug,
-	            'price', oi.price,
-	            'quantity', oi.quantity
-	        )
-	    ) AS products
-	FROM
-	    orders o
-	JOIN
-	    purchases oi ON o.id = oi.order_id
-	JOIN
-	    products p ON oi.product_id = p.id
-	WHERE
-	    o.user_id = $1
-	GROUP BY
-	    o.id;
+	query := `
+	 SELECT 
+		t.id,
+		t.transaction_id AS txn_id,
+		t.status AS payment_status,
+		t.invoice_number,
+		t.grand_total,
+		JSON_AGG(
+			JSON_BUILD_OBJECT(
+				'id',o.id,
+				'product_id',p.id,
+				'name',p.name,
+				'price',p.price,
+				'quantity', o.quantity
+			)
+		)
+	AS orders,
+	t.created_at
+	FROM 
+		transactions AS t 
+	JOIN 
+		orders AS o ON t.id=o.transaction_id
+	JOIN 
+		products as p on o.product_id=p.product_id 
+	JOIN 
+		users as u on t.customer_id=u.customer_id 
+	WHERE 
+		u.id=$1
+	GROUP BY 
+		t.id, t.transaction_id, t.status, t.tax, t.sub_total, t.grand_total, u.id;
 `
-
 	rows, err := m.store.Query(query, id)
 	if err != nil {
 		log.Printf("failed to retrieve orders due to %s", err)
@@ -87,15 +92,18 @@ func (m *OrdersStorage) GetOrdersByUserID(id uint) ([]*types.OrderList, error) {
 		var products string
 		if err := rows.Scan(
 			&order.ID,
-			&order.OrderID,
-			&order.Price,
-			&order.CreatedAt,
+			&order.TxnID,
+			&order.PaymentStatus,
+			&order.InvoiceNumber,
+			&order.Total,
 			&products,
+			&order.CreatedAt,
 		); err != nil {
 			if err == sql.ErrNoRows {
 				log.Println("row cannot be read")
 				return nil, utils.NotFound
 			}
+			log.Printf("error: %s", err)
 			return nil, utils.ServerError
 		}
 		err = json.Unmarshal([]byte(products), &order.Products)
@@ -105,6 +113,43 @@ func (m *OrdersStorage) GetOrdersByUserID(id uint) ([]*types.OrderList, error) {
 		orders = append(orders, &order)
 	}
 	return orders, nil
+}
+
+func (m *OrdersStorage) CreateOrder(orders []*types.NewOrder) error {
+	query := "INSERT INTO orders(transaction_id, quantity, price_id, product_id, amount) VALUES"
+
+	ordersLength := len(orders)
+	for i, order := range orders {
+		query = fmt.Sprintf("%s (%d, %d, '%s', '%s', '%s')", query,
+			order.TransactionID,
+			order.Quantity,
+			order.PriceID,
+			order.ProductID,
+			order.Amount,
+		)
+		if i == ordersLength-1 {
+			query = fmt.Sprintf("%s;", query)
+		} else {
+			query = fmt.Sprintf("%s,", query)
+		}
+	}
+	result, err := m.store.Exec(query)
+	if err != nil {
+		log.Printf("failed to create orders %s", err)
+		return utils.ServerError
+	}
+
+	affected, err := result.RowsAffected()
+	if err != nil {
+		return utils.ServerError
+	}
+
+	if affected != int64(len(orders)) {
+		return utils.ServerError
+	}
+
+	return nil
+
 }
 
 func (m *OrdersStorage) NewOrder(orderRequest *types.OrderRequest) (uint, error) {
@@ -144,6 +189,19 @@ func (m *OrdersStorage) NewPurchase(newPurchases []*types.PurchaseRequest) error
 	}
 	return nil
 
+}
+
+func (m *ProductStorage) GetOrderStatus(txnId string) string {
+	query := "SELECT payment_status from transactions where transaction_id=$1"
+	row := m.store.QueryRow(query, txnId)
+
+	var transactionStatus string
+	err := row.Scan(&transactionStatus)
+	if err != nil {
+		log.Printf("query failed %s", err)
+		return ""
+	}
+	return transactionStatus
 }
 
 // func (m *PurchaseStorage) Update() {}

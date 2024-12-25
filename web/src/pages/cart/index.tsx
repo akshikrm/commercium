@@ -5,7 +5,7 @@ import CartItemList from "./cart-list-item"
 import OrderInformation from "./order-information"
 
 const Cart = () => {
-    const { data: carts, total } = useGetCart()
+    const { data: carts, total, paddlePurchaseItems } = useGetCart()
 
     return (
         <>
@@ -26,7 +26,10 @@ const Cart = () => {
                 </Grid>
 
                 <Grid size={{ md: 4 }}>
-                    <OrderInformation total={total || 0} />
+                    <OrderInformation
+                        total={total || 0}
+                        paddlePurchaseItems={paddlePurchaseItems}
+                    />
                 </Grid>
             </Container>
         </>

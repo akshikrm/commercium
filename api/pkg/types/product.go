@@ -4,9 +4,11 @@ import "time"
 
 type CreateNewProduct struct {
 	Name        string `json:"name"`
+	ProductID   string `json:"product_id"`
 	CategoryID  uint   `json:"category_id"`
 	Slug        string `json:"slug"`
 	Price       uint   `json:"price"`
+	PriceID     string `json:"price_id"`
 	Image       string `json:"image"`
 	Description string `json:"description"`
 }
@@ -30,6 +32,7 @@ type ProductsList struct {
 type Product struct {
 	ID          uint       `json:"id"`
 	CategoryID  uint       `json:"category_id"`
+	ProductID   string     `json:"product_id"`
 	Name        string     `json:"name"`
 	Slug        string     `json:"slug"`
 	Price       uint       `json:"price"`

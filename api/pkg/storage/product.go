@@ -14,7 +14,7 @@ type ProductStorage struct {
 }
 
 func (p *ProductStorage) Create(product *types.CreateNewProduct) (*types.Product, error) {
-	query := "INSERT INTO products(name, slug, price, image, description, category_id) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *"
+	query := "INSERT INTO products(name, slug, price, image, description, category_id, product_id) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *"
 	row := p.store.QueryRow(query,
 		product.Name,
 		product.Slug,
@@ -22,6 +22,7 @@ func (p *ProductStorage) Create(product *types.CreateNewProduct) (*types.Product
 		product.Image,
 		product.Description,
 		product.CategoryID,
+		product.ProductID,
 	)
 
 	savedProduct, err := scanProductRow(row)
@@ -152,6 +153,7 @@ func scanProductRow(rows *sql.Row) (*types.Product, error) {
 	product := types.Product{}
 	err := rows.Scan(
 		&product.ID,
+		&product.ProductID,
 		&product.Name,
 		&product.Slug,
 		&product.Price,
