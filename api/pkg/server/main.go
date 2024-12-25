@@ -25,10 +25,10 @@ func (s *APIServer) Run() {
 
 	s.registerRoutes(router)
 
-	wrappedRouter := NewLogger(router)
+	// wrappedRouter := NewLogger(router)
 	log.Printf("🚀 Server started on port %s", s.Port)
 
-	log.Fatal(http.ListenAndServe(s.Port, wrappedRouter))
+	log.Fatal(http.ListenAndServe(s.Port, router))
 }
 
 func (s *APIServer) registerRoutes(r *http.ServeMux) {
