@@ -1,5 +1,5 @@
 import useGetCart from "@hooks/carts/use-get-cart"
-import { Container, Grid2 as Grid } from "@mui/material"
+import { Grid2 as Grid } from "@mui/material"
 import HeaderBreadcrumbs from "@components/header"
 import CartItemList from "./cart-list-item"
 import OrderInformation from "./order-information"
@@ -14,7 +14,7 @@ const Cart = () => {
                 links={[{ label: "home", href: "/" }]}
             />
 
-            <Container maxWidth='md' component={Grid} container spacing={4}>
+            <Grid container spacing={4}>
                 <Grid
                     size={{ md: 8 }}
                     sx={{
@@ -31,7 +31,7 @@ const Cart = () => {
                         paddlePurchaseItems={paddlePurchaseItems}
                     />
                 </Grid>
-            </Container>
+            </Grid>
         </>
     )
 }
