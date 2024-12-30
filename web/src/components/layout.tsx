@@ -1,5 +1,4 @@
 import { ReactNode } from "react"
-
 import {
     AppBar,
     Box,
@@ -10,12 +9,14 @@ import {
 } from "@mui/material"
 import useLogout from "@hooks/auth/use-logout"
 import useAuth from "@hooks/auth/use-auth"
+import MenuBar from "./menu-bar"
 
 const Layout = ({ children }: { children: ReactNode }) => {
     const logout = useLogout()
     const { user } = useAuth()
 
     const { first_name, last_name } = user
+
     return (
         <>
             <AppBar position='static'>
@@ -42,7 +43,10 @@ const Layout = ({ children }: { children: ReactNode }) => {
                     </Toolbar>
                 </Container>
             </AppBar>
-            <Container>{children}</Container>
+            <Box sx={{ display: "flex" }}>
+                <MenuBar />
+                <Container maxWidth='xl'>{children}</Container>
+            </Box>
         </>
     )
 }
