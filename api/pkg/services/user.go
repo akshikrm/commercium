@@ -7,15 +7,26 @@ import (
 )
 
 type UserModeler interface {
-	Get() ([]*types.User, error)
-	GetOne(id int) (*types.User, error)
+	GetAllUsers() ([]*types.User, error)
 	GetPasswordByEmail(email string) (*types.User, error)
+	GetUserById(id int) (*types.User, error)
 	GetUserByEmail(email string) (*types.User, error)
-	Create(user types.CreateUserRequest) (*types.User, error)
-	Update(id int, user types.UpdateUserRequest) error
-	Delete(id int) error
-	GetCustomerID(uint) *string
+	GetCustomerID(id uint) *string
+	CreateUser(user types.CreateUserRequest) (*types.User, error)
+	UpdateUser(id int, user types.UpdateUserRequest) error
+	DeleteUser(id int) error
 }
+
+// type UserModeler interface {
+// 	Get() ([]*types.User, error)
+// 	GetOne(id int) (*types.User, error)
+// 	GetPasswordByEmail(email string) (*types.User, error)
+// 	GetUserByEmail(email string) (*types.User, error)
+// 	Create(user types.CreateUserRequest) (*types.User, error)
+// 	Update(id int, user types.UpdateUserRequest) error
+// 	Delete(id int) error
+// 	GetCustomerID(uint) *string
+// }
 
 type ProfileModeler interface {
 	GetByUserId(int) (*types.Profile, error)

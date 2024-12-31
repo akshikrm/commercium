@@ -133,7 +133,18 @@ func (u *UserApi) Delete(ctx context.Context, w http.ResponseWriter, r *http.Req
 	return writeJson(w, http.StatusOK, "deleted successfully")
 }
 
-func NewUserApi(store *db.Storage) *UserApi {
+type Storage interface {
+	GetAllUsers() ([]*types.User, error)
+	GetPasswordByEmail(email string) (*types.User, error)
+	GetUserById(id int) (*types.User, error)
+	GetUserByEmail(email string) (*types.User, error)
+	GetCustomerID(id uint) *string
+	CreateUser(user types.CreateUserRequest) (*types.User, error)
+	UpdateUser(id int, user types.UpdateUserRequest) error
+	DeleteUser(id int) error
+}
+
+func NewUserApi(store Storage) *UserApi {
 	userModel := storage.NewUserStorage(store.DB)
 	profileModel := storage.NewProfileStorage(store.DB)
 	userService := services.NewUserService(userModel, profileModel)

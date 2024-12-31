@@ -101,7 +101,7 @@ func (p *PaddlePayment) CreateProduct(newProduct *types.CreateNewProduct) error 
 }
 
 func (p PaddlePayment) SyncPrice(store *db.Storage) {
-	rows, err := store.DB.Query("select id, product_id, price, price_id from products;")
+	rows, err := store.db.Query("select id, product_id, price, price_id from products;")
 	if err != nil {
 		panic(err)
 	}
