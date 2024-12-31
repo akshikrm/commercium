@@ -10,7 +10,7 @@ type PurchaseRequest struct {
 }
 
 type NewOrder struct {
-	TransactionID string `json:"transaction_id"`
+	TransactionID uint32 `json:"transaction_id"`
 	PriceID       string `json:"price_id"`
 	ProductID     string `json:"product_id"`
 	Quantity      uint   `json:"quantity"`

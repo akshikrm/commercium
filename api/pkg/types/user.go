@@ -27,7 +27,7 @@ type NewProfileRequest struct {
 	FirstName string `json:"first_name"`
 	LastName  string `json:"last_name"`
 	Email     string `json:"email"`
-	UserID    int    `json:"user_id"`
+	UserID    uint32 `json:"user_id"`
 }
 
 type UpdateProfileRequest struct {

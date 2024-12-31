@@ -11,7 +11,7 @@ type ProfileStorage struct {
 	DB *sql.DB
 }
 
-func (p *ProfileStorage) GetByUserId(userId int) (*types.Profile, error) {
+func (p *ProfileStorage) GetByUserId(userId uint32) (*types.Profile, error) {
 	query := `select * from profiles where user_id=$1`
 	row := p.DB.QueryRow(query, userId)
 
@@ -39,7 +39,7 @@ func (p *ProfileStorage) GetByUserId(userId int) (*types.Profile, error) {
 	return savedProfile, nil
 }
 
-func (p *ProfileStorage) Create(profile *types.NewProfileRequest) (int, error) {
+func (p *ProfileStorage) Create(profile *types.NewProfileRequest) (uint32, error) {
 	query := `insert into
 	profiles (first_name,last_name, email, user_id)
 	values ($1, $2, $3, $4)
@@ -73,7 +73,7 @@ func (p *ProfileStorage) CheckIfUserExists(email string) bool {
 	return status
 }
 
-func (p *ProfileStorage) UpdateProfileByUserID(userId int, profile *types.UpdateProfileRequest) error {
+func (p *ProfileStorage) UpdateProfileByUserID(userId uint32, profile *types.UpdateProfileRequest) error {
 	query := `update profiles set pincode=$1, address_one=$2, address_two=$3, phone_number=$4, first_name=$5, last_name=$6, email=$7 where user_id=$8`
 
 	result, err := p.DB.Exec(query,

@@ -41,7 +41,7 @@ func (m *TransactionsStorage) TransactionReady(transaction *types.TransactionRea
 	return nil
 }
 
-func (m *TransactionsStorage) NewTransaction(newTransaction *types.NewTransaction) *uint {
+func (m *TransactionsStorage) NewTransaction(newTransaction *types.NewTransaction) *uint32 {
 	query := `INSERT INTO 
 			transactions
 				(transaction_id, status, created_at, tax, sub_total, grand_total) 
@@ -57,7 +57,7 @@ func (m *TransactionsStorage) NewTransaction(newTransaction *types.NewTransactio
 		newTransaction.SubTotal,
 		newTransaction.GrandTotal,
 	)
-	var id uint
+	var id uint32
 	err := row.Scan(&id)
 
 	if err != nil {

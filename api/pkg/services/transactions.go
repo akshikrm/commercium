@@ -7,7 +7,7 @@ import (
 )
 
 type TransactionStorager interface {
-	NewTransaction(*types.NewTransaction) *uint
+	NewTransaction(*types.NewTransaction) *uint32
 	TransactionReady(*types.TransactionReady) error
 	UpdateStatus(string, string) error
 	TransactionCompleted(*types.TransactionCompleted) error

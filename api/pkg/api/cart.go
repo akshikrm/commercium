@@ -10,11 +10,11 @@ import (
 )
 
 type CartServicer interface {
-	GetAll(uint) ([]*types.CartList, error)
-	GetOne(uint) (*types.CartList, error)
+	GetAll(uint32) ([]*types.CartList, error)
+	GetOne(uint32) (*types.CartList, error)
 	Create(*types.CreateCartRequest) error
-	Update(uint, *types.UpdateCartRequest) (*types.CartList, error)
-	Delete(uint) error
+	Update(uint32, *types.UpdateCartRequest) (*types.CartList, error)
+	Delete(uint32) error
 }
 
 type CartApi struct {
@@ -23,7 +23,7 @@ type CartApi struct {
 
 func (c *CartApi) GetAll(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
 	userID := ctx.Value("userID")
-	carts, err := c.cartService.GetAll(uint(userID.(int)))
+	carts, err := c.cartService.GetAll(uint32(userID.(int)))
 	if err != nil {
 		return err
 	}
@@ -35,7 +35,7 @@ func (c *CartApi) GetOne(ctx context.Context, w http.ResponseWriter, r *http.Req
 	if err != nil {
 		return err
 	}
-	cart, err := c.cartService.GetOne(uint(cid))
+	cart, err := c.cartService.GetOne(uint32(cid))
 	if err != nil {
 		return err
 	}
@@ -48,7 +48,7 @@ func (c *CartApi) Create(ctx context.Context, w http.ResponseWriter, r *http.Req
 		return err
 	}
 	userID := ctx.Value("userID")
-	newCart.UserID = uint(userID.(int))
+	newCart.UserID = uint32(userID.(int))
 	if err := c.cartService.Create(&newCart); err != nil {
 		return err
 	}
@@ -64,7 +64,7 @@ func (c *CartApi) Update(ctx context.Context, w http.ResponseWriter, r *http.Req
 	if err := DecodeBody(r.Body, &updatedCart); err != nil {
 		return err
 	}
-	cart, err := c.cartService.Update(uint(cid), &updatedCart)
+	cart, err := c.cartService.Update(uint32(cid), &updatedCart)
 	if err != nil {
 		return err
 	}
@@ -76,7 +76,7 @@ func (c *CartApi) Delete(ctx context.Context, w http.ResponseWriter, r *http.Req
 	if err != nil {
 		return err
 	}
-	if err := c.cartService.Delete(uint(id)); err != nil {
+	if err := c.cartService.Delete(uint32(id)); err != nil {
 		return err
 	}
 	return writeJson(w, http.StatusOK, "deleted successfully")

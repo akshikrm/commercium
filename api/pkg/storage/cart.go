@@ -12,7 +12,7 @@ type CartStorage struct {
 	store *sql.DB
 }
 
-func (c *CartStorage) GetAll(userID uint) ([]*types.CartList, error) {
+func (c *CartStorage) GetAll(userID uint32) ([]*types.CartList, error) {
 	query := "SELECT c.id, c.quantity, p.price_id, p.id, p.name, p.slug, p.price, p.description, p.image, c.created_at FROM carts c INNER JOIN products p ON c.product_id=p.id WHERE c.user_id=$1 AND c.deleted_at IS NULL"
 	rows, err := c.store.Query(query, userID)
 	if err == sql.ErrNoRows {
@@ -46,7 +46,7 @@ func (c *CartStorage) GetAll(userID uint) ([]*types.CartList, error) {
 	return carts, nil
 }
 
-func (c *CartStorage) GetAllProductIDByUserID(userID uint) ([]*uint32, error) {
+func (c *CartStorage) GetAllProductIDByUserID(userID uint32) ([]*uint32, error) {
 	query := "SELECT p.id FROM carts c INNER JOIN products p ON c.product_id=p.id WHERE c.user_id=$1 AND c.deleted_at IS NULL"
 	rows, err := c.store.Query(query, userID)
 	if err == sql.ErrNoRows {
@@ -69,7 +69,7 @@ func (c *CartStorage) GetAllProductIDByUserID(userID uint) ([]*uint32, error) {
 	return products, nil
 }
 
-func (c *CartStorage) GetTotalPriceOfUser(userID uint) (uint32, error) {
+func (c *CartStorage) GetTotalPriceOfUser(userID uint32) (uint32, error) {
 	carts, err := c.GetAll(userID)
 	if err != nil {
 		return 0, err
@@ -81,7 +81,7 @@ func (c *CartStorage) GetTotalPriceOfUser(userID uint) (uint32, error) {
 	return total, nil
 }
 
-func (c *CartStorage) GetOne(cid uint) (*types.CartList, error) {
+func (c *CartStorage) GetOne(cid uint32) (*types.CartList, error) {
 	query := "SELECT c.id, c.quantity, p.id, p.name, p.slug, p.price, p.description, p.image, c.created_at FROM carts c INNER JOIN products p ON c.product_id=p.id WHERE c.id=$1 AND c.deleted_at IS NULL"
 	row := c.store.QueryRow(query, cid)
 	cart := types.CartList{}
@@ -107,7 +107,7 @@ func (c *CartStorage) GetOne(cid uint) (*types.CartList, error) {
 	return &cart, nil
 }
 
-func (c *CartStorage) CheckIfEntryExist(userID, productID uint) (bool, error) {
+func (c *CartStorage) CheckIfEntryExist(userID, productID uint32) (bool, error) {
 	query := "select exists(select 1 from carts where user_id=$1 and product_id=$2 and deleted_at IS NULL)"
 	row := c.store.QueryRow(query, userID, productID)
 	var exists bool
@@ -118,7 +118,7 @@ func (c *CartStorage) CheckIfEntryExist(userID, productID uint) (bool, error) {
 	return exists, nil
 }
 
-func (c *CartStorage) UpdateQuantity(cid, pid, qty uint) error {
+func (c *CartStorage) UpdateQuantity(cid, pid uint32, qty uint) error {
 	query := "UPDATE carts SET quantity=quantity+$1 WHERE user_id=$2 and product_id=$3"
 	if _, err := c.store.Exec(query, qty, cid, pid); err != nil {
 		if err == sql.ErrNoRows {
@@ -142,7 +142,7 @@ func (c *CartStorage) Create(newCart *types.CreateCartRequest) (*types.Cart, err
 	return cart, nil
 }
 
-func (c *CartStorage) Update(cid uint, updateCart *types.UpdateCartRequest) (*types.CartList, error) {
+func (c *CartStorage) Update(cid uint32, updateCart *types.UpdateCartRequest) (*types.CartList, error) {
 	query := "UPDATE carts SET quantity=$1 WHERE id=$2 AND deleted_at IS NULL"
 	if _, err := c.store.Exec(query, updateCart.Quantity, cid); err != nil {
 		if err == sql.ErrNoRows {
@@ -155,7 +155,7 @@ func (c *CartStorage) Update(cid uint, updateCart *types.UpdateCartRequest) (*ty
 	return c.GetOne(cid)
 }
 
-func (c *CartStorage) Delete(cid uint) error {
+func (c *CartStorage) Delete(cid uint32) error {
 	query := "UPDATE carts set deleted_at=$1 where id=$2 AND deleted_at IS NULL"
 	if _, err := c.store.Exec(query, time.Now(), cid); err != nil {
 		log.Printf("failed to delete cart item with id %d due to %s", cid, err)

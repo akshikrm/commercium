@@ -9,17 +9,18 @@ import (
 )
 
 type Storage struct {
-	DB       *sql.DB
-	user     string
-	name     string
-	password string
-	host     string
-	port     string
+	DB *sql.DB
 }
 
-func Connect(s *Storage) {
+func connect() *sql.DB {
+	user := os.Getenv("DB_USER")
+	name := os.Getenv("DB_NAME")
+	password := os.Getenv("DB_PASSWORD")
+	host := os.Getenv("DB_HOST")
+	port := os.Getenv("DB_PORT")
+
 	connString := fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=disable",
-		s.host, s.port, s.user, s.name, s.password)
+		host, port, user, name, password)
 	db, err := sql.Open("postgres", connString)
 
 	if err != nil {
@@ -30,22 +31,13 @@ func Connect(s *Storage) {
 		log.Fatal(err)
 	}
 
-	s.DB = db
 	log.Println("🗃️ connected to database")
+	return db
 }
 
 func NewStorage() *Storage {
-	db_user := os.Getenv("DB_USER")
-	db_name := os.Getenv("DB_NAME")
-	db_password := os.Getenv("DB_PASSWORD")
-	db_host := os.Getenv("DB_HOST")
-	db_port := os.Getenv("DB_PORT")
-
+	database := connect()
 	return &Storage{
-		user:     db_user,
-		name:     db_name,
-		password: db_password,
-		host:     db_host,
-		port:     db_port,
+		DB: database,
 	}
 }

@@ -8,19 +8,19 @@ import (
 
 type UserModeler interface {
 	Get() ([]*types.User, error)
-	GetOne(id int) (*types.User, error)
-	GetPasswordByEmail(email string) (*types.User, error)
-	GetUserByEmail(email string) (*types.User, error)
-	Create(user types.CreateUserRequest) (*types.User, error)
-	Update(id int, user types.UpdateUserRequest) error
-	Delete(id int) error
-	GetCustomerID(uint) *string
+	GetOne(id uint32) (*types.User, error)
+	GetPasswordByEmail(string) (*types.User, error)
+	GetUserByEmail(string) (*types.User, error)
+	Create(types.CreateUserRequest) (*types.User, error)
+	Update(uint32, types.UpdateUserRequest) error
+	Delete(uint32) error
+	GetCustomerID(uint32) *string
 }
 
 type ProfileModeler interface {
-	GetByUserId(int) (*types.Profile, error)
-	Create(*types.NewProfileRequest) (int, error)
-	UpdateProfileByUserID(int, *types.UpdateProfileRequest) error
+	GetByUserId(uint32) (*types.Profile, error)
+	Create(*types.NewProfileRequest) (uint32, error)
+	UpdateProfileByUserID(uint32, *types.UpdateProfileRequest) error
 	CheckIfUserExists(string) bool
 }
 
@@ -52,7 +52,7 @@ func (u *UserService) Get() ([]*types.User, error) {
 	return u.userModel.Get()
 }
 
-func (u *UserService) GetCustomerID(id uint) (*string, error) {
+func (u *UserService) GetCustomerID(id uint32) (*string, error) {
 	customerID := u.userModel.GetCustomerID(id)
 	if customerID == nil {
 		return nil, utils.ServerError
@@ -60,11 +60,11 @@ func (u *UserService) GetCustomerID(id uint) (*string, error) {
 	return customerID, nil
 }
 
-func (u *UserService) GetProfile(userId int) (*types.Profile, error) {
+func (u *UserService) GetProfile(userId uint32) (*types.Profile, error) {
 	return u.profileModel.GetByUserId(userId)
 }
 
-func (u *UserService) GetOne(id int) (*types.User, error) {
+func (u *UserService) GetOne(id uint32) (*types.User, error) {
 	user, err := u.userModel.GetOne(id)
 	if err != nil {
 		return nil, err
@@ -112,7 +112,7 @@ func (u *UserService) Create(user types.CreateUserRequest) (string, error) {
 	return token, nil
 }
 
-func (u *UserService) Update(id int, user *types.UpdateProfileRequest) (*types.Profile, error) {
+func (u *UserService) Update(id uint32, user *types.UpdateProfileRequest) (*types.Profile, error) {
 	err := u.profileModel.UpdateProfileByUserID(id, user)
 	if err != nil {
 		return nil, err
@@ -120,7 +120,7 @@ func (u *UserService) Update(id int, user *types.UpdateProfileRequest) (*types.P
 	return u.GetProfile(id)
 }
 
-func (u *UserService) Delete(id int) error {
+func (u *UserService) Delete(id uint32) error {
 	return u.userModel.Delete(id)
 }
 

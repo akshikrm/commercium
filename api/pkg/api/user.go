@@ -13,13 +13,13 @@ import (
 
 type UserServicer interface {
 	Get() ([]*types.User, error)
-	GetProfile(int) (*types.Profile, error)
-	GetOne(int) (*types.User, error)
+	GetProfile(uint32) (*types.Profile, error)
+	GetOne(uint32) (*types.User, error)
 	Login(*types.LoginUserRequest) (string, error)
 	Create(types.CreateUserRequest) (string, error)
-	Update(int, *types.UpdateProfileRequest) (*types.Profile, error)
-	Delete(int) error
-	GetCustomerID(id uint) (*string, error)
+	Update(uint32, *types.UpdateProfileRequest) (*types.Profile, error)
+	Delete(uint32) error
+	GetCustomerID(id uint32) (*string, error)
 }
 
 type UserApi struct {
@@ -36,7 +36,7 @@ type UserProfile struct {
 
 func (u *UserApi) GetProfile(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
 	id := ctx.Value("userID")
-	userProfile, err := u.UserService.GetProfile(id.(int))
+	userProfile, err := u.UserService.GetProfile(id.(uint32))
 	if err != nil {
 		return err
 	}
@@ -44,8 +44,8 @@ func (u *UserApi) GetProfile(ctx context.Context, w http.ResponseWriter, r *http
 }
 
 func (u *UserApi) GetCustomerID(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
-	id := ctx.Value("userID").(int)
-	customerID, err := u.UserService.GetCustomerID(uint(id))
+	id := ctx.Value("userID").(uint32)
+	customerID, err := u.UserService.GetCustomerID(uint32(id))
 	if err != nil {
 		return err
 	}
@@ -58,7 +58,7 @@ func (u *UserApi) UpdateProfile(ctx context.Context, w http.ResponseWriter, r *h
 	if err := DecodeBody(r.Body, &a); err != nil {
 		return err
 	}
-	user, err := u.UserService.Update(id.(int), &a)
+	user, err := u.UserService.Update(id.(uint32), &a)
 	if err != nil {
 		return err
 	}
@@ -77,7 +77,7 @@ func (u *UserApi) GetOne(ctx context.Context, w http.ResponseWriter, r *http.Req
 	if err != nil {
 		return err
 	}
-	foundUser, err := u.UserService.GetOne(id)
+	foundUser, err := u.UserService.GetOne(uint32(id))
 	if err != nil {
 		return err
 	}
@@ -114,7 +114,7 @@ func (u *UserApi) Update(w http.ResponseWriter, r *http.Request) error {
 		return err
 	}
 	id, err := parseId(r.PathValue("id"))
-	user, err := u.UserService.Update(id, &a)
+	user, err := u.UserService.Update(uint32(id), &a)
 	if err != nil {
 		return err
 	}
@@ -127,7 +127,7 @@ func (u *UserApi) Delete(ctx context.Context, w http.ResponseWriter, r *http.Req
 	if err != nil {
 		return err
 	}
-	if err := u.UserService.Delete(id); err != nil {
+	if err := u.UserService.Delete(uint32(id)); err != nil {
 		return err
 	}
 	return writeJson(w, http.StatusOK, "deleted successfully")

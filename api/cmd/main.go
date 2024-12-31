@@ -17,7 +17,6 @@ func main() {
 	flag.Parse()
 
 	store := db.NewStorage()
-	db.Connect(store)
 
 	if *sync {
 		paddlePayment := new(services.PaddlePayment)

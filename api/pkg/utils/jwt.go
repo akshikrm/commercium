@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-func CreateJwt(id int, role string) (string, error) {
+func CreateJwt(id uint32, role string) (string, error) {
 	now := time.Now()
 	claims := jwt.MapClaims{
 		"exp":  now.Add(time.Hour * 24).Unix(),

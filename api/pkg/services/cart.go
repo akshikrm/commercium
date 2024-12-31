@@ -6,13 +6,13 @@ import (
 )
 
 type CartModeler interface {
-	GetAll(uint) ([]*types.CartList, error)
-	GetOne(uint) (*types.CartList, error)
+	GetAll(uint32) ([]*types.CartList, error)
+	GetOne(uint32) (*types.CartList, error)
 	Create(*types.CreateCartRequest) (*types.Cart, error)
-	Update(uint, *types.UpdateCartRequest) (*types.CartList, error)
-	Delete(uint) error
-	CheckIfEntryExist(uint, uint) (bool, error)
-	UpdateQuantity(uint, uint, uint) error
+	Update(uint32, *types.UpdateCartRequest) (*types.CartList, error)
+	Delete(uint32) error
+	CheckIfEntryExist(uint32, uint32) (bool, error)
+	UpdateQuantity(uint32, uint32, uint) error
 	HardDeleteByUserID(string) error
 }
 
@@ -20,11 +20,11 @@ type CartService struct {
 	cartModel CartModeler
 }
 
-func (c *CartService) GetAll(userID uint) ([]*types.CartList, error) {
+func (c *CartService) GetAll(userID uint32) ([]*types.CartList, error) {
 	return c.cartModel.GetAll(userID)
 }
 
-func (c *CartService) GetOne(cid uint) (*types.CartList, error) {
+func (c *CartService) GetOne(cid uint32) (*types.CartList, error) {
 	return c.cartModel.GetOne(cid)
 }
 
@@ -43,11 +43,11 @@ func (c *CartService) Create(newCart *types.CreateCartRequest) error {
 	return err
 }
 
-func (c *CartService) Update(cid uint, updateCart *types.UpdateCartRequest) (*types.CartList, error) {
+func (c *CartService) Update(cid uint32, updateCart *types.UpdateCartRequest) (*types.CartList, error) {
 	return c.cartModel.Update(cid, updateCart)
 }
 
-func (c *CartService) Delete(cid uint) error {
+func (c *CartService) Delete(cid uint32) error {
 	return c.cartModel.Delete(cid)
 }
 
