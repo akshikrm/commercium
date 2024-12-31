@@ -3,9 +3,9 @@ package types
 import "time"
 
 type CreateCartRequest struct {
-	UserID    uint `json:"user_id"`
-	ProductID uint `json:"product_id"`
-	Quantity  uint `json:"quantity"`
+	UserID    uint32 `json:"user_id"`
+	ProductID uint32 `json:"product_id"`
+	Quantity  uint   `json:"quantity"`
 }
 
 type UpdateCartRequest struct {
@@ -13,9 +13,9 @@ type UpdateCartRequest struct {
 }
 
 type Cart struct {
-	ID        uint       `json:"id"`
-	UserID    uint       `json:"user_id"`
-	ProductID uint       `json:"product_id"`
+	ID        uint32     `json:"id"`
+	UserID    uint32     `json:"user_id"`
+	ProductID uint32     `json:"product_id"`
 	Quantity  uint       `json:"quantity"`
 	CreatedAt time.Time  `json:"created_at"`
 	UpdatedAt time.Time  `json:"updated_at"`
@@ -23,11 +23,11 @@ type Cart struct {
 }
 
 type CartList struct {
-	ID       uint   `json:"id"`
+	ID       uint32 `json:"id"`
 	Quantity uint   `json:"quantity"`
 	PriceID  string `json:"price_id"`
 	Product  struct {
-		ID          uint   `json:"id"`
+		ID          uint32 `json:"id"`
 		Name        string `json:"name"`
 		Slug        string `json:"slug"`
 		Price       uint   `json:"price"`

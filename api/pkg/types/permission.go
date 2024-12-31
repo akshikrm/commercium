@@ -12,9 +12,9 @@ type CreateNewPermission struct {
 }
 
 type Permission struct {
-	ID           int       `json:"id"`
-	RoleCode     int       `json:"role_code"`
-	ResourceCode int       `json:"resource_code"`
+	ID           uint32    `json:"id"`
+	RoleCode     uint32    `json:"role_code"`
+	ResourceCode uint32    `json:"resource_code"`
 	R            bool      `json:"r"`
 	W            bool      `json:"w"`
 	U            bool      `json:"u"`

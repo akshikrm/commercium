@@ -3,7 +3,7 @@ package types
 import "time"
 
 type Resource struct {
-	ID          int        `json:"id"`
+	ID          uint32     `json:"id"`
 	Code        string     `json:"code"`
 	Name        string     `json:"name"`
 	Description string     `json:"description"`

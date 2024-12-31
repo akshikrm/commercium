@@ -41,7 +41,7 @@ type UpdateProfileRequest struct {
 }
 
 type User struct {
-	ID        int        `json:"id"`
+	ID        uint32     `json:"id"`
 	Password  string     `json:"-"`
 	Role      string     `json:"role_code"`
 	CreatedAt time.Time  `json:"created_at"`
@@ -50,7 +50,7 @@ type User struct {
 }
 
 type Profile struct {
-	ID          int        `json:"id"`
+	ID          uint32     `json:"id"`
 	FirstName   string     `json:"first_name"`
 	LastName    string     `json:"last_name"`
 	Email       string     `json:"email"`
@@ -58,7 +58,7 @@ type Profile struct {
 	AddressOne  string     `json:"address_one"`
 	AddressTwo  string     `json:"address_two"`
 	PhoneNumber string     `json:"phone_number"`
-	UserID      int        `json:"-"`
+	UserID      uint32     `json:"-"`
 	CreatedAt   time.Time  `json:"created_at"`
 	UpdatedAt   time.Time  `json:"updated_at"`
 	DeletedAt   *time.Time `json:"deleted_at"`

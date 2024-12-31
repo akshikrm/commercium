@@ -3,7 +3,7 @@ package types
 import "time"
 
 type Upload struct {
-	ID        uint       `json:"id"`
+	ID        uint32     `json:"id"`
 	Path      string     `json:"path"`
 	CreatedAt time.Time  `json:"created_at"`
 	UpdatedAt time.Time  `json:"updated_at"`
