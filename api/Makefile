@@ -25,4 +25,6 @@ seed-db: build-seeder
 refresh-db: build-seeder
 	@./seeder --refresh-db
 	
-	
+
+seed-product: build-seeder
+		@./seeder --seed-product

@@ -1,5 +1,4 @@
 import { Currency } from "@components/prefix"
-import { BASE_URL_FILE } from "@config"
 import {
     Button,
     Card,
@@ -10,7 +9,7 @@ import {
     Stack,
     Typography
 } from "@mui/material"
-import { useMemo, useState } from "react"
+import { useState } from "react"
 import QuantityField from "./quanitity-field"
 import icons from "@/icons"
 import RenderIcon from "@components/render-icon"
@@ -21,16 +20,9 @@ type Props = {
     buyNow: (payload: NewCart) => void
 }
 
-const useGetUri = (image: string): string => {
-    return useMemo(() => {
-        return [BASE_URL_FILE, image].join("/")
-    }, [image])
-}
-
 const ProductItem = ({ product, addToCart, buyNow }: Props) => {
     const { id, name, description, image, price } = product
 
-    const convertedURI = useGetUri(image)
     const [quantity, setQuanitity] = useState<number>(1)
 
     return (
@@ -48,7 +40,7 @@ const ProductItem = ({ product, addToCart, buyNow }: Props) => {
             <CardMedia
                 sx={{ height: 200 }}
                 component='img'
-                image={convertedURI}
+                image={image}
                 title='green iguana'
                 onError={e => {
                     e.target.onerror = null

@@ -3,7 +3,6 @@ import RenderList from "@/components/render-list"
 import { Link } from "react-router"
 import { FunctionComponent } from "react"
 import { ADMIN_PATHS } from "@/paths"
-import { BASE_URL_FILE } from "@config"
 
 type Props = {
     products?: Product[]
@@ -16,15 +15,11 @@ const List: FunctionComponent<Props> = ({ products, onDelete }) => {
                 list={products}
                 render={product => {
                     const { id, image, name, description } = product
-                    const completeImageURI = [BASE_URL_FILE, image].join("/")
+                    console.log(image)
                     return (
                         <Card key={id}>
                             <Stack direction='row' alignItems='center'>
-                                <img
-                                    src={completeImageURI}
-                                    width={50}
-                                    height={50}
-                                />
+                                <img src={image} width={50} height={50} />
 
                                 <Stack
                                     direction='row'

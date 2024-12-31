@@ -24,6 +24,7 @@ func main() {
 	initdb := flag.Bool("init-db", false, "initialize db if true")
 	nukedb := flag.Bool("nuke-db", false, "clear everything in the database")
 	refreshdb := flag.Bool("refresh-db", false, "clear everything in the database")
+	seedProducts := flag.Bool("seed-product", false, "seed products only")
 	seed := flag.Bool("seed", false, "seed database")
 	flag.Parse()
 
@@ -37,6 +38,10 @@ func main() {
 
 	if *seed {
 		seeder.INIT()
+	}
+
+	if *seedProducts {
+		seeder.seedProducts()
 	}
 
 	if *refreshdb {

@@ -33,6 +33,7 @@ type Product struct {
 	ID          uint       `json:"id"`
 	CategoryID  uint       `json:"category_id"`
 	ProductID   string     `json:"product_id"`
+	PriceID     string     `json:"price_id"`
 	Name        string     `json:"name"`
 	Slug        string     `json:"slug"`
 	Price       uint       `json:"price"`

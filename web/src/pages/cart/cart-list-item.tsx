@@ -1,6 +1,5 @@
 import { Currency } from "@components/prefix"
 import RenderList from "@components/render-list"
-import { BASE_URL_FILE } from "@config"
 import useDeleteCart from "@hooks/carts/use-delete"
 import useUpdateCart from "@hooks/carts/use-update-cart"
 import { Card, IconButton, Stack, TextField, Typography } from "@mui/material"
@@ -31,12 +30,7 @@ const CartItemList = ({ data }: { data: Cart[] }) => {
                     return (
                         <Card key={id}>
                             <Stack direction='row' alignItems='center'>
-                                <img
-                                    src={[BASE_URL_FILE, product.image].join(
-                                        "/"
-                                    )}
-                                    width={100}
-                                />
+                                <img src={product.image} width={100} />
                                 <Stack spacing={0}>
                                     <Typography
                                         component='div'
