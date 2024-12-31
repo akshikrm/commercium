@@ -2,10 +2,13 @@ import { useTheme } from "@mui/material"
 import { Menu, Sidebar } from "react-pro-sidebar"
 import RenderList from "@components/render-list"
 import Item from "./components/item"
-import menus from "./paths"
+import { ADMIN_MENUS, USER_MENUS } from "./paths"
+import useIsUser from "@hooks/auth/use-is-user"
 
 const MenuBar = () => {
     const theme = useTheme()
+
+    const isUser = useIsUser()
 
     return (
         <Sidebar>
@@ -28,7 +31,7 @@ const MenuBar = () => {
                 }}
             >
                 <RenderList
-                    list={menus}
+                    list={isUser ? USER_MENUS : ADMIN_MENUS}
                     render={menu => {
                         return <Item {...menu} />
                     }}

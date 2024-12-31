@@ -1,6 +1,6 @@
-import { USER_PATHS } from "@/paths"
+import { ADMIN_PATHS, USER_PATHS } from "@/paths"
 
-const menus: Paths[] = [
+export const USER_MENUS: Paths[] = [
     {
         label: "dashboard",
         path: USER_PATHS.root
@@ -21,4 +21,20 @@ const menus: Paths[] = [
     }
 ]
 
-export default menus
+export const ADMIN_MENUS: Paths[] = [
+    {
+        label: "dashboard",
+        path: ADMIN_PATHS.root
+    },
+
+    {
+        label: "e-commerce",
+        path: ADMIN_PATHS.products.root,
+        children: [
+            {
+                label: "product",
+                path: ADMIN_PATHS.products.root
+            }
+        ]
+    }
+]
