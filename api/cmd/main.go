@@ -5,8 +5,9 @@ import (
 	"akshidas/e-com/pkg/repository"
 	"akshidas/e-com/pkg/services"
 	"flag"
-	"github.com/joho/godotenv"
 	"log"
+
+	"github.com/joho/godotenv"
 )
 
 func main() {
@@ -28,5 +29,5 @@ func main() {
 	}
 
 	services := services.New(store)
-	app.New(":5234", services).Run()
+	app.New(":5324", services).Run()
 }

@@ -6,18 +6,18 @@ import (
 	"net/http"
 )
 
-type app struct {
+type Server struct {
 	port   string
 	router *http.ServeMux
 }
 
-func (s *app) Run() {
+func (s *Server) Run() {
 	log.Printf("🚀 Server started on port %s", s.port)
 	log.Fatal(http.ListenAndServe(s.port, s.router))
 }
 
-func New(port string, service *services.Service) *app {
-	server := new(app)
+func New(port string, service *services.Service) *Server {
+	server := new(Server)
 	server.router = http.NewServeMux()
 	server.registerRoutes(service)
 	return server

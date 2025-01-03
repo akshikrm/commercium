@@ -1,4 +1,4 @@
-package api
+package app
 
 import (
 	"akshidas/e-com/pkg/types"
