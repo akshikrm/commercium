@@ -70,6 +70,6 @@ func (u *ProductApi) Update(ctx context.Context, w http.ResponseWriter, r *http.
 	return writeJson(w, http.StatusCreated, product)
 }
 
-func NewProductApi(service types.ProductServicer) *ProductApi {
+func newProductApi(service types.ProductServicer) *ProductApi {
 	return &ProductApi{ProductService: service}
 }

@@ -7,8 +7,9 @@ import (
 )
 
 type Server struct {
-	port   string
-	router *http.ServeMux
+	port     string
+	router   *http.ServeMux
+	services *services.Service
 }
 
 func (s *Server) Run() {
@@ -19,6 +20,16 @@ func (s *Server) Run() {
 func New(port string, service *services.Service) *Server {
 	server := new(Server)
 	server.router = http.NewServeMux()
-	server.registerRoutes(service)
+	server.services = service
+
+	server.router.HandleFunc("OPTIONS /", func(w http.ResponseWriter, r *http.Request) {
+		Cors(w)
+	})
+
+	server.registerUserRoutes()
+	server.registerProductRoutes()
+	server.registerProductCategoryRoutes()
+	server.registerCartRoutes()
+	server.registerPurchaseRoutes()
 	return server
 }

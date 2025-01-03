@@ -71,6 +71,6 @@ func (c *CartApi) Delete(ctx context.Context, w http.ResponseWriter, r *http.Req
 	return writeJson(w, http.StatusOK, "deleted successfully")
 }
 
-func NewCartApi(service types.CartServicer) *CartApi {
+func newCartApi(service types.CartServicer) *CartApi {
 	return &CartApi{cartService: service}
 }

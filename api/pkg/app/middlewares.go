@@ -48,6 +48,6 @@ func (m *MiddleWares) IsAuthenticated(ctx context.Context, f apiFuncWithContext)
 	}
 }
 
-func NewMiddleWare(userService types.UserServicer) *MiddleWares {
+func newMiddleWare(userService types.UserServicer) *MiddleWares {
 	return &MiddleWares{userService: userService}
 }

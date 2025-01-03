@@ -110,6 +110,8 @@ func (u *UserApi) Delete(ctx context.Context, w http.ResponseWriter, r *http.Req
 	return writeJson(w, http.StatusOK, "deleted successfully")
 }
 
-func NewUserApi(service types.UserServicer) *UserApi {
-	return &UserApi{UserService: service}
+func newUserApi(service types.UserServicer) *UserApi {
+	api := new(UserApi)
+	api.UserService = service
+	return api
 }

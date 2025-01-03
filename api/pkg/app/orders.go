@@ -79,7 +79,7 @@ func (a *OrdersApi) GetInvoice(ctx context.Context, w http.ResponseWriter, r *ht
 	return writeJson(w, http.StatusOK, *invoiceURL)
 }
 
-func NewOrdersApi(transactionService types.TransactionServicer, purchaseService types.PurchaseServicer) *OrdersApi {
+func newOrdersApi(transactionService types.TransactionServicer, purchaseService types.PurchaseServicer) *OrdersApi {
 
 	return &OrdersApi{
 		service:            purchaseService,

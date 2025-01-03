@@ -1,68 +1,66 @@
 package app
 
 import (
-	"akshidas/e-com/pkg/services"
 	"context"
-	"net/http"
 )
 
-func (s *Server) registerRoutes(services *services.Service) {
+func (s *Server) registerUserRoutes() {
 	ctx := context.Background()
-	r := s.router
+	userApi := newUserApi(s.services.User)
+	middlware := newMiddleWare(s.services.User)
 
-	r.HandleFunc("OPTIONS /", func(w http.ResponseWriter, r *http.Request) {
-		Cors(w)
-	})
+	s.router.HandleFunc("POST /users", RouteHandler(userApi.Create))
+	s.router.HandleFunc("POST /login", RouteHandler(userApi.Login))
+	s.router.HandleFunc("GET /users/my-customer-id", RouteHandler(middlware.IsAuthenticated(ctx, userApi.GetCustomerID)))
+	s.router.HandleFunc("GET /profile", RouteHandler(middlware.IsAuthenticated(ctx, userApi.GetProfile)))
+	s.router.HandleFunc("PUT /profile", RouteHandler(middlware.IsAuthenticated(ctx, userApi.UpdateProfile)))
+	s.router.HandleFunc("GET /users", RouteHandler(middlware.IsAdmin(ctx, userApi.GetAll)))
+	s.router.HandleFunc("GET /users/{id}", RouteHandler(middlware.IsAdmin(ctx, userApi.GetOne)))
+	s.router.HandleFunc("DELETE /users/{id}", RouteHandler(middlware.IsAdmin(ctx, userApi.Delete)))
+}
 
-	// Api
-	userApi := NewUserApi(services.User)
-	productApi := NewProductApi(services.Product)
-	cartApi := NewCartApi(services.Cart)
-	productCategoryApi := NewProductCategoriesApi(services.ProductCategory)
-	// uploadApi := NewUploadApi(s.Store)
-	purchaseApi := NewOrdersApi(services.Transaction, services.Purchase)
+func (s *Server) registerProductRoutes() {
+	ctx := context.Background()
+	productApi := newProductApi(s.services.Product)
+	middlware := newMiddleWare(s.services.User)
 
-	// Middle wares
-	middlware := NewMiddleWare(userApi.UserService)
+	s.router.HandleFunc("GET /products", RouteHandler(middlware.IsAuthenticated(ctx, productApi.GetAll)))
+	s.router.HandleFunc("POST /products", RouteHandler(middlware.IsAdmin(ctx, productApi.Create)))
+	s.router.HandleFunc("GET /products/{id}", RouteHandler(middlware.IsAdmin(ctx, productApi.GetOne)))
+	s.router.HandleFunc("PUT /products/{id}", RouteHandler(middlware.IsAdmin(ctx, productApi.Update)))
+	s.router.HandleFunc("DELETE /products/{id}", RouteHandler(middlware.IsAdmin(ctx, productApi.Delete)))
+}
 
-	// Public Routes
-	r.HandleFunc("POST /transactions", RouteHandler(purchaseApi.HandleTransactionHook))
-	r.HandleFunc("POST /users", RouteHandler(userApi.Create))
-	r.HandleFunc("POST /login", RouteHandler(userApi.Login))
-	// r.HandleFunc("POST /upload", RouteHandler(uploadApi.Upload))
+func (s *Server) registerProductCategoryRoutes() {
+	ctx := context.Background()
+	productCategoryApi := newProductCategoriesApi(s.services.ProductCategory)
+	middlware := newMiddleWare(s.services.User)
 
-	// Authenticated Routes
-	r.HandleFunc("GET /users/my-customer-id", RouteHandler(middlware.IsAuthenticated(ctx, userApi.GetCustomerID)))
-	r.HandleFunc("GET /orders/invoice/{txnId}", RouteHandler(middlware.IsAuthenticated(ctx, purchaseApi.GetInvoice)))
-	r.HandleFunc("GET /orders/status/{txnId}", RouteHandler(middlware.IsAuthenticated(ctx, purchaseApi.GetOrderStatus)))
-	r.HandleFunc("GET /orders", RouteHandler(middlware.IsAuthenticated(ctx, purchaseApi.GetMyOrders)))
+	s.router.HandleFunc("POST /products/categories", RouteHandler(middlware.IsAdmin(ctx, productCategoryApi.Create)))
+	s.router.HandleFunc("GET /products/categories", RouteHandler(middlware.IsAdmin(ctx, productCategoryApi.GetAll)))
+	s.router.HandleFunc("GET /products/categories/{id}", RouteHandler(middlware.IsAdmin(ctx, productCategoryApi.GetOne)))
+	s.router.HandleFunc("PUT /products/categories/{id}", RouteHandler(middlware.IsAdmin(ctx, productCategoryApi.Update)))
+	s.router.HandleFunc("DELETE /products/categories/{id}", RouteHandler(middlware.IsAdmin(ctx, productCategoryApi.Delete)))
+}
 
-	r.HandleFunc("GET /profile", RouteHandler(middlware.IsAuthenticated(ctx, userApi.GetProfile)))
-	r.HandleFunc("PUT /profile", RouteHandler(middlware.IsAuthenticated(ctx, userApi.UpdateProfile)))
-	r.HandleFunc("POST /carts", RouteHandler(middlware.IsAuthenticated(ctx, cartApi.Create)))
-	r.HandleFunc("GET /carts", RouteHandler(middlware.IsAuthenticated(ctx, cartApi.GetAll)))
-	r.HandleFunc("PUT /carts/{id}", RouteHandler(middlware.IsAuthenticated(ctx, cartApi.Update)))
-	r.HandleFunc("DELETE /carts/{id}", RouteHandler(middlware.IsAuthenticated(ctx, cartApi.Delete)))
-	r.HandleFunc("GET /products", RouteHandler(middlware.IsAuthenticated(ctx, productApi.GetAll)))
+func (s *Server) registerCartRoutes() {
+	ctx := context.Background()
+	cartApi := newCartApi(s.services.Cart)
+	middlware := newMiddleWare(s.services.User)
 
-	// Admin Routes
-	r.HandleFunc("GET /users", RouteHandler(middlware.IsAdmin(ctx, userApi.GetAll)))
-	r.HandleFunc("GET /users/{id}", RouteHandler(middlware.IsAdmin(ctx, userApi.GetOne)))
-	r.HandleFunc("DELETE /users/{id}", RouteHandler(middlware.IsAdmin(ctx, userApi.Delete)))
+	s.router.HandleFunc("POST /carts", RouteHandler(middlware.IsAuthenticated(ctx, cartApi.Create)))
+	s.router.HandleFunc("GET /carts", RouteHandler(middlware.IsAuthenticated(ctx, cartApi.GetAll)))
+	s.router.HandleFunc("PUT /carts/{id}", RouteHandler(middlware.IsAuthenticated(ctx, cartApi.Update)))
+	s.router.HandleFunc("DELETE /carts/{id}", RouteHandler(middlware.IsAuthenticated(ctx, cartApi.Delete)))
+}
 
-	r.HandleFunc("POST /products", RouteHandler(middlware.IsAdmin(ctx, productApi.Create)))
+func (s *Server) registerPurchaseRoutes() {
+	ctx := context.Background()
+	purchaseApi := newOrdersApi(s.services.Transaction, s.services.Purchase)
+	middlware := newMiddleWare(s.services.User)
 
-	r.HandleFunc("POST /products/categories", RouteHandler(middlware.IsAdmin(ctx, productCategoryApi.Create)))
-
-	r.HandleFunc("GET /products/categories", RouteHandler(middlware.IsAdmin(ctx, productCategoryApi.GetAll)))
-
-	r.HandleFunc("GET /products/categories/{id}", RouteHandler(middlware.IsAdmin(ctx, productCategoryApi.GetOne)))
-
-	r.HandleFunc("PUT /products/categories/{id}", RouteHandler(middlware.IsAdmin(ctx, productCategoryApi.Update)))
-
-	r.HandleFunc("DELETE /products/categories/{id}", RouteHandler(middlware.IsAdmin(ctx, productCategoryApi.Delete)))
-
-	r.HandleFunc("GET /products/{id}", RouteHandler(middlware.IsAdmin(ctx, productApi.GetOne)))
-	r.HandleFunc("PUT /products/{id}", RouteHandler(middlware.IsAdmin(ctx, productApi.Update)))
-	r.HandleFunc("DELETE /products/{id}", RouteHandler(middlware.IsAdmin(ctx, productApi.Delete)))
+	s.router.HandleFunc("POST /transactions", RouteHandler(purchaseApi.HandleTransactionHook))
+	s.router.HandleFunc("GET /orders/invoice/{txnId}", RouteHandler(middlware.IsAuthenticated(ctx, purchaseApi.GetInvoice)))
+	s.router.HandleFunc("GET /orders/status/{txnId}", RouteHandler(middlware.IsAuthenticated(ctx, purchaseApi.GetOrderStatus)))
+	s.router.HandleFunc("GET /orders", RouteHandler(middlware.IsAuthenticated(ctx, purchaseApi.GetMyOrders)))
 }

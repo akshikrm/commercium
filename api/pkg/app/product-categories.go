@@ -80,6 +80,6 @@ func (s *ProductCategoriesApi) Delete(ctx context.Context, w http.ResponseWriter
 	return writeJson(w, http.StatusOK, "delete successfully")
 }
 
-func NewProductCategoriesApi(service types.ProductCateogriesServicer) *ProductCategoriesApi {
+func newProductCategoriesApi(service types.ProductCateogriesServicer) *ProductCategoriesApi {
 	return &ProductCategoriesApi{service: service}
 }
