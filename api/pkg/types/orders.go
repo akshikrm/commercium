@@ -71,3 +71,14 @@ type OrderView struct {
 	} `json:"product"`
 	CreatedAt time.Time `json:"created_at"`
 }
+
+type OrdersRepository interface {
+	GetOrdersByUserID(uint) ([]*OrderList, error)
+	GetPurchaseByOrderID(uint) ([]*PurchaseList, error)
+	CreateOrder([]*NewOrder) error
+}
+
+type PurchaseServicer interface {
+	GetOrdersByUserID(uint) ([]*OrderList, error)
+	GetPurchaseByOrderID(id uint) ([]*PurchaseList, error)
+}

@@ -6,31 +6,10 @@ import (
 	"log"
 )
 
-type TransactionStorager interface {
-	NewTransaction(*types.NewTransaction) *uint32
-	TransactionReady(*types.TransactionReady) error
-	UpdateStatus(string, string) error
-	TransactionCompleted(*types.TransactionCompleted) error
-	GetOrderStatus(string) string
-}
-
-type OrderStorager interface {
-	CreateOrder([]*types.NewOrder) error
-}
-
-type CartServicer interface {
-	// GetAll(uint) ([]*types.CartList, error)
-	// GetOne(uint) (*types.CartList, error)
-	// Create(*types.CreateCartRequest) error
-	// Update(uint, *types.UpdateCartRequest) (*types.CartList, error)
-	// Delete(uint) error
-	HardDeleteByUserID(string) error
-}
-
 type TransactionService struct {
-	store       TransactionStorager
-	order       OrderStorager
-	cartService CartServicer
+	transactionRepository types.TransactionRepository
+	orderRepository       types.OrdersRepository
+	cartService           types.CartServicer
 }
 
 func (t *TransactionService) CreateTransaction(data *types.Data) error {
@@ -44,7 +23,7 @@ func (t *TransactionService) CreateTransaction(data *types.Data) error {
 	}
 
 	log.Println("adding transaction")
-	id := t.store.NewTransaction(&transaction)
+	id := t.transactionRepository.NewTransaction(&transaction)
 	if id == nil {
 		log.Println("transaction create failed")
 		return utils.ServerError
@@ -64,7 +43,7 @@ func (t *TransactionService) CreateTransaction(data *types.Data) error {
 	}
 
 	log.Println("adding orders")
-	if err := t.order.CreateOrder(orders); err != nil {
+	if err := t.orderRepository.CreateOrder(orders); err != nil {
 		log.Println(err)
 		return utils.ServerError
 	}
@@ -87,7 +66,7 @@ func (t *TransactionService) ReadyTransaction(data *types.Data) error {
 		Status:        data.Status,
 		CustomerID:    data.CustomerID,
 	}
-	err := t.store.TransactionReady(&transaction)
+	err := t.transactionRepository.TransactionReady(&transaction)
 	if err == nil {
 		log.Println("transaction ready")
 	}
@@ -100,7 +79,7 @@ func (t *TransactionService) CompleteTransaction(data *types.Data) error {
 		Status:        data.Status,
 		InvoiceNumber: data.InvoiceNumber,
 	}
-	err := t.store.TransactionCompleted(&transaction)
+	err := t.transactionRepository.TransactionCompleted(&transaction)
 	if err == nil {
 		log.Println("transaction complete")
 	}
@@ -109,25 +88,25 @@ func (t *TransactionService) CompleteTransaction(data *types.Data) error {
 
 func (t *TransactionService) FailedTransaction(data *types.Data) error {
 	log.Println("transaction failed")
-	return t.store.UpdateStatus(data.ID, "failed")
+	return t.transactionRepository.UpdateStatus(data.ID, "failed")
 }
 
 func (t *TransactionService) GetOrderStatus(txnID string) (string, error) {
-	status := t.store.GetOrderStatus(txnID)
+	status := t.transactionRepository.GetOrderStatus(txnID)
 	if status == "" {
 		return "", utils.NotFound
 	}
 	return status, nil
 }
 
-func NewTransactionService(
-	storage TransactionStorager,
-	order OrderStorager,
-	cartService CartServicer,
+func newTransactionService(
+	transactionRepository types.TransactionRepository,
+	orderRepoistory types.OrdersRepository,
+	cartService types.CartServicer,
 ) *TransactionService {
 	return &TransactionService{
-		store:       storage,
-		order:       order,
-		cartService: cartService,
+		transactionRepository: transactionRepository,
+		orderRepository:       orderRepoistory,
+		cartService:           cartService,
 	}
 }

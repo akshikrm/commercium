@@ -1,37 +1,14 @@
 package api
 
 import (
-	"akshidas/e-com/pkg/db"
-	"akshidas/e-com/pkg/services"
-	"akshidas/e-com/pkg/storage"
 	"akshidas/e-com/pkg/types"
 	"context"
 	"log"
 	"net/http"
-	"time"
 )
 
-type UserServicer interface {
-	Get() ([]*types.User, error)
-	GetProfile(uint32) (*types.Profile, error)
-	GetOne(uint32) (*types.User, error)
-	Login(*types.LoginUserRequest) (string, error)
-	Create(types.CreateUserRequest) (string, error)
-	Update(uint32, *types.UpdateProfileRequest) (*types.Profile, error)
-	Delete(uint32) error
-	GetCustomerID(id uint32) (*string, error)
-}
-
 type UserApi struct {
-	UserService UserServicer
-}
-
-type UserProfile struct {
-	FirstName string         `json:"first_name"`
-	LastName  string         `json:"last_name"`
-	Email     string         `json:"email"`
-	CreatedAt time.Time      `json:"created_at"`
-	Profile   *types.Profile `json:"profile"`
+	UserService types.UserServicer
 }
 
 func (u *UserApi) GetProfile(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
@@ -133,9 +110,6 @@ func (u *UserApi) Delete(ctx context.Context, w http.ResponseWriter, r *http.Req
 	return writeJson(w, http.StatusOK, "deleted successfully")
 }
 
-func NewUserApi(store *db.Storage) *UserApi {
-	userModel := storage.NewUserStorage(store.DB)
-	profileModel := storage.NewProfileStorage(store.DB)
-	userService := services.NewUserService(userModel, profileModel)
-	return &UserApi{UserService: userService}
+func NewUserApi(service types.UserServicer) *UserApi {
+	return &UserApi{UserService: service}
 }

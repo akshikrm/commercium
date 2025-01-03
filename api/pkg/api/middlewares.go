@@ -1,15 +1,17 @@
 package api
 
 import (
+	"akshidas/e-com/pkg/types"
 	"akshidas/e-com/pkg/utils"
 	"context"
-	"github.com/golang-jwt/jwt/v5"
 	"net/http"
+
+	"github.com/golang-jwt/jwt/v5"
 )
 
 type apiFuncWithContext func(context.Context, http.ResponseWriter, *http.Request) error
 
-type MiddleWares struct{ userService UserServicer }
+type MiddleWares struct{ userService types.UserServicer }
 
 func (m *MiddleWares) IsAdmin(ctx context.Context, f apiFuncWithContext) apiFunc {
 	validateAdmin := func(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
@@ -46,6 +48,6 @@ func (m *MiddleWares) IsAuthenticated(ctx context.Context, f apiFuncWithContext)
 	}
 }
 
-func NewMiddleWare(userService UserServicer) *MiddleWares {
+func NewMiddleWare(userService types.UserServicer) *MiddleWares {
 	return &MiddleWares{userService: userService}
 }

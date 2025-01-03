@@ -36,3 +36,23 @@ type CartList struct {
 	} `json:"product"`
 	CreatedAt time.Time `json:"created_at"`
 }
+
+type CartRepository interface {
+	GetAll(uint32) ([]*CartList, error)
+	GetOne(uint32) (*CartList, error)
+	Create(*CreateCartRequest) (*Cart, error)
+	Update(uint32, *UpdateCartRequest) (*CartList, error)
+	Delete(uint32) error
+	CheckIfEntryExist(uint32, uint32) (bool, error)
+	UpdateQuantity(uint32, uint32, uint) error
+	HardDeleteByUserID(string) error
+}
+
+type CartServicer interface {
+	GetAll(uint32) ([]*CartList, error)
+	GetOne(uint32) (*CartList, error)
+	Create(*CreateCartRequest) error
+	Update(uint32, *UpdateCartRequest) (*CartList, error)
+	Delete(uint32) error
+	HardDeleteByUserID(string) error
+}

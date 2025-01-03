@@ -6,31 +6,13 @@ import (
 	"log"
 )
 
-type UserModeler interface {
-	Get() ([]*types.User, error)
-	GetOne(id uint32) (*types.User, error)
-	GetPasswordByEmail(string) (*types.User, error)
-	GetUserByEmail(string) (*types.User, error)
-	Create(types.CreateUserRequest) (*types.User, error)
-	Update(uint32, types.UpdateUserRequest) error
-	Delete(uint32) error
-	GetCustomerID(uint32) *string
+type user struct {
+	userRepository    types.UserRepository
+	profileRepository types.ProfileRepository
 }
 
-type ProfileModeler interface {
-	GetByUserId(uint32) (*types.Profile, error)
-	Create(*types.NewProfileRequest) (uint32, error)
-	UpdateProfileByUserID(uint32, *types.UpdateProfileRequest) error
-	CheckIfUserExists(string) bool
-}
-
-type UserService struct {
-	userModel    UserModeler
-	profileModel ProfileModeler
-}
-
-func (u *UserService) Login(payload *types.LoginUserRequest) (string, error) {
-	user, err := u.userModel.GetPasswordByEmail(payload.Email)
+func (u *user) Login(payload *types.LoginUserRequest) (string, error) {
+	user, err := u.userRepository.GetPasswordByEmail(payload.Email)
 	if err != nil {
 		return "", err
 	}
@@ -48,24 +30,24 @@ func (u *UserService) Login(payload *types.LoginUserRequest) (string, error) {
 	return token, nil
 }
 
-func (u *UserService) Get() ([]*types.User, error) {
-	return u.userModel.Get()
+func (u *user) Get() ([]*types.User, error) {
+	return u.userRepository.Get()
 }
 
-func (u *UserService) GetCustomerID(id uint32) (*string, error) {
-	customerID := u.userModel.GetCustomerID(id)
+func (u *user) GetCustomerID(id uint32) (*string, error) {
+	customerID := u.userRepository.GetCustomerID(id)
 	if customerID == nil {
 		return nil, utils.ServerError
 	}
 	return customerID, nil
 }
 
-func (u *UserService) GetProfile(userId uint32) (*types.Profile, error) {
-	return u.profileModel.GetByUserId(userId)
+func (u *user) GetProfile(userId uint32) (*types.Profile, error) {
+	return u.profileRepository.GetByUserId(userId)
 }
 
-func (u *UserService) GetOne(id uint32) (*types.User, error) {
-	user, err := u.userModel.GetOne(id)
+func (u *user) GetOne(id uint32) (*types.User, error) {
+	user, err := u.userRepository.GetOne(id)
 	if err != nil {
 		return nil, err
 	}
@@ -73,13 +55,13 @@ func (u *UserService) GetOne(id uint32) (*types.User, error) {
 	return user, nil
 }
 
-func (u *UserService) Create(user types.CreateUserRequest) (string, error) {
+func (u *user) Create(user types.CreateUserRequest) (string, error) {
 	hashedPassword, err := utils.HashPassword([]byte(user.Password))
 	if err != nil {
 		return "", err
 	}
 
-	exists := u.profileModel.CheckIfUserExists(user.Email)
+	exists := u.profileRepository.CheckIfUserExists(user.Email)
 	if exists {
 		return "", utils.Conflict
 	}
@@ -92,7 +74,7 @@ func (u *UserService) Create(user types.CreateUserRequest) (string, error) {
 	if err := paddlePayment.CreateCustomer(&user); err != nil {
 		return "", err
 	}
-	savedUser, err := u.userModel.Create(user)
+	savedUser, err := u.userRepository.Create(user)
 	if err != nil {
 		return "", err
 	}
@@ -102,7 +84,7 @@ func (u *UserService) Create(user types.CreateUserRequest) (string, error) {
 		Email:     user.Email,
 		UserID:    savedUser.ID,
 	}
-	if _, err := u.profileModel.Create(&newUserProfile); err != nil {
+	if _, err := u.profileRepository.Create(&newUserProfile); err != nil {
 		return "", err
 	}
 	token, err := utils.CreateJwt(savedUser.ID, savedUser.Role)
@@ -112,18 +94,18 @@ func (u *UserService) Create(user types.CreateUserRequest) (string, error) {
 	return token, nil
 }
 
-func (u *UserService) Update(id uint32, user *types.UpdateProfileRequest) (*types.Profile, error) {
-	err := u.profileModel.UpdateProfileByUserID(id, user)
+func (u *user) Update(id uint32, user *types.UpdateProfileRequest) (*types.Profile, error) {
+	err := u.profileRepository.UpdateProfileByUserID(id, user)
 	if err != nil {
 		return nil, err
 	}
 	return u.GetProfile(id)
 }
 
-func (u *UserService) Delete(id uint32) error {
-	return u.userModel.Delete(id)
+func (u *user) Delete(id uint32) error {
+	return u.userRepository.Delete(id)
 }
 
-func NewUserService(userModel UserModeler, profileModel ProfileModeler) *UserService {
-	return &UserService{userModel: userModel, profileModel: profileModel}
+func newUserService(userRepository types.UserRepository, profileRepository types.ProfileRepository) *user {
+	return &user{userRepository: userRepository, profileRepository: profileRepository}
 }

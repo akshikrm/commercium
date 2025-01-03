@@ -1,7 +1,7 @@
 package services
 
 import (
-	"akshidas/e-com/pkg/db"
+	"akshidas/e-com/pkg/repository"
 	"akshidas/e-com/pkg/storage"
 	"akshidas/e-com/pkg/types"
 )
@@ -38,7 +38,7 @@ func (r *ResourceService) Delete(id int) error {
 	return r.roleModel.Delete(id)
 }
 
-func NewResourceService(database *db.Storage) *ResourceService {
+func NewResourceService(database *repository.Storage) *ResourceService {
 	roleModel := storage.NewResourceStorage(database.DB)
 	return &ResourceService{
 		roleModel: roleModel,

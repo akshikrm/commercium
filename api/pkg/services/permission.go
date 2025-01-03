@@ -1,7 +1,7 @@
 package services
 
 import (
-	"akshidas/e-com/pkg/db"
+	"akshidas/e-com/pkg/repository"
 	"akshidas/e-com/pkg/storage"
 	"akshidas/e-com/pkg/types"
 )
@@ -38,7 +38,7 @@ func (r *PermissionService) Delete(id int) error {
 	return r.permissionModel.Delete(id)
 }
 
-func NewPermissionService(database *db.Storage) *PermissionService {
+func NewPermissionService(database *repository.Storage) *PermissionService {
 	permissionModel := storage.NewPermissionStorage(database.DB)
 	return &PermissionService{
 		permissionModel: permissionModel,

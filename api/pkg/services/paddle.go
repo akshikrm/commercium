@@ -1,7 +1,7 @@
 package services
 
 import (
-	"akshidas/e-com/pkg/db"
+	"akshidas/e-com/pkg/repository"
 	"akshidas/e-com/pkg/types"
 	"akshidas/e-com/pkg/utils"
 	"context"
@@ -100,7 +100,7 @@ func (p *PaddlePayment) CreateProduct(newProduct *types.CreateNewProduct) error 
 	return nil
 }
 
-func (p PaddlePayment) SyncPrice(store *db.Storage) {
+func (p PaddlePayment) SyncPrice(store *repository.Storage) {
 	rows, err := store.DB.Query("select id, product_id, price, price_id from products;")
 	if err != nil {
 		panic(err)

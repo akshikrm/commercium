@@ -5,44 +5,35 @@ import (
 	"net/url"
 )
 
-type ProductCategoriesStorager interface {
-	Create(*types.NewProductCategoryRequest) (*types.ProductCategory, error)
-	GetNames() ([]*types.ProductCategoryName, error)
-	GetAll(url.Values) ([]*types.ProductCategory, error)
-	GetOne(int) (*types.ProductCategory, error)
-	Update(int, *types.UpdateProductCategoryRequest) (*types.ProductCategory, error)
-	Delete(int) error
+type productCategory struct {
+	repository types.ProductCategoriesRepository
 }
 
-type ProductCategoryService struct {
-	storage ProductCategoriesStorager
+func (p *productCategory) Create(newCategory *types.NewProductCategoryRequest) (*types.ProductCategory, error) {
+	return p.repository.Create(newCategory)
 }
 
-func (p *ProductCategoryService) Create(newCategory *types.NewProductCategoryRequest) (*types.ProductCategory, error) {
-	return p.storage.Create(newCategory)
+func (p *productCategory) GetNames() ([]*types.ProductCategoryName, error) {
+	return p.repository.GetNames()
+}
+func (p *productCategory) GetAll(filter url.Values) ([]*types.ProductCategory, error) {
+	return p.repository.GetAll(filter)
 }
 
-func (p *ProductCategoryService) GetNames() ([]*types.ProductCategoryName, error) {
-	return p.storage.GetNames()
-}
-func (p *ProductCategoryService) GetAll(filter url.Values) ([]*types.ProductCategory, error) {
-	return p.storage.GetAll(filter)
+func (p *productCategory) GetOne(id int) (*types.ProductCategory, error) {
+	return p.repository.GetOne(id)
 }
 
-func (p *ProductCategoryService) GetOne(id int) (*types.ProductCategory, error) {
-	return p.storage.GetOne(id)
+func (p *productCategory) Update(id int, updateProductCategory *types.UpdateProductCategoryRequest) (*types.ProductCategory, error) {
+	return p.repository.Update(id, updateProductCategory)
 }
 
-func (p *ProductCategoryService) Update(id int, updateProductCategory *types.UpdateProductCategoryRequest) (*types.ProductCategory, error) {
-	return p.storage.Update(id, updateProductCategory)
+func (p *productCategory) Delete(id int) error {
+	return p.repository.Delete(id)
 }
 
-func (p *ProductCategoryService) Delete(id int) error {
-	return p.storage.Delete(id)
-}
-
-func NewProductCategoryService(storage ProductCategoriesStorager) *ProductCategoryService {
-	return &ProductCategoryService{
-		storage: storage,
+func newProductCategoryService(repository types.ProductCategoriesRepository) *productCategory {
+	return &productCategory{
+		repository: repository,
 	}
 }

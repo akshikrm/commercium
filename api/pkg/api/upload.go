@@ -1,8 +1,6 @@
 package api
 
 import (
-	"akshidas/e-com/pkg/db"
-	"akshidas/e-com/pkg/storage"
 	"akshidas/e-com/pkg/types"
 	"io"
 	"log"
@@ -10,12 +8,8 @@ import (
 	"os"
 )
 
-type UploadModeler interface {
-	Create(string) (*types.Upload, error)
-}
-
 type UploadApi struct {
-	model UploadModeler
+	model types.UploadModeler
 }
 
 func (a *UploadApi) Upload(w http.ResponseWriter, r *http.Request) error {
@@ -42,9 +36,8 @@ func (a *UploadApi) Upload(w http.ResponseWriter, r *http.Request) error {
 	return writeJson(w, http.StatusCreated, uploaded)
 }
 
-func NewUploadApi(database *db.Storage) *UploadApi {
-	uploadStorage := storage.NewUploadStorage(database.DB)
+func NewUploadApi(store types.UploadModeler) *UploadApi {
 	return &UploadApi{
-		model: uploadStorage,
+		model: store,
 	}
 }

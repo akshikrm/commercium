@@ -1,25 +1,13 @@
 package api
 
 import (
-	"akshidas/e-com/pkg/db"
-	"akshidas/e-com/pkg/services"
-	"akshidas/e-com/pkg/storage"
 	"akshidas/e-com/pkg/types"
 	"context"
 	"net/http"
-	"net/url"
 )
 
-type ProductServicer interface {
-	Get(url.Values) ([]*types.ProductsList, error)
-	GetOne(int) (*types.Product, error)
-	Create(*types.CreateNewProduct) error
-	Update(int, *types.CreateNewProduct) (*types.Product, error)
-	Delete(int) error
-}
-
 type ProductApi struct {
-	ProductService ProductServicer
+	ProductService types.ProductServicer
 }
 
 func (u *ProductApi) GetAll(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
@@ -82,8 +70,6 @@ func (u *ProductApi) Update(ctx context.Context, w http.ResponseWriter, r *http.
 	return writeJson(w, http.StatusCreated, product)
 }
 
-func NewProductApi(database *db.Storage) *ProductApi {
-	productModel := storage.NewProductStorage(database.DB)
-	productService := services.NewProductService(productModel)
-	return &ProductApi{ProductService: productService}
+func NewProductApi(service types.ProductServicer) *ProductApi {
+	return &ProductApi{ProductService: service}
 }

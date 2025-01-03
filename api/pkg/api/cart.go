@@ -1,24 +1,13 @@
 package api
 
 import (
-	"akshidas/e-com/pkg/db"
-	"akshidas/e-com/pkg/services"
-	"akshidas/e-com/pkg/storage"
 	"akshidas/e-com/pkg/types"
 	"context"
 	"net/http"
 )
 
-type CartServicer interface {
-	GetAll(uint32) ([]*types.CartList, error)
-	GetOne(uint32) (*types.CartList, error)
-	Create(*types.CreateCartRequest) error
-	Update(uint32, *types.UpdateCartRequest) (*types.CartList, error)
-	Delete(uint32) error
-}
-
 type CartApi struct {
-	cartService CartServicer
+	cartService types.CartServicer
 }
 
 func (c *CartApi) GetAll(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
@@ -82,8 +71,6 @@ func (c *CartApi) Delete(ctx context.Context, w http.ResponseWriter, r *http.Req
 	return writeJson(w, http.StatusOK, "deleted successfully")
 }
 
-func NewCartApi(database *db.Storage) *CartApi {
-	cartModel := storage.NewCartStorage(database.DB)
-	cartService := services.NewCartService(cartModel)
-	return &CartApi{cartService: cartService}
+func NewCartApi(service types.CartServicer) *CartApi {
+	return &CartApi{cartService: service}
 }

@@ -1,30 +1,15 @@
 package api
 
 import (
-	"akshidas/e-com/pkg/db"
 	"akshidas/e-com/pkg/services"
-	"akshidas/e-com/pkg/storage"
 	"akshidas/e-com/pkg/types"
 	"context"
 	"net/http"
 )
 
-type PurchaseServicer interface {
-	GetOrdersByUserID(uint) ([]*types.OrderList, error)
-	GetPurchaseByOrderID(id uint) ([]*types.PurchaseList, error)
-}
-
-type TransactionServicer interface {
-	CreateTransaction(*types.Data) error
-	ReadyTransaction(*types.Data) error
-	CompleteTransaction(*types.Data) error
-	FailedTransaction(*types.Data) error
-	GetOrderStatus(string) (string, error)
-}
-
 type OrdersApi struct {
-	service            PurchaseServicer
-	transactionService TransactionServicer
+	service            types.PurchaseServicer
+	transactionService types.TransactionServicer
 }
 
 func (a *OrdersApi) HandleTransactionHook(w http.ResponseWriter, r *http.Request) error {
@@ -94,19 +79,8 @@ func (a *OrdersApi) GetInvoice(ctx context.Context, w http.ResponseWriter, r *ht
 	return writeJson(w, http.StatusOK, *invoiceURL)
 }
 
-func NewOrdersApi(database *db.Storage) *OrdersApi {
-	purchaseStorage := storage.NewOrdersStorage(database.DB)
-	cartStorage := storage.NewCartStorage(database.DB)
-	transactionStorage := storage.NewTransactionsStorage(database.DB)
-	orderStorage := storage.NewOrdersStorage(database.DB)
+func NewOrdersApi(transactionService types.TransactionServicer, purchaseService types.PurchaseServicer) *OrdersApi {
 
-	purchaseService := services.NewOrderService(purchaseStorage)
-	cartService := services.NewCartService(cartStorage)
-	transactionService := services.NewTransactionService(
-		transactionStorage,
-		orderStorage,
-		cartService,
-	)
 	return &OrdersApi{
 		service:            purchaseService,
 		transactionService: transactionService,

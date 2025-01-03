@@ -17,3 +17,19 @@ type Role struct {
 	UpdatedAt   time.Time  `json:"updated_at"`
 	DeletedAt   *time.Time `json:"deleted_at"`
 }
+
+type RoleRepository interface {
+	GetAll() ([]*Role, error)
+	GetOne(int) (*Role, error)
+	Create(*CreateRoleRequest) error
+	Update(int, *CreateRoleRequest) (*Role, error)
+	Delete(int) error
+}
+
+type RoleService interface {
+	GetAll() ([]*Role, error)
+	GetOne(int) (*Role, error)
+	Create(*CreateRoleRequest) error
+	Update(int, *CreateRoleRequest) (*Role, error)
+	Delete(int) error
+}

@@ -6,21 +6,16 @@ import (
 	"time"
 )
 
-type OrdersStorager interface {
-	GetOrdersByUserID(uint) ([]*types.OrderList, error)
-	GetPurchaseByOrderID(uint) ([]*types.PurchaseList, error)
+type order struct {
+	repository types.OrdersRepository
 }
 
-type OrderService struct {
-	ordersStorage OrdersStorager
+func (s *order) GetPurchaseByOrderID(id uint) ([]*types.PurchaseList, error) {
+	return s.repository.GetPurchaseByOrderID(id)
 }
 
-func (s *OrderService) GetPurchaseByOrderID(id uint) ([]*types.PurchaseList, error) {
-	return s.ordersStorage.GetPurchaseByOrderID(id)
-}
-
-func (s *OrderService) GetOrdersByUserID(id uint) ([]*types.OrderList, error) {
-	orders, err := s.ordersStorage.GetOrdersByUserID(id)
+func (s *order) GetOrdersByUserID(id uint) ([]*types.OrderList, error) {
+	orders, err := s.repository.GetOrdersByUserID(id)
 	if err != nil {
 		return nil, err
 	}
@@ -28,9 +23,9 @@ func (s *OrderService) GetOrdersByUserID(id uint) ([]*types.OrderList, error) {
 	return orders, nil
 }
 
-func NewOrderService(ordersStorage OrdersStorager) *OrderService {
-	return &OrderService{
-		ordersStorage: ordersStorage,
+func newOrderService(repository types.OrdersRepository) *order {
+	return &order{
+		repository: repository,
 	}
 }
 

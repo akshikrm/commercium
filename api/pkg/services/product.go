@@ -2,27 +2,19 @@ package services
 
 import (
 	"akshidas/e-com/pkg/types"
-	"fmt"
+	"log"
 	"net/url"
 )
 
-type ProductStorager interface {
-	GetAll(url.Values) ([]*types.ProductsList, error)
-	GetOne(int) (*types.Product, error)
-	Create(*types.CreateNewProduct) (*types.Product, error)
-	Update(int, *types.CreateNewProduct) (*types.Product, error)
-	Delete(int) error
+type product struct {
+	repository types.ProductRepository
 }
 
-type ProductService struct {
-	productModel ProductStorager
+func (r *product) Get(filter url.Values) ([]*types.ProductsList, error) {
+	return r.repository.GetAll(filter)
 }
 
-func (r *ProductService) Get(filter url.Values) ([]*types.ProductsList, error) {
-	return r.productModel.GetAll(filter)
-}
-
-func (r *ProductService) Create(newProduct *types.CreateNewProduct) error {
+func (r *product) Create(newProduct *types.CreateNewProduct) error {
 	paddlePayment := new(PaddlePayment)
 	if err := paddlePayment.Init(); err != nil {
 		return err
@@ -32,28 +24,28 @@ func (r *ProductService) Create(newProduct *types.CreateNewProduct) error {
 		return err
 	}
 
-	product, err := r.productModel.Create(newProduct)
-	fmt.Println(product.Name)
+	product, err := r.repository.Create(newProduct)
+	log.Printf("%s Product Added", product.Name)
 	if err != nil {
 		return (err)
 	}
 	return err
 }
 
-func (r *ProductService) Update(id int, newProduct *types.CreateNewProduct) (*types.Product, error) {
-	return r.productModel.Update(id, newProduct)
+func (r *product) Update(id int, newProduct *types.CreateNewProduct) (*types.OneProduct, error) {
+	return r.repository.Update(id, newProduct)
 }
 
-func (r *ProductService) GetOne(id int) (*types.Product, error) {
-	return r.productModel.GetOne(id)
+func (r *product) GetOne(id int) (*types.OneProduct, error) {
+	return r.repository.GetOne(id)
 }
 
-func (r *ProductService) Delete(id int) error {
-	return r.productModel.Delete(id)
+func (r *product) Delete(id int) error {
+	return r.repository.Delete(id)
 }
 
-func NewProductService(productModel ProductStorager) *ProductService {
-	return &ProductService{
-		productModel: productModel,
+func newProductService(repository types.ProductRepository) *product {
+	return &product{
+		repository: repository,
 	}
 }
