@@ -4,63 +4,71 @@ import (
 	"context"
 )
 
-func (s *Server) registerUserRoutes() {
+type routesFunc map[string]apiFunc
+
+type HandleFunc func(*Server) routesFunc
+
+func UserHandler(s *Server) routesFunc {
 	ctx := context.Background()
 	userApi := newUserApi(s.services.User)
-	middlware := newMiddleWare(s.services.User)
-
-	s.router.HandleFunc("POST /users", RouteHandler(userApi.Create))
-	s.router.HandleFunc("POST /login", RouteHandler(userApi.Login))
-	s.router.HandleFunc("GET /users/my-customer-id", RouteHandler(middlware.IsAuthenticated(ctx, userApi.GetCustomerID)))
-	s.router.HandleFunc("GET /profile", RouteHandler(middlware.IsAuthenticated(ctx, userApi.GetProfile)))
-	s.router.HandleFunc("PUT /profile", RouteHandler(middlware.IsAuthenticated(ctx, userApi.UpdateProfile)))
-	s.router.HandleFunc("GET /users", RouteHandler(middlware.IsAdmin(ctx, userApi.GetAll)))
-	s.router.HandleFunc("GET /users/{id}", RouteHandler(middlware.IsAdmin(ctx, userApi.GetOne)))
-	s.router.HandleFunc("DELETE /users/{id}", RouteHandler(middlware.IsAdmin(ctx, userApi.Delete)))
+	return routesFunc{
+		"POST /users":               userApi.Create,
+		"POST /login":               userApi.Login,
+		"GET /users/my-customer-id": s.middleware.IsAuthenticated(ctx, userApi.GetCustomerID),
+		"GET /profile":              s.middleware.IsAuthenticated(ctx, userApi.GetProfile),
+		"PUT /profile":              s.middleware.IsAuthenticated(ctx, userApi.UpdateProfile),
+		"GET /users":                s.middleware.IsAdmin(ctx, userApi.GetAll),
+		"GET /users/{id}":           s.middleware.IsAdmin(ctx, userApi.GetOne),
+		"DELETE /users/{id}":        s.middleware.IsAdmin(ctx, userApi.Delete),
+	}
 }
 
-func (s *Server) registerProductRoutes() {
+func ProductHandler(s *Server) routesFunc {
 	ctx := context.Background()
 	productApi := newProductApi(s.services.Product)
-	middlware := newMiddleWare(s.services.User)
 
-	s.router.HandleFunc("GET /products", RouteHandler(middlware.IsAuthenticated(ctx, productApi.GetAll)))
-	s.router.HandleFunc("POST /products", RouteHandler(middlware.IsAdmin(ctx, productApi.Create)))
-	s.router.HandleFunc("GET /products/{id}", RouteHandler(middlware.IsAdmin(ctx, productApi.GetOne)))
-	s.router.HandleFunc("PUT /products/{id}", RouteHandler(middlware.IsAdmin(ctx, productApi.Update)))
-	s.router.HandleFunc("DELETE /products/{id}", RouteHandler(middlware.IsAdmin(ctx, productApi.Delete)))
+	return routesFunc{
+		"GET /products":         s.middleware.IsAuthenticated(ctx, productApi.GetAll),
+		"POST /products":        s.middleware.IsAdmin(ctx, productApi.Create),
+		"GET /products/{id}":    s.middleware.IsAdmin(ctx, productApi.GetOne),
+		"PUT /products/{id}":    s.middleware.IsAdmin(ctx, productApi.Update),
+		"DELETE /products/{id}": s.middleware.IsAdmin(ctx, productApi.Delete),
+	}
 }
 
-func (s *Server) registerProductCategoryRoutes() {
+func ProductCategoryHandler(s *Server) routesFunc {
 	ctx := context.Background()
 	productCategoryApi := newProductCategoriesApi(s.services.ProductCategory)
-	middlware := newMiddleWare(s.services.User)
 
-	s.router.HandleFunc("POST /products/categories", RouteHandler(middlware.IsAdmin(ctx, productCategoryApi.Create)))
-	s.router.HandleFunc("GET /products/categories", RouteHandler(middlware.IsAdmin(ctx, productCategoryApi.GetAll)))
-	s.router.HandleFunc("GET /products/categories/{id}", RouteHandler(middlware.IsAdmin(ctx, productCategoryApi.GetOne)))
-	s.router.HandleFunc("PUT /products/categories/{id}", RouteHandler(middlware.IsAdmin(ctx, productCategoryApi.Update)))
-	s.router.HandleFunc("DELETE /products/categories/{id}", RouteHandler(middlware.IsAdmin(ctx, productCategoryApi.Delete)))
+	return routesFunc{
+		"POST /products/categories":        s.middleware.IsAdmin(ctx, productCategoryApi.Create),
+		"GET /products/categories":         s.middleware.IsAdmin(ctx, productCategoryApi.GetAll),
+		"GET /products/categories/{id}":    s.middleware.IsAdmin(ctx, productCategoryApi.GetOne),
+		"PUT /products/categories/{id}":    s.middleware.IsAdmin(ctx, productCategoryApi.Update),
+		"DELETE /products/categories/{id}": s.middleware.IsAdmin(ctx, productCategoryApi.Delete),
+	}
 }
 
-func (s *Server) registerCartRoutes() {
+func CartHandler(s *Server) routesFunc {
 	ctx := context.Background()
 	cartApi := newCartApi(s.services.Cart)
-	middlware := newMiddleWare(s.services.User)
 
-	s.router.HandleFunc("POST /carts", RouteHandler(middlware.IsAuthenticated(ctx, cartApi.Create)))
-	s.router.HandleFunc("GET /carts", RouteHandler(middlware.IsAuthenticated(ctx, cartApi.GetAll)))
-	s.router.HandleFunc("PUT /carts/{id}", RouteHandler(middlware.IsAuthenticated(ctx, cartApi.Update)))
-	s.router.HandleFunc("DELETE /carts/{id}", RouteHandler(middlware.IsAuthenticated(ctx, cartApi.Delete)))
+	return routesFunc{
+		"POST /carts":        s.middleware.IsAuthenticated(ctx, cartApi.Create),
+		"GET /carts":         s.middleware.IsAuthenticated(ctx, cartApi.GetAll),
+		"PUT /carts/{id}":    s.middleware.IsAuthenticated(ctx, cartApi.Update),
+		"DELETE /carts/{id}": s.middleware.IsAuthenticated(ctx, cartApi.Delete),
+	}
 }
 
-func (s *Server) registerPurchaseRoutes() {
+func PurchaseHandler(s *Server) routesFunc {
 	ctx := context.Background()
 	purchaseApi := newOrdersApi(s.services.Transaction, s.services.Purchase)
-	middlware := newMiddleWare(s.services.User)
 
-	s.router.HandleFunc("POST /transactions", RouteHandler(purchaseApi.HandleTransactionHook))
-	s.router.HandleFunc("GET /orders/invoice/{txnId}", RouteHandler(middlware.IsAuthenticated(ctx, purchaseApi.GetInvoice)))
-	s.router.HandleFunc("GET /orders/status/{txnId}", RouteHandler(middlware.IsAuthenticated(ctx, purchaseApi.GetOrderStatus)))
-	s.router.HandleFunc("GET /orders", RouteHandler(middlware.IsAuthenticated(ctx, purchaseApi.GetMyOrders)))
+	return routesFunc{
+		"POST /transactions":          purchaseApi.HandleTransactionHook,
+		"GET /orders/invoice/{txnId}": s.middleware.IsAuthenticated(ctx, purchaseApi.GetInvoice),
+		"GET /orders/status/{txnId}":  s.middleware.IsAuthenticated(ctx, purchaseApi.GetOrderStatus),
+		"GET /orders":                 s.middleware.IsAuthenticated(ctx, purchaseApi.GetMyOrders),
+	}
 }

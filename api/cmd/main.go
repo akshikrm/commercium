@@ -29,5 +29,13 @@ func main() {
 	}
 
 	services := services.New(store)
-	app.New(":5324", services).Run()
+
+	server := app.New(":5324", services)
+
+	server.RegisterRoutes(app.UserHandler)
+	server.RegisterRoutes(app.ProductHandler)
+	server.RegisterRoutes(app.ProductCategoryHandler)
+	server.RegisterRoutes(app.CartHandler)
+	server.RegisterRoutes(app.PurchaseHandler)
+	server.Run()
 }
