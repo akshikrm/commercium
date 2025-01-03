@@ -1,8 +1,8 @@
 package main
 
 import (
-	"akshidas/e-com/pkg/db"
-	"akshidas/e-com/pkg/server"
+	"akshidas/e-com/pkg/app"
+	"akshidas/e-com/pkg/repository"
 	"akshidas/e-com/pkg/services"
 	"flag"
 	"github.com/joho/godotenv"
@@ -16,7 +16,7 @@ func main() {
 	sync := flag.Bool("sync", false, "seed database")
 	flag.Parse()
 
-	store := db.NewStorage()
+	store := repository.New()
 
 	if *sync {
 		paddlePayment := new(services.PaddlePayment)
@@ -27,10 +27,6 @@ func main() {
 		return
 	}
 
-	server := &server.APIServer{
-		Status: "Server is up and running",
-		Port:   ":5234",
-		Store:  store,
-	}
-	server.Run()
+	services := services.New(store)
+	app.New(":5234", services).Run()
 }
