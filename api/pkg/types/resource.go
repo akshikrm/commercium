@@ -17,3 +17,11 @@ type CreateResourceRequest struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`
 }
+
+type ResourceRepository interface {
+	GetAll() ([]*Resource, error)
+	GetOne(int) (*Resource, error)
+	Create(*CreateResourceRequest) error
+	Update(int, *CreateResourceRequest) (*Resource, error)
+	Delete(int) error
+}

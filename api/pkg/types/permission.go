@@ -23,3 +23,11 @@ type Permission struct {
 	UpdatedAt    time.Time `json:"updated_at"`
 	DeletedAt    time.Time `json:"deleted_at"`
 }
+
+type PermissionRepository interface {
+	GetAll() ([]*Permission, error)
+	GetOne(int) (*Permission, error)
+	Create(*CreateNewPermission) error
+	Update(int, *CreateNewPermission) (*Permission, error)
+	Delete(int) error
+}

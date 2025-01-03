@@ -19,8 +19,6 @@ type Storage struct {
 	Transaction     types.TransactionRepository
 	Orders          types.OrdersRepository
 	Role            types.RoleRepository
-	Permission      interface{}
-	Resource        interface{}
 }
 
 func New() *Storage {
@@ -33,9 +31,7 @@ func New() *Storage {
 	repository.User = newUser(database)
 	repository.Profile = newProfile(database)
 	repository.Cart = newCart(database)
-	repository.Permission = newPermission(database)
 	repository.Role = newRole(database)
-	repository.Resource = newResource(database)
 	repository.Transaction = newTransactions(database)
 	repository.Orders = newOrders(database)
 

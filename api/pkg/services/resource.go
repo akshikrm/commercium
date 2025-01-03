@@ -1,46 +1,35 @@
 package services
 
 import (
-	"akshidas/e-com/pkg/repository"
-	"akshidas/e-com/pkg/storage"
 	"akshidas/e-com/pkg/types"
 )
 
-type ResourceModeler interface {
-	GetAll() ([]*types.Resource, error)
-	GetOne(int) (*types.Resource, error)
-	Create(*types.CreateResourceRequest) error
-	Update(int, *types.CreateResourceRequest) (*types.Resource, error)
-	Delete(int) error
-}
-
 type ResourceService struct {
-	roleModel ResourceModeler
+	repository types.ResourceRepository
 }
 
 func (r *ResourceService) GetAll() ([]*types.Resource, error) {
-	return r.roleModel.GetAll()
+	return r.repository.GetAll()
 }
 
 func (r *ResourceService) GetOne(id int) (*types.Resource, error) {
-	return r.roleModel.GetOne(id)
+	return r.repository.GetOne(id)
 }
 
 func (r *ResourceService) Create(newResource *types.CreateResourceRequest) error {
-	return r.roleModel.Create(newResource)
+	return r.repository.Create(newResource)
 }
 
 func (r *ResourceService) Update(id int, newResource *types.CreateResourceRequest) (*types.Resource, error) {
-	return r.roleModel.Update(id, newResource)
+	return r.repository.Update(id, newResource)
 }
 
 func (r *ResourceService) Delete(id int) error {
-	return r.roleModel.Delete(id)
+	return r.repository.Delete(id)
 }
 
-func NewResourceService(database *repository.Storage) *ResourceService {
-	roleModel := storage.NewResourceStorage(database.DB)
+func NewResourceService(repository types.ResourceRepository) *ResourceService {
 	return &ResourceService{
-		roleModel: roleModel,
+		repository: repository,
 	}
 }
