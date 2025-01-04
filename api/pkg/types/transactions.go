@@ -22,3 +22,21 @@ type TransactionCompleted struct {
 	Status        string `json:"status"`
 	InvoiceNumber string `json:"invoice_number"`
 }
+
+type TransactionRepository interface {
+	NewTransaction(*NewTransaction) *uint32
+	TransactionReady(*TransactionReady) error
+	UpdateStatus(string, string) error
+	TransactionCompleted(*TransactionCompleted) error
+	GetOrderStatus(string) string
+}
+
+type PurchaseService interface {
+	CreateTransaction(*Data) error
+	ReadyTransaction(*Data) error
+	CompleteTransaction(*Data) error
+	FailedTransaction(*Data) error
+	GetOrderStatus(string) (string, error)
+	GetPurchaseByOrderID(id uint) ([]*PurchaseList, error)
+	GetOrdersByUserID(id uint) ([]*OrderList, error)
+}

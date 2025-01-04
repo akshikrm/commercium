@@ -9,3 +9,7 @@ type Upload struct {
 	UpdatedAt time.Time  `json:"updated_at"`
 	DeletedAt *time.Time `json:"deleted_at"`
 }
+
+type UploadModeler interface {
+	Create(string) (*Upload, error)
+}

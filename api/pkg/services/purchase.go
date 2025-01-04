@@ -6,34 +6,13 @@ import (
 	"log"
 )
 
-type TransactionStorager interface {
-	NewTransaction(*types.NewTransaction) *uint
-	TransactionReady(*types.TransactionReady) error
-	UpdateStatus(string, string) error
-	TransactionCompleted(*types.TransactionCompleted) error
-	GetOrderStatus(string) string
+type transaction struct {
+	repository      types.TransactionRepository
+	orderRepository types.OrdersRepository
+	cartService     types.CartServicer
 }
 
-type OrderStorager interface {
-	CreateOrder([]*types.NewOrder) error
-}
-
-type CartServicer interface {
-	// GetAll(uint) ([]*types.CartList, error)
-	// GetOne(uint) (*types.CartList, error)
-	// Create(*types.CreateCartRequest) error
-	// Update(uint, *types.UpdateCartRequest) (*types.CartList, error)
-	// Delete(uint) error
-	HardDeleteByUserID(string) error
-}
-
-type TransactionService struct {
-	store       TransactionStorager
-	order       OrderStorager
-	cartService CartServicer
-}
-
-func (t *TransactionService) CreateTransaction(data *types.Data) error {
+func (t *transaction) CreateTransaction(data *types.Data) error {
 	transaction := types.NewTransaction{
 		TransactionID: data.ID,
 		Status:        data.Status,
@@ -44,7 +23,7 @@ func (t *TransactionService) CreateTransaction(data *types.Data) error {
 	}
 
 	log.Println("adding transaction")
-	id := t.store.NewTransaction(&transaction)
+	id := t.repository.NewTransaction(&transaction)
 	if id == nil {
 		log.Println("transaction create failed")
 		return utils.ServerError
@@ -64,7 +43,7 @@ func (t *TransactionService) CreateTransaction(data *types.Data) error {
 	}
 
 	log.Println("adding orders")
-	if err := t.order.CreateOrder(orders); err != nil {
+	if err := t.orderRepository.CreateOrder(orders); err != nil {
 		log.Println(err)
 		return utils.ServerError
 	}
@@ -81,53 +60,66 @@ func (t *TransactionService) CreateTransaction(data *types.Data) error {
 
 }
 
-func (t *TransactionService) ReadyTransaction(data *types.Data) error {
+func (t *transaction) ReadyTransaction(data *types.Data) error {
 	transaction := types.TransactionReady{
 		TransactionID: data.ID,
 		Status:        data.Status,
 		CustomerID:    data.CustomerID,
 	}
-	err := t.store.TransactionReady(&transaction)
+	err := t.repository.TransactionReady(&transaction)
 	if err == nil {
 		log.Println("transaction ready")
 	}
 	return err
 }
 
-func (t *TransactionService) CompleteTransaction(data *types.Data) error {
+func (t *transaction) CompleteTransaction(data *types.Data) error {
 	transaction := types.TransactionCompleted{
 		TransactionID: data.ID,
 		Status:        data.Status,
 		InvoiceNumber: data.InvoiceNumber,
 	}
-	err := t.store.TransactionCompleted(&transaction)
+	err := t.repository.TransactionCompleted(&transaction)
 	if err == nil {
 		log.Println("transaction complete")
 	}
 	return err
 }
 
-func (t *TransactionService) FailedTransaction(data *types.Data) error {
+func (t *transaction) FailedTransaction(data *types.Data) error {
 	log.Println("transaction failed")
-	return t.store.UpdateStatus(data.ID, "failed")
+	return t.repository.UpdateStatus(data.ID, "failed")
 }
 
-func (t *TransactionService) GetOrderStatus(txnID string) (string, error) {
-	status := t.store.GetOrderStatus(txnID)
+func (t *transaction) GetOrderStatus(txnID string) (string, error) {
+	status := t.repository.GetOrderStatus(txnID)
 	if status == "" {
 		return "", utils.NotFound
 	}
 	return status, nil
 }
 
-func NewTransactionService(
-	storage TransactionStorager,
-	order OrderStorager,
-	cartService CartServicer,
-) *TransactionService {
-	return &TransactionService{
-		store:       storage,
-		order:       order,
-		cartService: cartService,
+func (s *transaction) GetPurchaseByOrderID(id uint) ([]*types.PurchaseList, error) {
+	return s.orderRepository.GetPurchaseByOrderID(id)
+}
+
+func (s *transaction) GetOrdersByUserID(id uint) ([]*types.OrderList, error) {
+	orders, err := s.orderRepository.GetOrdersByUserID(id)
+	if err != nil {
+		return nil, err
+	}
+
+	return orders, nil
+}
+
+func newPurchaseService(
+	repository types.TransactionRepository,
+	orderRepository types.OrdersRepository,
+	cartService types.CartServicer,
+) types.PurchaseService {
+	return &transaction{
+		repository:      repository,
+		orderRepository: orderRepository,
+		cartService:     cartService,
 	}
 }

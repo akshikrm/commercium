@@ -1,4 +1,4 @@
-package storage
+package repository
 
 import (
 	"akshidas/e-com/pkg/types"
@@ -7,11 +7,11 @@ import (
 	"log"
 )
 
-type TransactionsStorage struct {
+type transactions struct {
 	store *sql.DB
 }
 
-func (m *TransactionsStorage) UpdateStatus(txnID, status string) error {
+func (m *transactions) UpdateStatus(txnID, status string) error {
 	query := "update transactions set status=$1 where transaction_id=$2"
 	_, err := m.store.Exec(query, status, txnID)
 	if err != nil {
@@ -21,7 +21,7 @@ func (m *TransactionsStorage) UpdateStatus(txnID, status string) error {
 	return nil
 }
 
-func (m *TransactionsStorage) TransactionCompleted(transaction *types.TransactionCompleted) error {
+func (m *transactions) TransactionCompleted(transaction *types.TransactionCompleted) error {
 	query := "update transactions set status=$1, invoice_number=$2 where transaction_id=$3"
 	_, err := m.store.Exec(query, transaction.Status, transaction.InvoiceNumber, transaction.TransactionID)
 	if err != nil {
@@ -31,7 +31,7 @@ func (m *TransactionsStorage) TransactionCompleted(transaction *types.Transactio
 	return nil
 }
 
-func (m *TransactionsStorage) TransactionReady(transaction *types.TransactionReady) error {
+func (m *transactions) TransactionReady(transaction *types.TransactionReady) error {
 	query := "update transactions set status=$1, customer_id=$2 where transaction_id=$3"
 	_, err := m.store.Exec(query, transaction.Status, transaction.CustomerID, transaction.TransactionID)
 	if err != nil {
@@ -41,7 +41,7 @@ func (m *TransactionsStorage) TransactionReady(transaction *types.TransactionRea
 	return nil
 }
 
-func (m *TransactionsStorage) NewTransaction(newTransaction *types.NewTransaction) *uint {
+func (m *transactions) NewTransaction(newTransaction *types.NewTransaction) *uint32 {
 	query := `INSERT INTO 
 			transactions
 				(transaction_id, status, created_at, tax, sub_total, grand_total) 
@@ -57,7 +57,7 @@ func (m *TransactionsStorage) NewTransaction(newTransaction *types.NewTransactio
 		newTransaction.SubTotal,
 		newTransaction.GrandTotal,
 	)
-	var id uint
+	var id uint32
 	err := row.Scan(&id)
 
 	if err != nil {
@@ -67,7 +67,7 @@ func (m *TransactionsStorage) NewTransaction(newTransaction *types.NewTransactio
 	return &id
 }
 
-func (m *TransactionsStorage) GetOrderStatus(txnId string) string {
+func (m *transactions) GetOrderStatus(txnId string) string {
 	query := "SELECT status from transactions where transaction_id=$1"
 	row := m.store.QueryRow(query, txnId)
 
@@ -80,6 +80,6 @@ func (m *TransactionsStorage) GetOrderStatus(txnId string) string {
 	return transactionStatus
 }
 
-func NewTransactionsStorage(store *sql.DB) *TransactionsStorage {
-	return &TransactionsStorage{store: store}
+func newTransactions(store *sql.DB) types.TransactionRepository {
+	return &transactions{store: store}
 }

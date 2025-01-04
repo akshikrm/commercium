@@ -1,4 +1,4 @@
-package storage
+package repository
 
 import (
 	"akshidas/e-com/pkg/types"
@@ -10,11 +10,11 @@ import (
 	"time"
 )
 
-type ProductCategoriesStorage struct {
+type productCategories struct {
 	store *sql.DB
 }
 
-func (p *ProductCategoriesStorage) Create(newCategory *types.NewProductCategoryRequest) (*types.ProductCategory, error) {
+func (p *productCategories) Create(newCategory *types.NewProductCategoryRequest) (*types.ProductCategory, error) {
 	query := "INSERT INTO product_categories(name, slug, description, enabled) VALUES($1, $2, $3, $4) RETURNING *"
 	row := p.store.QueryRow(query, newCategory.Name, newCategory.Slug, newCategory.Description, newCategory.Enabled)
 
@@ -32,7 +32,7 @@ func (p *ProductCategoriesStorage) Create(newCategory *types.NewProductCategoryR
 
 }
 
-func (p *ProductCategoriesStorage) GetNames() ([]*types.ProductCategoryName, error) {
+func (p *productCategories) GetNames() ([]*types.ProductCategoryName, error) {
 	query := "SELECT id, name, slug FROM  product_categories WHERE deleted_at IS NULL AND enabled='t'"
 	rows, err := p.store.Query(query)
 	if err == sql.ErrNoRows {
@@ -60,7 +60,7 @@ func (p *ProductCategoriesStorage) GetNames() ([]*types.ProductCategoryName, err
 	return productsCategories, nil
 }
 
-func (p *ProductCategoriesStorage) GetAll(filter url.Values) ([]*types.ProductCategory, error) {
+func (p *productCategories) GetAll(filter url.Values) ([]*types.ProductCategory, error) {
 	query := buildFilterQuery("SELECT * FROM product_categories as p WHERE deleted_at IS NULL", filter)
 	fmt.Println(query)
 	rows, err := p.store.Query(query)
@@ -79,7 +79,7 @@ func (p *ProductCategoriesStorage) GetAll(filter url.Values) ([]*types.ProductCa
 	return productsCategories, nil
 }
 
-func (p *ProductCategoriesStorage) GetOne(id int) (*types.ProductCategory, error) {
+func (p *productCategories) GetOne(id int) (*types.ProductCategory, error) {
 	query := "SELECT * FROM product_categories WHERE id=$1 AND deleted_at IS NULL"
 	row := p.store.QueryRow(query, id)
 	productCategory, err := scanCategoryRow(row)
@@ -93,7 +93,7 @@ func (p *ProductCategoriesStorage) GetOne(id int) (*types.ProductCategory, error
 	return productCategory, err
 }
 
-func (p *ProductCategoriesStorage) Update(id int, updateProductCategory *types.UpdateProductCategoryRequest) (*types.ProductCategory, error) {
+func (p *productCategories) Update(id int, updateProductCategory *types.UpdateProductCategoryRequest) (*types.ProductCategory, error) {
 	query := "UPDATE product_categories SET name=$1, slug=$2, description=$3, enabled=$4 WHERE id=$5 AND deleted_at IS NULL RETURNING *"
 	row := p.store.QueryRow(
 		query,
@@ -114,7 +114,7 @@ func (p *ProductCategoriesStorage) Update(id int, updateProductCategory *types.U
 	return productCategory, err
 }
 
-func (p *ProductCategoriesStorage) Delete(id int) error {
+func (p *productCategories) Delete(id int) error {
 	query := "UPDATE product_categories set deleted_at=$1 where id=$2 AND deleted_at IS NULL"
 	if _, err := p.store.Exec(query, time.Now(), id); err != nil {
 		log.Printf("failed to delete product category with id %d due to %s", id, err)
@@ -164,6 +164,6 @@ func scanCategoryRows(rows *sql.Rows) ([]*types.ProductCategory, error) {
 	return productsCategories, nil
 }
 
-func NewProductCategoryStorage(store *sql.DB) *ProductCategoriesStorage {
-	return &ProductCategoriesStorage{store: store}
+func newProductCategory(store *sql.DB) *productCategories {
+	return &productCategories{store: store}
 }

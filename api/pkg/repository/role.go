@@ -1,4 +1,4 @@
-package storage
+package repository
 
 import (
 	"akshidas/e-com/pkg/types"
@@ -8,11 +8,11 @@ import (
 	"time"
 )
 
-type RoleStorage struct {
+type role struct {
 	store *sql.DB
 }
 
-func (r *RoleStorage) GetAll() ([]*types.Role, error) {
+func (r *role) GetAll() ([]*types.Role, error) {
 	query := `select * from roles`
 	rows, err := r.store.Query(query)
 
@@ -28,7 +28,7 @@ func (r *RoleStorage) GetAll() ([]*types.Role, error) {
 	return roles, err
 }
 
-func (r *RoleStorage) GetOne(id int) (*types.Role, error) {
+func (r *role) GetOne(id int) (*types.Role, error) {
 	query := `select * from roles where id=$1`
 	row := r.store.QueryRow(query, id)
 
@@ -41,7 +41,7 @@ func (r *RoleStorage) GetOne(id int) (*types.Role, error) {
 	return role, nil
 }
 
-func (r *RoleStorage) Create(newRole *types.CreateRoleRequest) error {
+func (r *role) Create(newRole *types.CreateRoleRequest) error {
 	query := `INSERT INTO roles(name, code, description)
 	VALUES($1,$2, $3)
 	`
@@ -57,7 +57,7 @@ func (r *RoleStorage) Create(newRole *types.CreateRoleRequest) error {
 	return nil
 }
 
-func (r *RoleStorage) Update(id int, newRole *types.CreateRoleRequest) (*types.Role, error) {
+func (r *role) Update(id int, newRole *types.CreateRoleRequest) (*types.Role, error) {
 	query := `UPDATE roles SET name=$1, code=$2, description=$3 returning *`
 	row := r.store.QueryRow(query,
 		newRole.Name,
@@ -73,7 +73,7 @@ func (r *RoleStorage) Update(id int, newRole *types.CreateRoleRequest) (*types.R
 	return role, nil
 }
 
-func (r *RoleStorage) Delete(id int) error {
+func (r *role) Delete(id int) error {
 	query := "UPDATE roles set deleted_at=$1 where id=$2"
 	if _, err := r.store.Exec(query, time.Now(), id); err != nil {
 		log.Printf("failed to delete role %d due to %s", id, err)
@@ -129,8 +129,8 @@ func scanRow(row *sql.Row) (*types.Role, error) {
 
 }
 
-func NewRoleStorage(store *sql.DB) *RoleStorage {
-	return &RoleStorage{
+func newRole(store *sql.DB) *role {
+	return &role{
 		store: store,
 	}
 }

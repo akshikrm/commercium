@@ -1,4 +1,4 @@
-package storage
+package repository
 
 import (
 	"akshidas/e-com/pkg/types"
@@ -8,11 +8,11 @@ import (
 	"time"
 )
 
-type UserStorage struct {
+type user struct {
 	store *sql.DB
 }
 
-func (m *UserStorage) Get() ([]*types.User, error) {
+func (m *user) Get() ([]*types.User, error) {
 	query := "select * from users where role_code != 'admin' AND deleted_at IS NULL;"
 
 	rows, err := m.store.Query(query)
@@ -33,7 +33,7 @@ func (m *UserStorage) Get() ([]*types.User, error) {
 	return users, nil
 }
 
-func (m *UserStorage) GetPasswordByEmail(email string) (*types.User, error) {
+func (m *user) GetPasswordByEmail(email string) (*types.User, error) {
 	query := "select user_id, password, role_code from users inner join profiles on users.id = profiles.user_id where email=$1 AND users.deleted_at IS NULL;"
 
 	row := m.store.QueryRow(query, email)
@@ -50,7 +50,7 @@ func (m *UserStorage) GetPasswordByEmail(email string) (*types.User, error) {
 	return &user, nil
 }
 
-func (m *UserStorage) GetOne(id int) (*types.User, error) {
+func (m *user) GetOne(id uint32) (*types.User, error) {
 	query := "select id, role_code, created_at,updated_at from users where id=$1 AND deleted_at IS NULL"
 	row := m.store.QueryRow(query, id)
 	user := &types.User{}
@@ -68,7 +68,7 @@ func (m *UserStorage) GetOne(id int) (*types.User, error) {
 	return user, nil
 }
 
-func (m *UserStorage) GetUserByEmail(email string) (*types.User, error) {
+func (m *user) GetUserByEmail(email string) (*types.User, error) {
 	query := "select * from users where email=$1 AND deleted_at IS NULL"
 	row := m.store.QueryRow(query, email)
 
@@ -80,7 +80,7 @@ func (m *UserStorage) GetUserByEmail(email string) (*types.User, error) {
 	return user, nil
 }
 
-func (m *UserStorage) GetCustomerID(id uint) *string {
+func (m *user) GetCustomerID(id uint32) *string {
 	query := "select customer_id from users where id=$1"
 	row := m.store.QueryRow(query, id)
 	var customer_id string
@@ -91,7 +91,7 @@ func (m *UserStorage) GetCustomerID(id uint) *string {
 	return &customer_id
 }
 
-func (m *UserStorage) Create(user types.CreateUserRequest) (*types.User, error) {
+func (m *user) Create(user types.CreateUserRequest) (*types.User, error) {
 	query := `insert into 
 	users (password, role_code, customer_id)
 	values($1, $2, $3)
@@ -117,7 +117,7 @@ func (m *UserStorage) Create(user types.CreateUserRequest) (*types.User, error) 
 	return &savedUser, nil
 }
 
-func (m *UserStorage) Update(id int, user types.UpdateUserRequest) error {
+func (m *user) Update(id uint32, user types.UpdateUserRequest) error {
 	query := `update users set first_name=$1, last_name=$2, email=$3 where id=$4`
 	result, err := m.store.Exec(query, user.FirstName, user.LastName, user.Email, id)
 
@@ -134,7 +134,7 @@ func (m *UserStorage) Update(id int, user types.UpdateUserRequest) error {
 	return nil
 }
 
-func (m *UserStorage) Delete(id int) error {
+func (m *user) Delete(id uint32) error {
 	query := "UPDATE users set deleted_at=$1 where id=$2"
 	if _, err := m.store.Exec(query, time.Now(), id); err != nil {
 		log.Printf("failed to delete %d due to %s", id, err)
@@ -174,8 +174,8 @@ func ScanRow(row *sql.Row) (*types.User, error) {
 	return user, err
 }
 
-func NewUserStorage(store *sql.DB) *UserStorage {
-	return &UserStorage{
+func newUser(store *sql.DB) *user {
+	return &user{
 		store: store,
 	}
 }

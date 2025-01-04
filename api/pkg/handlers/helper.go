@@ -1,4 +1,4 @@
-package api
+package handlers
 
 import (
 	"akshidas/e-com/pkg/utils"
@@ -10,7 +10,7 @@ import (
 	"strconv"
 )
 
-type apiFunc func(http.ResponseWriter, *http.Request) error
+type ApiFunc func(http.ResponseWriter, *http.Request) error
 
 type ApiError struct {
 	Error string `json:"error"`
@@ -48,7 +48,7 @@ func Cors(w http.ResponseWriter) error {
 	return writeJson(w, http.StatusNoContent, errors.New("no content"))
 }
 
-func RouteHandler(f apiFunc) http.HandlerFunc {
+func RouteHandler(f ApiFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if err := f(w, r); err != nil {
 			handleError(w, err)

@@ -1,37 +1,30 @@
 package main
 
 import (
-	"akshidas/e-com/pkg/db"
-	"akshidas/e-com/pkg/server"
+	"akshidas/e-com/pkg/app"
+	"akshidas/e-com/pkg/handlers"
+	"akshidas/e-com/pkg/repository"
 	"akshidas/e-com/pkg/services"
-	"flag"
-	"github.com/joho/godotenv"
 	"log"
+
+	"github.com/joho/godotenv"
 )
 
 func main() {
 	if err := godotenv.Load(); err != nil {
 		log.Fatal("Error loading .env file")
 	}
-	sync := flag.Bool("sync", false, "seed database")
-	flag.Parse()
 
-	store := db.NewStorage()
-	db.Connect(store)
+	store := repository.New()
+	services := services.New(store)
+	handlers := handlers.New(services)
+	server := app.New(":5234", handlers)
 
-	if *sync {
-		paddlePayment := new(services.PaddlePayment)
-		if err := paddlePayment.Init(); err != nil {
-			panic(err)
-		}
-		paddlePayment.SyncPrice(store)
-		return
-	}
+	server.RegisterRoutes(app.UserRoute)
+	server.RegisterRoutes(app.ProductRoute)
+	server.RegisterRoutes(app.ProductCategoryRoute)
+	server.RegisterRoutes(app.CartRoute)
+	server.RegisterRoutes(app.PurchaseRoute)
 
-	server := &server.APIServer{
-		Status: "Server is up and running",
-		Port:   ":5234",
-		Store:  store,
-	}
 	server.Run()
 }

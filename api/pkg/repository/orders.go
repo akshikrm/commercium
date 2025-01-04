@@ -1,4 +1,4 @@
-package storage
+package repository
 
 import (
 	"akshidas/e-com/pkg/types"
@@ -9,11 +9,11 @@ import (
 	"log"
 )
 
-type OrdersStorage struct {
+type orders struct {
 	store *sql.DB
 }
 
-func (m *OrdersStorage) GetPurchaseByOrderID(id uint) ([]*types.PurchaseList, error) {
+func (m *orders) GetPurchaseByOrderID(id uint) ([]*types.PurchaseList, error) {
 	query := `select ps.id, ps.quantity, ps.price, ps.created_at,pr.id as
 	product_id, pr.name as product_name, pr.slug as product_slug from purchases
 	ps INNER JOIN products pr on ps.product_id=pr.id where ps.order_id=$1;`
@@ -47,7 +47,7 @@ func (m *OrdersStorage) GetPurchaseByOrderID(id uint) ([]*types.PurchaseList, er
 	return purchases, nil
 }
 
-func (m *OrdersStorage) GetOrdersByUserID(id uint) ([]*types.OrderList, error) {
+func (m *orders) GetOrdersByUserID(id uint) ([]*types.OrderList, error) {
 	query := `
 	 SELECT 
 		t.id,
@@ -115,7 +115,7 @@ func (m *OrdersStorage) GetOrdersByUserID(id uint) ([]*types.OrderList, error) {
 	return orders, nil
 }
 
-func (m *OrdersStorage) CreateOrder(orders []*types.NewOrder) error {
+func (m *orders) CreateOrder(orders []*types.NewOrder) error {
 	query := "INSERT INTO orders(transaction_id, quantity, price_id, product_id, amount) VALUES"
 
 	ordersLength := len(orders)
@@ -152,7 +152,7 @@ func (m *OrdersStorage) CreateOrder(orders []*types.NewOrder) error {
 
 }
 
-func (m *OrdersStorage) NewOrder(orderRequest *types.OrderRequest) (uint, error) {
+func (m *orders) NewOrder(orderRequest *types.OrderRequest) (uint, error) {
 	query := "INSERT INTO orders(order_id, user_id, price) VALUES($1, $2, $3) RETURNING(id)"
 
 	row := m.store.QueryRow(query, orderRequest.OrderID, orderRequest.UserID, orderRequest.Price)
@@ -164,7 +164,7 @@ func (m *OrdersStorage) NewOrder(orderRequest *types.OrderRequest) (uint, error)
 	return orderID, nil
 }
 
-func (m *OrdersStorage) NewPurchase(newPurchases []*types.PurchaseRequest) error {
+func (m *orders) NewPurchase(newPurchases []*types.PurchaseRequest) error {
 	query := "INSERT INTO purchases(order_id, product_id, quantity, price) VALUES"
 	for i, purchaseRequest := range newPurchases {
 		query = fmt.Sprintf("%s (%d, %d, %d, %d)",
@@ -191,7 +191,7 @@ func (m *OrdersStorage) NewPurchase(newPurchases []*types.PurchaseRequest) error
 
 }
 
-func (m *ProductStorage) GetOrderStatus(txnId string) string {
+func (m *product) GetOrderStatus(txnId string) string {
 	query := "SELECT payment_status from transactions where transaction_id=$1"
 	row := m.store.QueryRow(query, txnId)
 
@@ -204,9 +204,6 @@ func (m *ProductStorage) GetOrderStatus(txnId string) string {
 	return transactionStatus
 }
 
-// func (m *PurchaseStorage) Update() {}
-// func (m *PurchaseStorage) Delete() {}
-
-func NewOrdersStorage(store *sql.DB) *OrdersStorage {
-	return &OrdersStorage{store: store}
+func newOrders(store *sql.DB) *orders {
+	return &orders{store: store}
 }

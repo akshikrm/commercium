@@ -1,29 +1,16 @@
-package api
+package handlers
 
 import (
-	"akshidas/e-com/pkg/db"
-	"akshidas/e-com/pkg/services"
-	"akshidas/e-com/pkg/storage"
 	"akshidas/e-com/pkg/types"
 	"context"
 	"net/http"
-	"net/url"
 )
 
-type ProductCateogriesServicer interface {
-	Create(*types.NewProductCategoryRequest) (*types.ProductCategory, error)
-	GetAll(url.Values) ([]*types.ProductCategory, error)
-	GetNames() ([]*types.ProductCategoryName, error)
-	GetOne(int) (*types.ProductCategory, error)
-	Update(int, *types.UpdateProductCategoryRequest) (*types.ProductCategory, error)
-	Delete(int) error
+type productCategory struct {
+	service types.ProductCateogoryServicer
 }
 
-type ProductCategoriesApi struct {
-	service ProductCateogriesServicer
-}
-
-func (s *ProductCategoriesApi) Create(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
+func (s *productCategory) Create(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
 	newProductCategory := types.NewProductCategoryRequest{}
 	if err := DecodeBody(r.Body, &newProductCategory); err != nil {
 		return err
@@ -35,7 +22,7 @@ func (s *ProductCategoriesApi) Create(ctx context.Context, w http.ResponseWriter
 	return writeJson(w, http.StatusCreated, "product category created")
 }
 
-func (s *ProductCategoriesApi) GetAll(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
+func (s *productCategory) GetAll(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
 	filter := r.URL.Query()
 	filterType := filter.Get("type")
 	if filterType == "name" {
@@ -52,7 +39,7 @@ func (s *ProductCategoriesApi) GetAll(ctx context.Context, w http.ResponseWriter
 	return writeJson(w, http.StatusOK, productCategories)
 }
 
-func (s *ProductCategoriesApi) GetOne(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
+func (s *productCategory) GetOne(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
 	id, err := parseId(r.PathValue("id"))
 	if err != nil {
 		return err
@@ -64,7 +51,7 @@ func (s *ProductCategoriesApi) GetOne(ctx context.Context, w http.ResponseWriter
 	return writeJson(w, http.StatusOK, productCategories)
 }
 
-func (s *ProductCategoriesApi) Update(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
+func (s *productCategory) Update(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
 	id, err := parseId(r.PathValue("id"))
 	if err != nil {
 		return err
@@ -81,7 +68,7 @@ func (s *ProductCategoriesApi) Update(ctx context.Context, w http.ResponseWriter
 	return writeJson(w, http.StatusOK, updatedProductCategory)
 }
 
-func (s *ProductCategoriesApi) Delete(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
+func (s *productCategory) Delete(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
 	id, err := parseId(r.PathValue("id"))
 	if err != nil {
 		return err
@@ -93,8 +80,8 @@ func (s *ProductCategoriesApi) Delete(ctx context.Context, w http.ResponseWriter
 	return writeJson(w, http.StatusOK, "delete successfully")
 }
 
-func NewProductCategoriesApi(store *db.Storage) *ProductCategoriesApi {
-	model := storage.NewProductCategoryStorage(store.DB)
-	service := services.NewProductCategoryService(model)
-	return &ProductCategoriesApi{service: service}
+func NewProductCategory(service types.ProductCateogoryServicer) types.ProductCategoryHandler {
+	handler := new(productCategory)
+	handler.service = service
+	return handler
 }

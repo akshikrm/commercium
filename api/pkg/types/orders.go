@@ -1,6 +1,10 @@
 package types
 
-import "time"
+import (
+	"context"
+	"net/http"
+	"time"
+)
 
 type PurchaseRequest struct {
 	OrderID   uint32 `json:"order_id"`
@@ -10,7 +14,7 @@ type PurchaseRequest struct {
 }
 
 type NewOrder struct {
-	TransactionID string `json:"transaction_id"`
+	TransactionID uint32 `json:"transaction_id"`
 	PriceID       string `json:"price_id"`
 	ProductID     string `json:"product_id"`
 	Quantity      uint   `json:"quantity"`
@@ -70,4 +74,22 @@ type OrderView struct {
 		} `json:"category"`
 	} `json:"product"`
 	CreatedAt time.Time `json:"created_at"`
+}
+
+type OrdersRepository interface {
+	GetOrdersByUserID(uint) ([]*OrderList, error)
+	GetPurchaseByOrderID(uint) ([]*PurchaseList, error)
+	CreateOrder([]*NewOrder) error
+}
+
+type PurchaseServicer interface {
+	GetOrdersByUserID(uint) ([]*OrderList, error)
+	GetPurchaseByOrderID(id uint) ([]*PurchaseList, error)
+}
+
+type PurchaseHandler interface {
+	HandleTransactionHook(http.ResponseWriter, *http.Request) error
+	GetMyOrders(context.Context, http.ResponseWriter, *http.Request) error
+	GetOrderStatus(context.Context, http.ResponseWriter, *http.Request) error
+	GetInvoice(context.Context, http.ResponseWriter, *http.Request) error
 }

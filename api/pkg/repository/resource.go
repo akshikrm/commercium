@@ -1,4 +1,4 @@
-package storage
+package repository
 
 import (
 	"akshidas/e-com/pkg/types"
@@ -8,11 +8,11 @@ import (
 	"time"
 )
 
-type ResourceStorage struct {
+type resource struct {
 	store *sql.DB
 }
 
-func (r *ResourceStorage) GetAll() ([]*types.Resource, error) {
+func (r *resource) GetAll() ([]*types.Resource, error) {
 	query := `select * from resources`
 	rows, err := r.store.Query(query)
 
@@ -28,7 +28,7 @@ func (r *ResourceStorage) GetAll() ([]*types.Resource, error) {
 	return resources, err
 }
 
-func (r *ResourceStorage) GetOne(id int) (*types.Resource, error) {
+func (r *resource) GetOne(id int) (*types.Resource, error) {
 	query := `select * from resources where id=$1`
 	row := r.store.QueryRow(query, id)
 
@@ -41,7 +41,7 @@ func (r *ResourceStorage) GetOne(id int) (*types.Resource, error) {
 	return resource, nil
 }
 
-func (r *ResourceStorage) Create(newResource *types.CreateResourceRequest) error {
+func (r *resource) Create(newResource *types.CreateResourceRequest) error {
 	query := `INSERT INTO resources(name, code, description)
 	VALUES($1,$2, $3)
 	`
@@ -57,7 +57,7 @@ func (r *ResourceStorage) Create(newResource *types.CreateResourceRequest) error
 	return nil
 }
 
-func (r *ResourceStorage) Update(id int, newResource *types.CreateResourceRequest) (*types.Resource, error) {
+func (r *resource) Update(id int, newResource *types.CreateResourceRequest) (*types.Resource, error) {
 	query := `UPDATE resources SET name=$1, code=$2, description=$3 returning *`
 	row := r.store.QueryRow(query,
 		newResource.Name,
@@ -73,7 +73,7 @@ func (r *ResourceStorage) Update(id int, newResource *types.CreateResourceReques
 	return resource, nil
 }
 
-func (r *ResourceStorage) Delete(id int) error {
+func (r *resource) Delete(id int) error {
 	query := "UPDATE resources set deleted_at=$1 where id=$2"
 	if _, err := r.store.Exec(query, time.Now(), id); err != nil {
 		log.Printf("failed to delete resource %d due to %s", id, err)
@@ -129,8 +129,8 @@ func scanResourceRow(row *sql.Row) (*types.Resource, error) {
 
 }
 
-func NewResourceStorage(store *sql.DB) *ResourceStorage {
-	return &ResourceStorage{
+func newResource(store *sql.DB) *resource {
+	return &resource{
 		store: store,
 	}
 }
