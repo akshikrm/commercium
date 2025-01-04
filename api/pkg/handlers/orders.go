@@ -9,7 +9,7 @@ import (
 
 type purchase struct {
 	// service            types.PurchaseServicer
-	service types.TransactionServicer
+	service types.PurchaseService
 }
 
 func (a *purchase) HandleTransactionHook(w http.ResponseWriter, r *http.Request) error {
@@ -79,7 +79,7 @@ func (a *purchase) GetInvoice(ctx context.Context, w http.ResponseWriter, r *htt
 	return writeJson(w, http.StatusOK, *invoiceURL)
 }
 
-func NewPurchase(service types.TransactionServicer) types.PurchaseHandler {
+func NewPurchase(service types.PurchaseService) types.PurchaseHandler {
 	handler := new(purchase)
 	handler.service = service
 	return handler

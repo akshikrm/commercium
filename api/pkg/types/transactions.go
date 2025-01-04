@@ -31,7 +31,7 @@ type TransactionRepository interface {
 	GetOrderStatus(string) string
 }
 
-type TransactionServicer interface {
+type PurchaseService interface {
 	CreateTransaction(*Data) error
 	ReadyTransaction(*Data) error
 	CompleteTransaction(*Data) error

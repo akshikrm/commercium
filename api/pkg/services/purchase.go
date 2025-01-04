@@ -112,11 +112,11 @@ func (s *transaction) GetOrdersByUserID(id uint) ([]*types.OrderList, error) {
 	return orders, nil
 }
 
-func newTransactionService(
+func newPurchaseService(
 	repository types.TransactionRepository,
 	orderRepository types.OrdersRepository,
 	cartService types.CartServicer,
-) types.TransactionServicer {
+) types.PurchaseService {
 	return &transaction{
 		repository:      repository,
 		orderRepository: orderRepository,

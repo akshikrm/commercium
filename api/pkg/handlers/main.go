@@ -20,7 +20,7 @@ func New(service *services.Service) *Handler {
 	handler.ProductCategory = NewProductCategory(service.ProductCategory)
 	handler.Cart = NewCart(service.Cart)
 	handler.User = NewUser(service.User)
-	handler.Purchase = NewPurchase(service.Transaction)
+	handler.Purchase = NewPurchase(service.Purchase)
 	handler.Middleware = newMiddleWare(service.User)
 	return handler
 }

@@ -10,7 +10,7 @@ type Service struct {
 	Product         types.ProductServicer
 	ProductCategory types.ProductCateogoryServicer
 	Cart            types.CartServicer
-	Transaction     types.TransactionServicer
+	Purchase        types.PurchaseService
 	Role            types.RoleService
 }
 
@@ -20,7 +20,7 @@ func New(store *repository.Storage) *Service {
 	service.ProductCategory = newProductCategoryService(store.ProductCategory)
 	service.Cart = newCartService(store.Cart)
 	service.User = newUserService(store.User, store.Profile)
-	service.Transaction = newTransactionService(store.Transaction, store.Orders, service.Cart)
+	service.Purchase = newPurchaseService(store.Transaction, store.Orders, service.Cart)
 	service.Role = newRoleService(store.Role)
 	return service
 }
