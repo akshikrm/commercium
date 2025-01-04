@@ -1,6 +1,10 @@
 package types
 
-import "time"
+import (
+	"context"
+	"net/http"
+	"time"
+)
 
 type CreateUserRequest struct {
 	FirstName  string `json:"first_name"`
@@ -99,4 +103,16 @@ type UserServicer interface {
 	Update(uint32, *UpdateProfileRequest) (*Profile, error)
 	Delete(uint32) error
 	GetCustomerID(id uint32) (*string, error)
+}
+
+type UserHandler interface {
+	GetProfile(context.Context, http.ResponseWriter, *http.Request) error
+	GetCustomerID(context.Context, http.ResponseWriter, *http.Request) error
+	UpdateProfile(context.Context, http.ResponseWriter, *http.Request) error
+	GetAll(context.Context, http.ResponseWriter, *http.Request) error
+	GetOne(context.Context, http.ResponseWriter, *http.Request) error
+	Login(http.ResponseWriter, *http.Request) error
+	Create(http.ResponseWriter, *http.Request) error
+	Update(http.ResponseWriter, *http.Request) error
+	Delete(context.Context, http.ResponseWriter, *http.Request) error
 }

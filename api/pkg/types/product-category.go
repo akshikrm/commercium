@@ -1,6 +1,8 @@
 package types
 
 import (
+	"context"
+	"net/http"
 	"net/url"
 	"time"
 )
@@ -45,11 +47,19 @@ type ProductCategoriesRepository interface {
 	Delete(int) error
 }
 
-type ProductCateogriesServicer interface {
+type ProductCateogoryServicer interface {
 	Create(*NewProductCategoryRequest) (*ProductCategory, error)
 	GetAll(url.Values) ([]*ProductCategory, error)
 	GetNames() ([]*ProductCategoryName, error)
 	GetOne(int) (*ProductCategory, error)
 	Update(int, *UpdateProductCategoryRequest) (*ProductCategory, error)
 	Delete(int) error
+}
+
+type ProductCategoryHandler interface {
+	GetAll(context.Context, http.ResponseWriter, *http.Request) error
+	GetOne(context.Context, http.ResponseWriter, *http.Request) error
+	Delete(context.Context, http.ResponseWriter, *http.Request) error
+	Create(context.Context, http.ResponseWriter, *http.Request) error
+	Update(context.Context, http.ResponseWriter, *http.Request) error
 }

@@ -1,4 +1,4 @@
-package app
+package handlers
 
 import (
 	"akshidas/e-com/pkg/types"
@@ -13,7 +13,7 @@ type apiFuncWithContext func(context.Context, http.ResponseWriter, *http.Request
 
 type MiddleWares struct{ userService types.UserServicer }
 
-func (m *MiddleWares) IsAdmin(ctx context.Context, f apiFuncWithContext) apiFunc {
+func (m *MiddleWares) IsAdmin(ctx context.Context, f apiFuncWithContext) ApiFunc {
 	validateAdmin := func(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
 		if role := ctx.Value("role"); role != "admin" {
 			return accessDenied(w)
@@ -23,7 +23,7 @@ func (m *MiddleWares) IsAdmin(ctx context.Context, f apiFuncWithContext) apiFunc
 	return m.IsAuthenticated(ctx, validateAdmin)
 }
 
-func (m *MiddleWares) IsAuthenticated(ctx context.Context, f apiFuncWithContext) apiFunc {
+func (m *MiddleWares) IsAuthenticated(ctx context.Context, f apiFuncWithContext) ApiFunc {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		authtoken := r.Header.Get("Authorization")
 		token, err := utils.ValidateJWT(authtoken)

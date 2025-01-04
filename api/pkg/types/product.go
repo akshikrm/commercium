@@ -1,6 +1,8 @@
 package types
 
 import (
+	"context"
+	"net/http"
 	"net/url"
 	"time"
 )
@@ -61,4 +63,12 @@ type ProductServicer interface {
 	Create(*CreateNewProduct) error
 	Update(int, *CreateNewProduct) (*OneProduct, error)
 	Delete(int) error
+}
+
+type ProductHandler interface {
+	GetAll(context.Context, http.ResponseWriter, *http.Request) error
+	GetOne(context.Context, http.ResponseWriter, *http.Request) error
+	Delete(context.Context, http.ResponseWriter, *http.Request) error
+	Create(context.Context, http.ResponseWriter, *http.Request) error
+	Update(context.Context, http.ResponseWriter, *http.Request) error
 }

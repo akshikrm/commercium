@@ -8,7 +8,7 @@ import (
 type Service struct {
 	User            types.UserServicer
 	Product         types.ProductServicer
-	ProductCategory types.ProductCateogriesServicer
+	ProductCategory types.ProductCateogoryServicer
 	Cart            types.CartServicer
 	Purchase        types.PurchaseServicer
 	Transaction     types.TransactionServicer

@@ -1,4 +1,4 @@
-package app
+package handlers
 
 import (
 	"akshidas/e-com/pkg/services"
@@ -7,12 +7,12 @@ import (
 	"net/http"
 )
 
-type OrdersApi struct {
+type orders struct {
 	service            types.PurchaseServicer
 	transactionService types.TransactionServicer
 }
 
-func (a *OrdersApi) HandleTransactionHook(w http.ResponseWriter, r *http.Request) error {
+func (a *orders) HandleTransactionHook(w http.ResponseWriter, r *http.Request) error {
 	body := new(types.Body)
 
 	if err := DecodeBody(r.Body, &body); err != nil {
@@ -44,7 +44,7 @@ func (a *OrdersApi) HandleTransactionHook(w http.ResponseWriter, r *http.Request
 	return writeJson(w, http.StatusOK, "waiting...")
 }
 
-func (a *OrdersApi) GetMyOrders(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
+func (a *orders) GetMyOrders(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
 	userID := uint(ctx.Value("userID").(int))
 	orders, err := a.service.GetOrdersByUserID(userID)
 	if err != nil {
@@ -53,7 +53,7 @@ func (a *OrdersApi) GetMyOrders(ctx context.Context, w http.ResponseWriter, r *h
 	return writeJson(w, http.StatusOK, orders)
 }
 
-func (a *OrdersApi) GetOrderStatus(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
+func (a *orders) GetOrderStatus(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
 	txnId := r.PathValue("txnId")
 	paddle := new(services.PaddlePayment)
 	if err := paddle.Init(); err != nil {
@@ -68,7 +68,7 @@ func (a *OrdersApi) GetOrderStatus(ctx context.Context, w http.ResponseWriter, r
 	return writeJson(w, http.StatusOK, transactionStatus)
 }
 
-func (a *OrdersApi) GetInvoice(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
+func (a *orders) GetInvoice(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
 	txnId := r.PathValue("txnId")
 	paddle := new(services.PaddlePayment)
 	if err := paddle.Init(); err != nil {
@@ -79,10 +79,9 @@ func (a *OrdersApi) GetInvoice(ctx context.Context, w http.ResponseWriter, r *ht
 	return writeJson(w, http.StatusOK, *invoiceURL)
 }
 
-func newOrdersApi(transactionService types.TransactionServicer, purchaseService types.PurchaseServicer) *OrdersApi {
-
-	return &OrdersApi{
-		service:            purchaseService,
-		transactionService: transactionService,
-	}
+func NewOrders(transactionService types.TransactionServicer, purchaseService types.PurchaseServicer) types.PurchaseHandler {
+	handler := new(orders)
+	handler.service = purchaseService
+	handler.transactionService = transactionService
+	return handler
 }

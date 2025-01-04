@@ -2,6 +2,7 @@ package main
 
 import (
 	"akshidas/e-com/pkg/app"
+	"akshidas/e-com/pkg/handlers"
 	"akshidas/e-com/pkg/repository"
 	"akshidas/e-com/pkg/services"
 	"log"
@@ -16,13 +17,14 @@ func main() {
 
 	store := repository.New()
 	services := services.New(store)
-	server := app.New(":5324", services)
+	handlers := handlers.New(services)
+	server := app.New(":5234", handlers)
 
-	server.RegisterRoutes(app.UserHandler)
-	server.RegisterRoutes(app.ProductHandler)
-	server.RegisterRoutes(app.ProductCategoryHandler)
-	server.RegisterRoutes(app.CartHandler)
-	server.RegisterRoutes(app.PurchaseHandler)
+	server.RegisterRoutes(app.UserRoute)
+	server.RegisterRoutes(app.ProductRoute)
+	server.RegisterRoutes(app.ProductCategoryRoute)
+	server.RegisterRoutes(app.CartRoute)
+	server.RegisterRoutes(app.PurchaseRoute)
 
 	server.Run()
 }

@@ -1,4 +1,4 @@
-package app
+package handlers
 
 import (
 	"akshidas/e-com/pkg/types"
@@ -6,55 +6,55 @@ import (
 	"net/http"
 )
 
-type ProductApi struct {
-	ProductService types.ProductServicer
+type product struct {
+	service types.ProductServicer
 }
 
-func (u *ProductApi) GetAll(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
+func (u *product) GetAll(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
 	filter := r.URL.Query()
-	users, err := u.ProductService.Get(filter)
+	users, err := u.service.Get(filter)
 	if err != nil {
 		return err
 	}
 	return writeJson(w, http.StatusOK, users)
 }
 
-func (u *ProductApi) GetOne(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
+func (u *product) GetOne(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
 	id, err := parseId(r.PathValue("id"))
 	if err != nil {
 		return err
 	}
-	foundProduct, err := u.ProductService.GetOne(id)
+	foundProduct, err := u.service.GetOne(id)
 	if err != nil {
 		return err
 	}
 	return writeJson(w, http.StatusOK, foundProduct)
 }
 
-func (u *ProductApi) Delete(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
+func (u *product) Delete(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
 	id, err := parseId(r.PathValue("id"))
 	if err != nil {
 		return err
 	}
-	if err := u.ProductService.Delete(id); err != nil {
+	if err := u.service.Delete(id); err != nil {
 		return err
 	}
 	return writeJson(w, http.StatusOK, "deleted successfully")
 }
 
-func (u *ProductApi) Create(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
+func (u *product) Create(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
 	a := &types.CreateNewProduct{}
 	if err := DecodeBody(r.Body, &a); err != nil {
 		return err
 	}
-	err := u.ProductService.Create(a)
+	err := u.service.Create(a)
 	if err != nil {
 		return err
 	}
 	return writeJson(w, http.StatusCreated, "product created")
 }
 
-func (u *ProductApi) Update(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
+func (u *product) Update(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
 	a := types.CreateNewProduct{}
 	if err := DecodeBody(r.Body, &a); err != nil {
 		return err
@@ -63,13 +63,15 @@ func (u *ProductApi) Update(ctx context.Context, w http.ResponseWriter, r *http.
 	if err != nil {
 		return err
 	}
-	product, err := u.ProductService.Update(id, &a)
+	product, err := u.service.Update(id, &a)
 	if err != nil {
 		return err
 	}
 	return writeJson(w, http.StatusCreated, product)
 }
 
-func newProductApi(service types.ProductServicer) *ProductApi {
-	return &ProductApi{ProductService: service}
+func NewProduct(service types.ProductServicer) types.ProductHandler {
+	handler := new(product)
+	handler.service = service
+	return handler
 }

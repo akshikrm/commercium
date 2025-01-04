@@ -1,4 +1,4 @@
-package app
+package handlers
 
 import (
 	"akshidas/e-com/pkg/types"
@@ -7,111 +7,111 @@ import (
 	"net/http"
 )
 
-type UserApi struct {
-	UserService types.UserServicer
+type user struct {
+	service types.UserServicer
 }
 
-func (u *UserApi) GetProfile(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
+func (u *user) GetProfile(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
 	id := ctx.Value("userID")
-	userProfile, err := u.UserService.GetProfile(id.(uint32))
+	userProfile, err := u.service.GetProfile(id.(uint32))
 	if err != nil {
 		return err
 	}
 	return writeJson(w, http.StatusOK, userProfile)
 }
 
-func (u *UserApi) GetCustomerID(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
+func (u *user) GetCustomerID(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
 	id := ctx.Value("userID").(uint32)
-	customerID, err := u.UserService.GetCustomerID(uint32(id))
+	customerID, err := u.service.GetCustomerID(uint32(id))
 	if err != nil {
 		return err
 	}
 	return writeJson(w, http.StatusOK, customerID)
 }
 
-func (u *UserApi) UpdateProfile(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
+func (u *user) UpdateProfile(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
 	id := ctx.Value("userID")
 	a := types.UpdateProfileRequest{}
 	if err := DecodeBody(r.Body, &a); err != nil {
 		return err
 	}
-	user, err := u.UserService.Update(id.(uint32), &a)
+	user, err := u.service.Update(id.(uint32), &a)
 	if err != nil {
 		return err
 	}
 	return writeJson(w, http.StatusOK, user)
 }
 
-func (u *UserApi) GetAll(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
-	users, err := u.UserService.Get()
+func (u *user) GetAll(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
+	users, err := u.service.Get()
 	if err != nil {
 		return err
 	}
 	return writeJson(w, http.StatusOK, users)
 }
-func (u *UserApi) GetOne(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
+func (u *user) GetOne(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
 	id, err := parseId(r.PathValue("id"))
 	if err != nil {
 		return err
 	}
-	foundUser, err := u.UserService.GetOne(uint32(id))
+	foundUser, err := u.service.GetOne(uint32(id))
 	if err != nil {
 		return err
 	}
 	return writeJson(w, http.StatusOK, foundUser)
 }
 
-func (u *UserApi) Login(w http.ResponseWriter, r *http.Request) error {
+func (u *user) Login(w http.ResponseWriter, r *http.Request) error {
 	a := types.LoginUserRequest{}
 	if err := DecodeBody(r.Body, &a); err != nil {
 		return err
 	}
-	token, err := u.UserService.Login(&a)
+	token, err := u.service.Login(&a)
 	if err != nil {
 		return err
 	}
 	return writeJson(w, http.StatusOK, token)
 }
 
-func (u *UserApi) Create(w http.ResponseWriter, r *http.Request) error {
+func (u *user) Create(w http.ResponseWriter, r *http.Request) error {
 	a := &types.CreateUserRequest{}
 	if err := DecodeBody(r.Body, &a); err != nil {
 		return err
 	}
-	token, err := u.UserService.Create(*a)
+	token, err := u.service.Create(*a)
 	if err != nil {
 		return err
 	}
 	return writeJson(w, http.StatusCreated, token)
 }
 
-func (u *UserApi) Update(w http.ResponseWriter, r *http.Request) error {
+func (u *user) Update(w http.ResponseWriter, r *http.Request) error {
 	a := types.UpdateProfileRequest{}
 	if err := DecodeBody(r.Body, &a); err != nil {
 		return err
 	}
 	id, err := parseId(r.PathValue("id"))
-	user, err := u.UserService.Update(uint32(id), &a)
+	user, err := u.service.Update(uint32(id), &a)
 	if err != nil {
 		return err
 	}
 	return writeJson(w, http.StatusOK, user)
 }
 
-func (u *UserApi) Delete(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
+func (u *user) Delete(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
 	log.Println("deleting")
 	id, err := parseId(r.PathValue("id"))
 	if err != nil {
 		return err
 	}
-	if err := u.UserService.Delete(uint32(id)); err != nil {
+	if err := u.service.Delete(uint32(id)); err != nil {
 		return err
 	}
 	return writeJson(w, http.StatusOK, "deleted successfully")
 }
 
-func newUserApi(service types.UserServicer) *UserApi {
-	api := new(UserApi)
-	api.UserService = service
-	return api
+func NewUser(service types.UserServicer) types.UserHandler {
+	handler := new(user)
+	handler.service = service
+	return handler
 }

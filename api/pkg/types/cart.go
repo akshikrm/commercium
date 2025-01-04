@@ -1,6 +1,10 @@
 package types
 
-import "time"
+import (
+	"context"
+	"net/http"
+	"time"
+)
 
 type CreateCartRequest struct {
 	UserID    uint32 `json:"user_id"`
@@ -55,4 +59,12 @@ type CartServicer interface {
 	Update(uint32, *UpdateCartRequest) (*CartList, error)
 	Delete(uint32) error
 	HardDeleteByUserID(string) error
+}
+
+type CartHandler interface {
+	GetAll(context.Context, http.ResponseWriter, *http.Request) error
+	GetOne(context.Context, http.ResponseWriter, *http.Request) error
+	Create(context.Context, http.ResponseWriter, *http.Request) error
+	Update(context.Context, http.ResponseWriter, *http.Request) error
+	Delete(context.Context, http.ResponseWriter, *http.Request) error
 }
