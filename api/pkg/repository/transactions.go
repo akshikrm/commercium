@@ -80,6 +80,6 @@ func (m *transactions) GetOrderStatus(txnId string) string {
 	return transactionStatus
 }
 
-func newTransactions(store *sql.DB) *transactions {
+func newTransactions(store *sql.DB) types.TransactionRepository {
 	return &transactions{store: store}
 }

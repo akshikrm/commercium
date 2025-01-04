@@ -6,13 +6,13 @@ import (
 	"log"
 )
 
-type TransactionService struct {
-	transactionRepository types.TransactionRepository
-	orderRepository       types.OrdersRepository
-	cartService           types.CartServicer
+type transaction struct {
+	repository      types.TransactionRepository
+	orderRepository types.OrdersRepository
+	cartService     types.CartServicer
 }
 
-func (t *TransactionService) CreateTransaction(data *types.Data) error {
+func (t *transaction) CreateTransaction(data *types.Data) error {
 	transaction := types.NewTransaction{
 		TransactionID: data.ID,
 		Status:        data.Status,
@@ -23,7 +23,7 @@ func (t *TransactionService) CreateTransaction(data *types.Data) error {
 	}
 
 	log.Println("adding transaction")
-	id := t.transactionRepository.NewTransaction(&transaction)
+	id := t.repository.NewTransaction(&transaction)
 	if id == nil {
 		log.Println("transaction create failed")
 		return utils.ServerError
@@ -60,53 +60,66 @@ func (t *TransactionService) CreateTransaction(data *types.Data) error {
 
 }
 
-func (t *TransactionService) ReadyTransaction(data *types.Data) error {
+func (t *transaction) ReadyTransaction(data *types.Data) error {
 	transaction := types.TransactionReady{
 		TransactionID: data.ID,
 		Status:        data.Status,
 		CustomerID:    data.CustomerID,
 	}
-	err := t.transactionRepository.TransactionReady(&transaction)
+	err := t.repository.TransactionReady(&transaction)
 	if err == nil {
 		log.Println("transaction ready")
 	}
 	return err
 }
 
-func (t *TransactionService) CompleteTransaction(data *types.Data) error {
+func (t *transaction) CompleteTransaction(data *types.Data) error {
 	transaction := types.TransactionCompleted{
 		TransactionID: data.ID,
 		Status:        data.Status,
 		InvoiceNumber: data.InvoiceNumber,
 	}
-	err := t.transactionRepository.TransactionCompleted(&transaction)
+	err := t.repository.TransactionCompleted(&transaction)
 	if err == nil {
 		log.Println("transaction complete")
 	}
 	return err
 }
 
-func (t *TransactionService) FailedTransaction(data *types.Data) error {
+func (t *transaction) FailedTransaction(data *types.Data) error {
 	log.Println("transaction failed")
-	return t.transactionRepository.UpdateStatus(data.ID, "failed")
+	return t.repository.UpdateStatus(data.ID, "failed")
 }
 
-func (t *TransactionService) GetOrderStatus(txnID string) (string, error) {
-	status := t.transactionRepository.GetOrderStatus(txnID)
+func (t *transaction) GetOrderStatus(txnID string) (string, error) {
+	status := t.repository.GetOrderStatus(txnID)
 	if status == "" {
 		return "", utils.NotFound
 	}
 	return status, nil
 }
 
+func (s *transaction) GetPurchaseByOrderID(id uint) ([]*types.PurchaseList, error) {
+	return s.orderRepository.GetPurchaseByOrderID(id)
+}
+
+func (s *transaction) GetOrdersByUserID(id uint) ([]*types.OrderList, error) {
+	orders, err := s.orderRepository.GetOrdersByUserID(id)
+	if err != nil {
+		return nil, err
+	}
+
+	return orders, nil
+}
+
 func newTransactionService(
-	transactionRepository types.TransactionRepository,
-	orderRepoistory types.OrdersRepository,
+	repository types.TransactionRepository,
+	orderRepository types.OrdersRepository,
 	cartService types.CartServicer,
-) *TransactionService {
-	return &TransactionService{
-		transactionRepository: transactionRepository,
-		orderRepository:       orderRepoistory,
-		cartService:           cartService,
+) types.TransactionServicer {
+	return &transaction{
+		repository:      repository,
+		orderRepository: orderRepository,
+		cartService:     cartService,
 	}
 }

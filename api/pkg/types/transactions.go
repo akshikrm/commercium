@@ -37,4 +37,6 @@ type TransactionServicer interface {
 	CompleteTransaction(*Data) error
 	FailedTransaction(*Data) error
 	GetOrderStatus(string) (string, error)
+	GetPurchaseByOrderID(id uint) ([]*PurchaseList, error)
+	GetOrdersByUserID(id uint) ([]*OrderList, error)
 }

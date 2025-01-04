@@ -7,12 +7,12 @@ import (
 	"net/http"
 )
 
-type orders struct {
-	service            types.PurchaseServicer
-	transactionService types.TransactionServicer
+type purchase struct {
+	// service            types.PurchaseServicer
+	service types.TransactionServicer
 }
 
-func (a *orders) HandleTransactionHook(w http.ResponseWriter, r *http.Request) error {
+func (a *purchase) HandleTransactionHook(w http.ResponseWriter, r *http.Request) error {
 	body := new(types.Body)
 
 	if err := DecodeBody(r.Body, &body); err != nil {
@@ -22,29 +22,29 @@ func (a *orders) HandleTransactionHook(w http.ResponseWriter, r *http.Request) e
 	switch body.EventType {
 	case "transaction.created":
 		{
-			a.transactionService.CreateTransaction(&body.Data)
+			a.service.CreateTransaction(&body.Data)
 			return writeJson(w, http.StatusOK, "transaction created...")
 		}
 	case "transaction.ready":
 		{
-			a.transactionService.ReadyTransaction(&body.Data)
+			a.service.ReadyTransaction(&body.Data)
 			return writeJson(w, http.StatusOK, "transaction ready...")
 		}
 	case "transaction.completed":
 		{
-			a.transactionService.CompleteTransaction(&body.Data)
+			a.service.CompleteTransaction(&body.Data)
 			return writeJson(w, http.StatusOK, "transaction completed...")
 		}
 	case "transaction.payment_failed":
 		{
-			a.transactionService.FailedTransaction(&body.Data)
+			a.service.FailedTransaction(&body.Data)
 			return writeJson(w, http.StatusOK, "transaction failed...")
 		}
 	}
 	return writeJson(w, http.StatusOK, "waiting...")
 }
 
-func (a *orders) GetMyOrders(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
+func (a *purchase) GetMyOrders(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
 	userID := uint(ctx.Value("userID").(int))
 	orders, err := a.service.GetOrdersByUserID(userID)
 	if err != nil {
@@ -53,14 +53,14 @@ func (a *orders) GetMyOrders(ctx context.Context, w http.ResponseWriter, r *http
 	return writeJson(w, http.StatusOK, orders)
 }
 
-func (a *orders) GetOrderStatus(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
+func (a *purchase) GetOrderStatus(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
 	txnId := r.PathValue("txnId")
 	paddle := new(services.PaddlePayment)
 	if err := paddle.Init(); err != nil {
 		return err
 	}
 
-	transactionStatus, err := a.transactionService.GetOrderStatus(txnId)
+	transactionStatus, err := a.service.GetOrderStatus(txnId)
 	if err != nil {
 		return err
 	}
@@ -68,7 +68,7 @@ func (a *orders) GetOrderStatus(ctx context.Context, w http.ResponseWriter, r *h
 	return writeJson(w, http.StatusOK, transactionStatus)
 }
 
-func (a *orders) GetInvoice(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
+func (a *purchase) GetInvoice(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
 	txnId := r.PathValue("txnId")
 	paddle := new(services.PaddlePayment)
 	if err := paddle.Init(); err != nil {
@@ -79,9 +79,8 @@ func (a *orders) GetInvoice(ctx context.Context, w http.ResponseWriter, r *http.
 	return writeJson(w, http.StatusOK, *invoiceURL)
 }
 
-func NewOrders(transactionService types.TransactionServicer, purchaseService types.PurchaseServicer) types.PurchaseHandler {
-	handler := new(orders)
-	handler.service = purchaseService
-	handler.transactionService = transactionService
+func NewPurchase(service types.TransactionServicer) types.PurchaseHandler {
+	handler := new(purchase)
+	handler.service = service
 	return handler
 }
