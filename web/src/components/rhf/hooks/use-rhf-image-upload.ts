@@ -4,15 +4,33 @@ import useUploadImage from "@hooks/use-upload-image"
 
 const useRHFImageUpload = (name: string) => {
     const [previews, setPreviews] = useState<Preview[]>([])
-    const { setValue } = useFormContext()
+    const { setValue, watch } = useFormContext()
     const mutation = useUploadImage()
 
+    const image: string = watch("image")
+
+    useEffect(() => {
+        if (image.length > 0) {
+            const imageSplit = image.split("/")
+            const lastPart = imageSplit[imageSplit.length - 1]
+            if (lastPart) {
+                const [productID] = lastPart.split(".")
+                setPreviews([
+                    {
+                        publicID: productID,
+                        status: "success"
+                    }
+                ])
+            }
+        }
+    }, [image])
+
     const { status, data } = mutation
-    const { public_id } = data || {}
+    const { public_id, secure_url } = data || {}
 
     useEffect(() => {
         if (status === "success") {
-            setValue(name, public_id)
+            setValue(name, secure_url)
             setPreviews(prev => {
                 const temp = [...prev]
                 const selectedIndex = temp.findIndex(
@@ -29,7 +47,7 @@ const useRHFImageUpload = (name: string) => {
         if (status === "pending") {
             setPreviews([...previews, { publicID: "", status: "pending" }])
         }
-    }, [status, public_id])
+    }, [status, public_id, secure_url])
 
     return { mutation, previews }
 }
