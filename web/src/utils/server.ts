@@ -24,6 +24,9 @@ server.interceptors.response.use(
                 "there seems to be some problem with your network connection, trying again...",
                 { id: TOAST_ID }
             )
+            return Promise.reject(
+                "there seems to be some problem with your network connection, trying again..."
+            )
         }
         if (status === 401) {
             clearSession()
