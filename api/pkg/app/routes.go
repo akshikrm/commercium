@@ -73,3 +73,12 @@ func PurchaseRoute(s *Server) routes {
 		"GET /orders":                 middleware.IsAuthenticated(ctx, handler.GetMyOrders),
 	}
 }
+
+func UploadRoute(s *Server) routes {
+	ctx := context.Background()
+	handler := s.handlers.Upload
+	middleware := s.handlers.Middleware
+	return routes{
+		"POST /upload": middleware.IsAdmin(ctx, handler.Upload),
+	}
+}

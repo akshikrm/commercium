@@ -79,7 +79,7 @@ func (a *purchase) GetInvoice(ctx context.Context, w http.ResponseWriter, r *htt
 	return writeJson(w, http.StatusOK, *invoiceURL)
 }
 
-func NewPurchase(service types.PurchaseService) types.PurchaseHandler {
+func newPurchase(service types.PurchaseService) types.PurchaseHandler {
 	handler := new(purchase)
 	handler.service = service
 	return handler

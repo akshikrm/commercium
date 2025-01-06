@@ -87,7 +87,7 @@ func (s Seeder) seedProductCategories() {
 func (s Seeder) seedProducts() {
 	fmt.Print("Seeding products...")
 	file := readFile("./seed/mock/products.json")
-	products := []types.CreateNewProduct{}
+	products := []types.NewProductRequest{}
 	json.Unmarshal(file, &products)
 
 	for _, product := range products {

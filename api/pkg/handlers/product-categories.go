@@ -80,7 +80,7 @@ func (s *productCategory) Delete(ctx context.Context, w http.ResponseWriter, r *
 	return writeJson(w, http.StatusOK, "delete successfully")
 }
 
-func NewProductCategory(service types.ProductCateogoryServicer) types.ProductCategoryHandler {
+func newProductCategory(service types.ProductCateogoryServicer) types.ProductCategoryHandler {
 	handler := new(productCategory)
 	handler.service = service
 	return handler

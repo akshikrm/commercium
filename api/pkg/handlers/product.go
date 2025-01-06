@@ -43,7 +43,7 @@ func (u *product) Delete(ctx context.Context, w http.ResponseWriter, r *http.Req
 }
 
 func (u *product) Create(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
-	a := &types.CreateNewProduct{}
+	a := &types.NewProductRequest{}
 	if err := DecodeBody(r.Body, &a); err != nil {
 		return err
 	}
@@ -55,7 +55,7 @@ func (u *product) Create(ctx context.Context, w http.ResponseWriter, r *http.Req
 }
 
 func (u *product) Update(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
-	a := types.CreateNewProduct{}
+	a := types.NewProductRequest{}
 	if err := DecodeBody(r.Body, &a); err != nil {
 		return err
 	}
@@ -70,7 +70,7 @@ func (u *product) Update(ctx context.Context, w http.ResponseWriter, r *http.Req
 	return writeJson(w, http.StatusCreated, product)
 }
 
-func NewProduct(service types.ProductServicer) types.ProductHandler {
+func newProduct(service types.ProductServicer) types.ProductHandler {
 	handler := new(product)
 	handler.service = service
 	return handler

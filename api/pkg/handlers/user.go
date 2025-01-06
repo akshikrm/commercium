@@ -110,7 +110,7 @@ func (u *user) Delete(ctx context.Context, w http.ResponseWriter, r *http.Reques
 	return writeJson(w, http.StatusOK, "deleted successfully")
 }
 
-func NewUser(service types.UserServicer) types.UserHandler {
+func newUser(service types.UserServicer) types.UserHandler {
 	handler := new(user)
 	handler.service = service
 	return handler

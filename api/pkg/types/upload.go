@@ -1,6 +1,10 @@
 package types
 
-import "time"
+import (
+	"context"
+	"net/http"
+	"time"
+)
 
 type Upload struct {
 	ID        uint32     `json:"id"`
@@ -12,4 +16,8 @@ type Upload struct {
 
 type UploadModeler interface {
 	Create(string) (*Upload, error)
+}
+
+type UploadHandler interface {
+	Upload(context.Context, http.ResponseWriter, *http.Request) error
 }

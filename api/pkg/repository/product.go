@@ -13,13 +13,13 @@ type product struct {
 	store *sql.DB
 }
 
-func (p *product) Create(product *types.CreateNewProduct) (*types.OneProduct, error) {
+func (p *product) Create(product *types.NewProductRequest) (*types.OneProduct, error) {
 	query := "INSERT INTO products(name, slug, price, image, description, category_id, product_id, price_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *"
 	row := p.store.QueryRow(query,
 		product.Name,
 		product.Slug,
 		product.Price,
-		product.Image,
+		product.PrimaryImage,
 		product.Description,
 		product.CategoryID,
 		product.ProductID,
@@ -37,13 +37,13 @@ func (p *product) Create(product *types.CreateNewProduct) (*types.OneProduct, er
 	return savedProduct, nil
 }
 
-func (p *product) Update(pid int, product *types.CreateNewProduct) (*types.OneProduct, error) {
+func (p *product) Update(pid int, product *types.NewProductRequest) (*types.OneProduct, error) {
 	query := "UPDATE products SET name=$1, slug=$2, price=$3, image=$4, description=$5, category_id=$6 WHERE id=$7 AND deleted_at IS NULL RETURNING *"
 	row := p.store.QueryRow(query,
 		product.Name,
 		product.Slug,
 		product.Price,
-		product.Image,
+		product.PrimaryImage,
 		product.Description,
 		product.CategoryID,
 		pid,

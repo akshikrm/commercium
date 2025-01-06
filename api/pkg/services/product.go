@@ -14,7 +14,7 @@ func (r *product) Get(filter url.Values) ([]*types.ProductsList, error) {
 	return r.repository.GetAll(filter)
 }
 
-func (r *product) Create(newProduct *types.CreateNewProduct) error {
+func (r *product) Create(newProduct *types.NewProductRequest) error {
 	paddlePayment := new(PaddlePayment)
 	if err := paddlePayment.Init(); err != nil {
 		return err
@@ -32,7 +32,7 @@ func (r *product) Create(newProduct *types.CreateNewProduct) error {
 	return err
 }
 
-func (r *product) Update(id int, newProduct *types.CreateNewProduct) (*types.OneProduct, error) {
+func (r *product) Update(id int, newProduct *types.NewProductRequest) (*types.OneProduct, error) {
 	return r.repository.Update(id, newProduct)
 }
 

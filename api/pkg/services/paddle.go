@@ -61,13 +61,14 @@ func (p *PaddlePayment) GetInvoice(txnId string) *string {
 
 }
 
-func (p *PaddlePayment) CreateProduct(newProduct *types.CreateNewProduct) error {
+func (p *PaddlePayment) CreateProduct(newProduct *types.NewProductRequest) error {
 	ctx := context.Background()
 
 	product, err := p.Client.CreateProduct(ctx, &paddle.CreateProductRequest{
 		Name:        newProduct.Name,
 		Description: &newProduct.Description,
 		TaxCategory: paddle.TaxCategoryStandard,
+		ImageURL:    &newProduct.PrimaryImage,
 	})
 
 	if err != nil {
