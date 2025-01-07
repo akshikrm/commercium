@@ -1,6 +1,5 @@
 build:
 	@go build -o temp cmd/main.go 
-	@go build -o file-server ./storage.go
 	@rm ./dist && mv ./temp ./dist
 		
 build-seeder:
