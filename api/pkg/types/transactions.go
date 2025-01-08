@@ -25,9 +25,9 @@ type TransactionCompleted struct {
 
 type TransactionRepository interface {
 	NewTransaction(*NewTransaction) *uint32
-	TransactionReady(*TransactionReady) error
-	UpdateStatus(string, string) error
-	TransactionCompleted(*TransactionCompleted) error
+	TransactionReady(*TransactionReady) bool
+	UpdateStatus(string, string) bool
+	TransactionCompleted(*TransactionCompleted) bool
 	GetOrderStatus(string) string
 }
 

@@ -77,20 +77,20 @@ type Profile struct {
 }
 
 type UserRepository interface {
-	Get() ([]*User, error)
-	GetOne(id uint32) (*User, error)
-	GetPasswordByEmail(string) (*User, error)
-	GetUserByEmail(string) (*User, error)
-	Create(CreateUserRequest) (*User, error)
-	Update(uint32, UpdateUserRequest) error
-	Delete(uint32) error
+	Get() ([]*User, bool)
+	GetOne(id uint32) (*User, bool)
+	GetPasswordByEmail(string) (*User, bool)
+	GetUserByEmail(string) (*User, bool)
+	Create(CreateUserRequest) (*User, bool)
+	Update(uint32, UpdateUserRequest) bool
+	Delete(uint32) bool
 	GetCustomerID(uint32) *string
 }
 
 type ProfileRepository interface {
-	GetByUserId(uint32) (*Profile, error)
-	Create(*NewProfileRequest) (uint32, error)
-	UpdateProfileByUserID(uint32, *UpdateProfileRequest) error
+	GetByUserId(uint32) (*Profile, bool)
+	Create(*NewProfileRequest) (uint32, bool)
+	UpdateProfileByUserID(uint32, *UpdateProfileRequest) bool
 	CheckIfUserExists(string) bool
 }
 

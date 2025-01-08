@@ -2,7 +2,6 @@ package repository
 
 import (
 	"akshidas/e-com/pkg/types"
-	"akshidas/e-com/pkg/utils"
 	"database/sql"
 	"log"
 )
@@ -11,7 +10,7 @@ type profile struct {
 	DB *sql.DB
 }
 
-func (p *profile) GetByUserId(userId uint32) (*types.Profile, error) {
+func (p *profile) GetByUserId(userId uint32) (*types.Profile, bool) {
 	query := `select * from profiles where user_id=$1`
 	row := p.DB.QueryRow(query, userId)
 
@@ -31,15 +30,15 @@ func (p *profile) GetByUserId(userId uint32) (*types.Profile, error) {
 		&savedProfile.DeletedAt,
 	); err != nil {
 		if err == sql.ErrNoRows {
-			return nil, utils.NotFound
+			return nil, false
 		}
 		log.Printf("failed to get profile of user with id: %d due to: %s", userId, err)
-		return nil, utils.ServerError
+		return nil, false
 	}
-	return savedProfile, nil
+	return savedProfile, false
 }
 
-func (p *profile) Create(profile *types.NewProfileRequest) (uint32, error) {
+func (p *profile) Create(profile *types.NewProfileRequest) (uint32, bool) {
 	query := `insert into
 	profiles (first_name,last_name, email, user_id)
 	values ($1, $2, $3, $4)
@@ -57,9 +56,9 @@ func (p *profile) Create(profile *types.NewProfileRequest) (uint32, error) {
 	savedProfile := types.Profile{}
 	if err := row.Scan(&savedProfile.ID); err != nil {
 		log.Printf("failed to scan user after writing %d %s", savedProfile.ID, err)
-		return 0, utils.ServerError
+		return 0, true
 	}
-	return savedProfile.ID, nil
+	return savedProfile.ID, false
 }
 
 func (p *profile) CheckIfUserExists(email string) bool {
@@ -73,7 +72,7 @@ func (p *profile) CheckIfUserExists(email string) bool {
 	return status
 }
 
-func (p *profile) UpdateProfileByUserID(userId uint32, profile *types.UpdateProfileRequest) error {
+func (p *profile) UpdateProfileByUserID(userId uint32, profile *types.UpdateProfileRequest) bool {
 	query := `update profiles set pincode=$1, address_one=$2, address_two=$3, phone_number=$4, first_name=$5, last_name=$6, email=$7 where user_id=$8`
 
 	result, err := p.DB.Exec(query,
@@ -89,17 +88,16 @@ func (p *profile) UpdateProfileByUserID(userId uint32, profile *types.UpdateProf
 
 	if err != nil {
 		log.Printf("failed to update profile %v due to %s", profile, err)
-		return utils.ServerError
+		return false
 	}
 
 	if count, _ := result.RowsAffected(); count == 0 {
 		log.Printf("updated %d rows", count)
-		return utils.NotFound
+		return true
 	}
-
-	return nil
+	return true
 }
 
-func newProfile(DB *sql.DB) *profile {
+func newProfile(DB *sql.DB) types.ProfileRepository {
 	return &profile{DB: DB}
 }

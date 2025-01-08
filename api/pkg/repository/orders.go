@@ -2,7 +2,6 @@ package repository
 
 import (
 	"akshidas/e-com/pkg/types"
-	"akshidas/e-com/pkg/utils"
 	"database/sql"
 	"encoding/json"
 	"fmt"
@@ -13,17 +12,16 @@ type orders struct {
 	store *sql.DB
 }
 
-func (m *orders) GetPurchaseByOrderID(id uint) ([]*types.PurchaseList, error) {
+func (m *orders) GetPurchaseByOrderID(id uint) ([]*types.PurchaseList, bool) {
 	query := `select ps.id, ps.quantity, ps.price, ps.created_at,pr.id as
 	product_id, pr.name as product_name, pr.slug as product_slug from purchases
 	ps INNER JOIN products pr on ps.product_id=pr.id where ps.order_id=$1;`
 	rows, err := m.store.Query(query, id)
 	if err != nil {
 		log.Printf("failed to retrieve data due to %s", err)
-		return nil, utils.ServerError
+		return nil, false
 	}
 	defer rows.Close()
-
 	purchases := []*types.PurchaseList{}
 	for rows.Next() {
 		purchase := types.PurchaseList{}
@@ -36,18 +34,15 @@ func (m *orders) GetPurchaseByOrderID(id uint) ([]*types.PurchaseList, error) {
 			&purchase.Product.Name,
 			&purchase.Product.Slug,
 		); err != nil {
-			if err == sql.ErrNoRows {
-				log.Printf("row cannot be read")
-				return nil, utils.NotFound
-			}
-			return nil, utils.ServerError
+			log.Printf("failed to read row due to %s", err)
+			return nil, false
 		}
 		purchases = append(purchases, &purchase)
 	}
-	return purchases, nil
+	return purchases, true
 }
 
-func (m *orders) GetOrdersByUserID(id uint) ([]*types.OrderList, error) {
+func (m *orders) GetOrdersByUserID(id uint) ([]*types.OrderList, bool) {
 	query := `
 	 SELECT 
 		t.id,
@@ -82,7 +77,7 @@ func (m *orders) GetOrdersByUserID(id uint) ([]*types.OrderList, error) {
 	rows, err := m.store.Query(query, id)
 	if err != nil {
 		log.Printf("failed to retrieve orders due to %s", err)
-		return nil, utils.ServerError
+		return nil, false
 	}
 	defer rows.Close()
 
@@ -101,10 +96,10 @@ func (m *orders) GetOrdersByUserID(id uint) ([]*types.OrderList, error) {
 		); err != nil {
 			if err == sql.ErrNoRows {
 				log.Println("row cannot be read")
-				return nil, utils.NotFound
+				return nil, true
 			}
 			log.Printf("error: %s", err)
-			return nil, utils.ServerError
+			return nil, false
 		}
 		err = json.Unmarshal([]byte(products), &order.Products)
 		if err != nil {
@@ -112,10 +107,10 @@ func (m *orders) GetOrdersByUserID(id uint) ([]*types.OrderList, error) {
 		}
 		orders = append(orders, &order)
 	}
-	return orders, nil
+	return orders, true
 }
 
-func (m *orders) CreateOrder(orders []*types.NewOrder) error {
+func (m *orders) CreateOrder(orders []*types.NewOrder) bool {
 	query := "INSERT INTO orders(transaction_id, quantity, price_id, product_id, amount) VALUES"
 
 	ordersLength := len(orders)
@@ -136,35 +131,35 @@ func (m *orders) CreateOrder(orders []*types.NewOrder) error {
 	result, err := m.store.Exec(query)
 	if err != nil {
 		log.Printf("failed to create orders %s", err)
-		return utils.ServerError
+		return false
 	}
 
 	affected, err := result.RowsAffected()
 	if err != nil {
-		return utils.ServerError
+		return false
 	}
 
 	if affected != int64(len(orders)) {
-		return utils.ServerError
+		return false
 	}
 
-	return nil
+	return true
 
 }
 
-func (m *orders) NewOrder(orderRequest *types.OrderRequest) (uint, error) {
+func (m *orders) NewOrder(orderRequest *types.OrderRequest) (uint, bool) {
 	query := "INSERT INTO orders(order_id, user_id, price) VALUES($1, $2, $3) RETURNING(id)"
 
 	row := m.store.QueryRow(query, orderRequest.OrderID, orderRequest.UserID, orderRequest.Price)
 	var orderID uint
 	if err := row.Scan(&orderID); err != nil {
 		log.Printf("failed to place order :%s", err)
-		return 0, utils.ServerError
+		return 0, false
 	}
-	return orderID, nil
+	return orderID, true
 }
 
-func (m *orders) NewPurchase(newPurchases []*types.PurchaseRequest) error {
+func (m *orders) NewPurchase(newPurchases []*types.PurchaseRequest) bool {
 	query := "INSERT INTO purchases(order_id, product_id, quantity, price) VALUES"
 	for i, purchaseRequest := range newPurchases {
 		query = fmt.Sprintf("%s (%d, %d, %d, %d)",
@@ -182,12 +177,12 @@ func (m *orders) NewPurchase(newPurchases []*types.PurchaseRequest) error {
 	if err != nil {
 		if err == sql.ErrNoRows {
 			log.Printf("cannot scan the saved purchase due to %s", err)
-			return utils.NotFound
+			return true
 		}
 		log.Printf("failed write purchase due to %s", err)
-		return utils.ServerError
+		return false
 	}
-	return nil
+	return true
 
 }
 
@@ -204,6 +199,6 @@ func (m *product) GetOrderStatus(txnId string) string {
 	return transactionStatus
 }
 
-func newOrders(store *sql.DB) *orders {
+func newOrders(store *sql.DB) types.OrdersRepository {
 	return &orders{store: store}
 }

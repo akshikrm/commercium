@@ -39,12 +39,12 @@ type ProductCategory struct {
 }
 
 type ProductCategoriesRepository interface {
-	Create(*NewProductCategoryRequest) (*ProductCategory, error)
-	GetNames() ([]*ProductCategoryName, error)
-	GetAll(url.Values) ([]*ProductCategory, error)
-	GetOne(int) (*ProductCategory, error)
-	Update(int, *UpdateProductCategoryRequest) (*ProductCategory, error)
-	Delete(int) error
+	Create(*NewProductCategoryRequest) (*ProductCategory, bool)
+	GetNames() ([]*ProductCategoryName, bool)
+	GetAll(url.Values) ([]*ProductCategory, bool)
+	GetOne(int) (*ProductCategory, bool)
+	Update(int, *UpdateProductCategoryRequest) (*ProductCategory, bool)
+	Delete(int) bool
 }
 
 type ProductCateogoryServicer interface {

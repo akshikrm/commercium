@@ -77,9 +77,9 @@ type OrderView struct {
 }
 
 type OrdersRepository interface {
-	GetOrdersByUserID(uint) ([]*OrderList, error)
-	GetPurchaseByOrderID(uint) ([]*PurchaseList, error)
-	CreateOrder([]*NewOrder) error
+	GetOrdersByUserID(uint) ([]*OrderList, bool)
+	GetPurchaseByOrderID(uint) ([]*PurchaseList, bool)
+	CreateOrder([]*NewOrder) bool
 }
 
 type PurchaseServicer interface {

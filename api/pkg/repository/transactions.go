@@ -2,7 +2,6 @@ package repository
 
 import (
 	"akshidas/e-com/pkg/types"
-	"akshidas/e-com/pkg/utils"
 	"database/sql"
 	"log"
 )
@@ -11,34 +10,34 @@ type transactions struct {
 	store *sql.DB
 }
 
-func (m *transactions) UpdateStatus(txnID, status string) error {
+func (m *transactions) UpdateStatus(txnID, status string) bool {
 	query := "update transactions set status=$1 where transaction_id=$2"
 	_, err := m.store.Exec(query, status, txnID)
 	if err != nil {
 		log.Printf("failed to update transaction due to %s", err)
-		return utils.ServerError
+		return false
 	}
-	return nil
+	return true
 }
 
-func (m *transactions) TransactionCompleted(transaction *types.TransactionCompleted) error {
+func (m *transactions) TransactionCompleted(transaction *types.TransactionCompleted) bool {
 	query := "update transactions set status=$1, invoice_number=$2 where transaction_id=$3"
 	_, err := m.store.Exec(query, transaction.Status, transaction.InvoiceNumber, transaction.TransactionID)
 	if err != nil {
 		log.Printf("failed to update transaction due to %s", err)
-		return utils.ServerError
+		return false
 	}
-	return nil
+	return true
 }
 
-func (m *transactions) TransactionReady(transaction *types.TransactionReady) error {
+func (m *transactions) TransactionReady(transaction *types.TransactionReady) bool {
 	query := "update transactions set status=$1, customer_id=$2 where transaction_id=$3"
 	_, err := m.store.Exec(query, transaction.Status, transaction.CustomerID, transaction.TransactionID)
 	if err != nil {
 		log.Printf("failed to update transaction due to %s", err)
-		return utils.ServerError
+		return false
 	}
-	return nil
+	return true
 }
 
 func (m *transactions) NewTransaction(newTransaction *types.NewTransaction) *uint32 {

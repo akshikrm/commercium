@@ -21,7 +21,6 @@ func (t *transaction) CreateTransaction(data *types.Data) error {
 		SubTotal:      data.Details.Totals.Subtotal,
 		GrandTotal:    data.Details.Totals.GrandTotal,
 	}
-
 	log.Println("adding transaction")
 	id := t.repository.NewTransaction(&transaction)
 	if id == nil {
@@ -43,8 +42,7 @@ func (t *transaction) CreateTransaction(data *types.Data) error {
 	}
 
 	log.Println("adding orders")
-	if err := t.orderRepository.CreateOrder(orders); err != nil {
-		log.Println(err)
+	if ok := t.orderRepository.CreateOrder(orders); !ok {
 		return utils.ServerError
 	}
 	log.Println("orders added")
@@ -66,11 +64,12 @@ func (t *transaction) ReadyTransaction(data *types.Data) error {
 		Status:        data.Status,
 		CustomerID:    data.CustomerID,
 	}
-	err := t.repository.TransactionReady(&transaction)
-	if err == nil {
-		log.Println("transaction ready")
+	ok := t.repository.TransactionReady(&transaction)
+	if !ok {
+		return utils.ServerError
 	}
-	return err
+	log.Println("transaction ready")
+	return nil
 }
 
 func (t *transaction) CompleteTransaction(data *types.Data) error {
@@ -79,16 +78,21 @@ func (t *transaction) CompleteTransaction(data *types.Data) error {
 		Status:        data.Status,
 		InvoiceNumber: data.InvoiceNumber,
 	}
-	err := t.repository.TransactionCompleted(&transaction)
-	if err == nil {
-		log.Println("transaction complete")
+	ok := t.repository.TransactionCompleted(&transaction)
+	if !ok {
+		return utils.ServerError
 	}
-	return err
+	log.Println("transaction complete")
+	return nil
 }
 
 func (t *transaction) FailedTransaction(data *types.Data) error {
+	ok := t.repository.UpdateStatus(data.ID, "failed")
+	if !ok {
+		return utils.ServerError
+	}
 	log.Println("transaction failed")
-	return t.repository.UpdateStatus(data.ID, "failed")
+	return nil
 }
 
 func (t *transaction) GetOrderStatus(txnID string) (string, error) {
@@ -100,15 +104,18 @@ func (t *transaction) GetOrderStatus(txnID string) (string, error) {
 }
 
 func (s *transaction) GetPurchaseByOrderID(id uint) ([]*types.PurchaseList, error) {
-	return s.orderRepository.GetPurchaseByOrderID(id)
+	purchases, ok := s.orderRepository.GetPurchaseByOrderID(id)
+	if !ok {
+		return nil, utils.ServerError
+	}
+	return purchases, nil
 }
 
 func (s *transaction) GetOrdersByUserID(id uint) ([]*types.OrderList, error) {
-	orders, err := s.orderRepository.GetOrdersByUserID(id)
-	if err != nil {
-		return nil, err
+	orders, ok := s.orderRepository.GetOrdersByUserID(id)
+	if !ok {
+		return nil, utils.ServerError
 	}
-
 	return orders, nil
 }
 

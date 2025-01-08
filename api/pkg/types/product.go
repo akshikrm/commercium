@@ -51,12 +51,12 @@ type OneProduct struct {
 }
 
 type ProductRepository interface {
-	GetAll(url.Values) ([]*ProductsList, error)
-	GetOne(int) (*OneProduct, error)
-	Create(*NewProductRequest) (*OneProduct, error)
-	Update(int, *NewProductRequest) (*OneProduct, error)
-	Delete(int) error
-	InsertImages(uint32, []string) error
+	GetAll(url.Values) ([]*ProductsList, bool)
+	GetOne(int) (*OneProduct, bool)
+	Create(*NewProductRequest) (*OneProduct, bool)
+	Update(int, *NewProductRequest) (*OneProduct, bool)
+	Delete(int) bool
+	InsertImages(uint32, []string) bool
 }
 
 type ProductServicer interface {

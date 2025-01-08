@@ -2,6 +2,7 @@ package services
 
 import (
 	"akshidas/e-com/pkg/types"
+	"akshidas/e-com/pkg/utils"
 	"log"
 	"net/url"
 )
@@ -11,7 +12,11 @@ type product struct {
 }
 
 func (r *product) Get(filter url.Values) ([]*types.ProductsList, error) {
-	return r.repository.GetAll(filter)
+	products, ok := r.repository.GetAll(filter)
+	if !ok {
+		return nil, utils.ServerError
+	}
+	return products, nil
 }
 
 func (r *product) Create(newProduct *types.NewProductRequest) error {
@@ -24,24 +29,36 @@ func (r *product) Create(newProduct *types.NewProductRequest) error {
 		return err
 	}
 
-	product, err := r.repository.Create(newProduct)
+	product, ok := r.repository.Create(newProduct)
 	log.Printf("%s Product Added", product.Name)
-	if err != nil {
-		return (err)
+	if !ok {
+		return utils.ServerError
 	}
-	return err
+	return nil
 }
 
 func (r *product) Update(id int, newProduct *types.NewProductRequest) (*types.OneProduct, error) {
-	return r.repository.Update(id, newProduct)
+	updatedProduct, ok := r.repository.Update(id, newProduct)
+	if !ok {
+		return nil, utils.ServerError
+	}
+	return updatedProduct, nil
 }
 
 func (r *product) GetOne(id int) (*types.OneProduct, error) {
-	return r.repository.GetOne(id)
+	product, ok := r.repository.GetOne(id)
+	if !ok {
+		return nil, utils.ServerError
+	}
+	return product, nil
 }
 
 func (r *product) Delete(id int) error {
-	return r.repository.Delete(id)
+	ok := r.repository.Delete(id)
+	if !ok {
+		return utils.ServerError
+	}
+	return nil
 }
 
 func newProductService(repository types.ProductRepository) *product {
