@@ -43,7 +43,7 @@ type OneProduct struct {
 	Name        string     `json:"name"`
 	Slug        string     `json:"slug"`
 	Price       uint       `json:"price"`
-	Image       string     `json:"image"`
+	Image       string     `json:"images"`
 	Description string     `json:"description"`
 	CreatedAt   time.Time  `json:"created_at"`
 	UpdatedAt   time.Time  `json:"updated_at"`
@@ -56,6 +56,7 @@ type ProductRepository interface {
 	Create(*NewProductRequest) (*OneProduct, error)
 	Update(int, *NewProductRequest) (*OneProduct, error)
 	Delete(int) error
+	InsertImages(uint32, []string) error
 }
 
 type ProductServicer interface {

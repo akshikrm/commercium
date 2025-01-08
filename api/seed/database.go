@@ -1,11 +1,11 @@
 package main
 
 import (
+	"akshidas/e-com/pkg/repository"
 	"database/sql"
 	"fmt"
-	"slices"
-
 	_ "github.com/lib/pq"
+	"slices"
 )
 
 type Database struct {
@@ -106,4 +106,10 @@ func (s *Database) dropTrigger() {
 			fmt.Println("SUCCESS")
 		}
 	}
+}
+
+func NewDatabase(store repository.Storage) *Database {
+	database := new(Database)
+	database.store = store.DB
+	return database
 }

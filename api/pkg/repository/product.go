@@ -4,6 +4,7 @@ import (
 	"akshidas/e-com/pkg/types"
 	"akshidas/e-com/pkg/utils"
 	"database/sql"
+	"fmt"
 	"log"
 	"net/url"
 	"time"
@@ -106,7 +107,6 @@ func (m *product) GetOne(id int) (*types.OneProduct, error) {
 
 	product, err := scanProductRow(row)
 	if err == sql.ErrNoRows {
-
 		log.Printf("product with id %d not found due to %s", id, err)
 		return nil, utils.NotFound
 	}
@@ -122,6 +122,19 @@ func (m *product) Delete(id int) error {
 	if _, err := m.store.Exec(query, time.Now(), id); err != nil {
 		log.Printf("failed to products %d due to %s", id, err)
 		return utils.ServerError
+	}
+	return nil
+}
+
+func (m *product) InsertImages(productID uint32, uris []string) error {
+	query := "INSERT INTO product_images(product_id, uri) VALUES"
+	for i, uri := range uris {
+		query = fmt.Sprintf("%s (%d, %s)", query, productID, uri)
+		if i == len(uris)-1 {
+			query = fmt.Sprintf("%s;", query)
+		} else {
+			query = fmt.Sprintf("%s,", query)
+		}
 	}
 	return nil
 }

@@ -1,12 +1,12 @@
 package repository
 
 import (
+	config "akshidas/e-com"
 	"akshidas/e-com/pkg/types"
 	"database/sql"
 	"fmt"
 	_ "github.com/lib/pq"
 	"log"
-	"os"
 )
 
 type Storage struct {
@@ -21,9 +21,9 @@ type Storage struct {
 	Role            types.RoleRepository
 }
 
-func New() *Storage {
+func New(config *config.Config) *Storage {
 	repository := new(Storage)
-	database := connect()
+	database := connect(config)
 	repository.DB = database
 
 	repository.Product = newProduct(database)
@@ -38,15 +38,9 @@ func New() *Storage {
 	return repository
 }
 
-func connect() *sql.DB {
-	user := os.Getenv("DB_USER")
-	name := os.Getenv("DB_NAME")
-	password := os.Getenv("DB_PASSWORD")
-	host := os.Getenv("DB_HOST")
-	port := os.Getenv("DB_PORT")
-
+func connect(config *config.Config) *sql.DB {
 	connString := fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=disable",
-		host, port, user, name, password)
+		config.Host, config.Port, config.User, config.Name, config.Password)
 	db, err := sql.Open("postgres", connString)
 
 	if err != nil {

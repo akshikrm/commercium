@@ -1,7 +1,7 @@
 package main
 
 import (
-	"akshidas/e-com/pkg/db"
+	"akshidas/e-com/pkg/repository"
 	"flag"
 	"fmt"
 	"github.com/joho/godotenv"
@@ -15,8 +15,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	store := db.NewStorage()
-	db.Connect(store)
+	store := repository.New()
 
 	database := Database{store: store.DB}
 	seeder := Seeder{store: store.DB}
