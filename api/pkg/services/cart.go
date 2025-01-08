@@ -22,6 +22,9 @@ func (c *cart) GetOne(cid uint32) (*types.CartList, error) {
 	if !ok {
 		return nil, utils.ServerError
 	}
+	if cart == nil {
+		return nil, utils.NotFound
+	}
 	return cart, nil
 }
 
@@ -43,6 +46,10 @@ func (c *cart) Update(cid uint32, updateCart *types.UpdateCartRequest) (*types.C
 	if !ok {
 		return nil, utils.ServerError
 	}
+	if cart == nil {
+		return nil, utils.NotFound
+	}
+
 	return cart, nil
 }
 
