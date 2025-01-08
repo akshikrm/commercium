@@ -128,14 +128,31 @@ func (m *product) Delete(id int) error {
 
 func (m *product) InsertImages(productID uint32, uris []string) error {
 	query := "INSERT INTO product_images(product_id, uri) VALUES"
+	uriCount := len(uris)
 	for i, uri := range uris {
-		query = fmt.Sprintf("%s (%d, %s)", query, productID, uri)
-		if i == len(uris)-1 {
+		query = fmt.Sprintf("%s (%d, '%s')", query, productID, uri)
+		if i == uriCount-1 {
 			query = fmt.Sprintf("%s;", query)
 		} else {
 			query = fmt.Sprintf("%s,", query)
 		}
 	}
+	fmt.Println(query)
+	result, err := m.store.Exec(query)
+
+	if err != nil {
+		log.Printf("failed to insert images due to: %s", err)
+		return utils.ServerError
+	}
+
+	if affected, err := result.RowsAffected(); err != nil {
+		return utils.ServerError
+	} else {
+		if affected != int64(uriCount) {
+			return utils.ServerError
+		}
+	}
+
 	return nil
 }
 
