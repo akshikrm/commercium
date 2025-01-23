@@ -32,8 +32,8 @@ type Seeder struct {
 func (s *Seeder) INIT() {
 	s.seedRoles()
 	s.seedUsers()
-	// s.seedProductCategories()
-	// s.seedProducts()
+	s.seedProductCategories()
+	s.seedProducts()
 }
 
 func (s *Seeder) seedRoles() {
@@ -85,32 +85,32 @@ func (s Seeder) seedProductCategories() {
 	productCategories := []types.NewProductCategoryRequest{}
 	json.Unmarshal(file, &productCategories)
 
-	fmt.Print("SEEDING product categories...")
+	fmt.Println("SEEDING product categories...")
 	for _, product := range productCategories {
 		if _, err := s.service.ProductCategory.Create(&product); err != nil {
-			fmt.Println("FAILED")
+			fmt.Printf("SEEDING %s FAILED\n", product.Name)
 			fmt.Printf("ERR: %s\n", err)
-			os.Exit(1)
+		} else {
+			fmt.Printf("SEEDING %s SUCCESS\n", product.Name)
 		}
 	}
-	fmt.Println("SUCCESS")
-
 }
 
 func (s Seeder) seedProducts() {
-	fmt.Print("SEEDING products...")
+	fmt.Println("SEEDING products...")
 	file := readFile("./seed/mock/products.json")
 	products := []types.NewProductRequest{}
 	json.Unmarshal(file, &products)
 
 	for _, product := range products {
 		if err := s.service.Product.Create(&product); err != nil {
-			fmt.Println("FAILED")
+			fmt.Printf("SEEDING %s FAILED\n", product.Name)
 			fmt.Printf("ERR: %s\n", err)
-			os.Exit(1)
+		} else {
+			fmt.Printf("SEEDING %s SUCCESS\n", product.Name)
+
 		}
 	}
-	fmt.Println("SUCCESS")
 }
 
 func NewSeeder(service *services.Service) *Seeder {

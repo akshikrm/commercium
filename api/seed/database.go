@@ -82,7 +82,7 @@ func (s *database) dropFunction() {
 
 func (s *database) createTrigger() {
 	for key := range SCHEMA {
-		fmt.Printf("CREATING trigger...")
+		fmt.Printf("CREATING trigger on %s...", key)
 		query := fmt.Sprintf(`CREATE TRIGGER update_user_task_updated_on BEFORE UPDATE ON %s FOR EACH ROW EXECUTE PROCEDURE update_updated_on_user_task();`, key)
 		_, err := s.store.Exec(query)
 		if err != nil {

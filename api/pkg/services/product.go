@@ -3,7 +3,6 @@ package services
 import (
 	"akshidas/e-com/pkg/types"
 	"akshidas/e-com/pkg/utils"
-	"log"
 	"net/url"
 )
 
@@ -29,8 +28,7 @@ func (r *product) Create(newProduct *types.NewProductRequest) error {
 		return err
 	}
 
-	product, ok := r.repository.Create(newProduct)
-	log.Printf("%s Product Added", product.Name)
+	_, ok := r.repository.Create(newProduct)
 	if !ok {
 		return utils.ServerError
 	}
