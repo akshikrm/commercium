@@ -43,7 +43,6 @@ func (p *product) GetAll(filter url.Values) ([]*types.ProductsList, bool) {
 			&product.Category.Slug,
 			&product.Category.Description,
 		)
-		fmt.Println(product.Image)
 		if err != nil {
 			log.Printf("failed to scan products due to %s", err)
 			return nil, false
@@ -100,7 +99,7 @@ func (p *product) Update(pid int, product *types.NewProductRequest) (*types.OneP
 		product.Name,
 		product.Slug,
 		product.Price,
-		product.Image,
+		pq.Array(product.Image),
 		product.Description,
 		product.CategoryID,
 		pid,

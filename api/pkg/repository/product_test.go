@@ -42,3 +42,22 @@ func TestCreateProduct(t *testing.T) {
 		t.Error("failed to create product")
 	}
 }
+
+func TestUpdateProduct(t *testing.T) {
+	testConfig := config.NewTestConfig()
+	store := New(testConfig)
+	product := types.NewProductRequest{
+		Name:        "Test",
+		Slug:        "test",
+		Description: "Test",
+		Image:       []string{"https://picsum.photos/id/12/2500/1667", "https://res.cloudinary.com/commercium/image/upload/v1737622147/005_uqebq5.jpg"},
+		Price:       34,
+		CategoryID:  1,
+		PriceID:     "Test",
+		ProductID:   "Test",
+	}
+	_, ok := store.Product.Update(13, &product)
+	if !ok {
+		t.Error("failed to update product")
+	}
+}
