@@ -89,7 +89,7 @@ func (p *PaddlePayment) CreateProduct(newProduct *types.NewProductRequest) error
 		Name:        newProduct.Name,
 		Description: &newProduct.Description,
 		TaxCategory: paddle.TaxCategoryStandard,
-		ImageURL:    &newProduct.PrimaryImage,
+		ImageURL:    &newProduct.Image[0],
 	})
 
 	if err != nil {

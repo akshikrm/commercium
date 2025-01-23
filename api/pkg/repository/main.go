@@ -5,8 +5,9 @@ import (
 	"akshidas/e-com/pkg/types"
 	"database/sql"
 	"fmt"
+	"os"
+
 	_ "github.com/lib/pq"
-	"log"
 )
 
 type Storage struct {
@@ -44,13 +45,15 @@ func connect(config *config.Config) *sql.DB {
 	db, err := sql.Open("postgres", connString)
 
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println(err)
+		os.Exit(1)
 	}
 
 	if err := db.Ping(); err != nil {
-		log.Fatal(err)
+		fmt.Println(err)
+		os.Exit(1)
 	}
 
-	log.Println("🗃️ connected to database")
+	fmt.Println("🗃️ connected to database")
 	return db
 }

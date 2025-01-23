@@ -4,7 +4,7 @@
     "slug": "introduction-to-data-science",
     "description": "This course introduces the basics of data science, including data cleaning, exploration, and visualization techniques. Students will also learn about essential tools such as Python and R for data analysis.",
     "price": 199,
-    "image": "https://picsum.photos/id/0/5000/3333",
+    "image": [ "https://picsum.photos/id/0/5000/3333" ],
     "category_id": 1
   },
   {
@@ -12,7 +12,7 @@
     "slug": "machine-learning-fundamentals",
     "description": "Learn the core concepts of machine learning, including supervised and unsupervised learning, regression, classification, clustering, and evaluation techniques using popular algorithms and tools.",
     "price": 249,
-    "image": "https://picsum.photos/id/1/5000/3333",
+    "image": [ "https://picsum.photos/id/1/5000/3333" ],
     "category_id": 4
   },
   {
@@ -20,7 +20,7 @@
     "slug": "web-development-with-javascript",
     "description": "This course covers web development using JavaScript. Students will learn how to create interactive web pages, understand front-end frameworks, and integrate JavaScript with HTML and CSS for full-stack development.",
     "price": 179,
-    "image": "https://picsum.photos/id/2/5000/3333",
+    "image": [ "https://picsum.photos/id/2/5000/3333" ],
     "category_id": 3
   },
   {
@@ -28,7 +28,7 @@
     "slug": "introduction-to-cybersecurity",
     "description": "An introduction to the fundamentals of cybersecurity, covering topics such as network security, encryption, threat detection, and risk management. This course is ideal for beginners interested in protecting digital assets.",
     "price": 219,
-    "image": "https://picsum.photos/id/3/5000/3333",
+    "image": [ "https://picsum.photos/id/3/5000/3333" ],
     "category_id": 1
   },
   {
@@ -36,7 +36,7 @@
     "slug": "cloud-computing-essentials",
     "description": "Explore the principles of cloud computing, including infrastructure, platforms, and services. This course covers popular cloud providers, such as AWS, Google Cloud, and Microsoft Azure, and how to deploy applications in the cloud.",
     "price": 229,
-    "image": "https://picsum.photos/id/4/5000/3333",
+    "image": [ "https://picsum.photos/id/4/5000/3333" ],
     "category_id": 2
   },
   {
@@ -44,7 +44,7 @@
     "slug": "financial-accounting-for-beginners",
     "description": "This course introduces the principles of financial accounting, focusing on the preparation and analysis of financial statements, balance sheets, income statements, and cash flow statements.",
     "price": 149,
-    "image": "https://picsum.photos/id/5/5000/3334",
+    "image": [ "https://picsum.photos/id/5/5000/3334" ],
     "category_id": 4
   },
   {
@@ -52,7 +52,7 @@
     "slug": "digital-marketing-strategies",
     "description": "Learn the core concepts of digital marketing, including social media marketing, SEO, content creation, email marketing, and PPC advertising. Students will understand how to drive traffic and optimize online marketing campaigns.",
     "price": 189,
-    "image": "https://picsum.photos/id/6/5000/3333",
+    "image": [ "https://picsum.photos/id/6/5000/3333" ],
     "category_id": 4
   },
   {
@@ -60,7 +60,7 @@
     "slug": "mobile-app-development-with-flutter",
     "description": "Learn how to build cross-platform mobile applications using Flutter. This course covers the development of mobile apps for iOS and Android, focusing on design, functionality, and performance optimization.",
     "price": 249,
-    "image": "https://picsum.photos/id/7/4728/3168",
+    "image": [ "https://picsum.photos/id/7/4728/3168" ],
     "category_id": 4
   },
   {
@@ -68,7 +68,7 @@
     "slug": "artificial-intelligence-and-ethics",
     "description": "This course examines the ethical implications of artificial intelligence and machine learning technologies. Topics include bias in algorithms, data privacy, and the societal impact of AI.",
     "price": 199,
-    "image": "https://picsum.photos/id/8/5000/3333",
+    "image": [ "https://picsum.photos/id/8/5000/3333" ],
     "category_id": 2
   },
   {
@@ -76,7 +76,7 @@
     "slug": "introduction-to-graphic-design",
     "description": "Learn the fundamentals of graphic design, including design principles, typography, color theory, and composition. Students will use tools like Adobe Illustrator and Photoshop to create digital artwork.",
     "price": 159,
-    "image": "https://picsum.photos/id/9/5000/3269",
+    "image": [ "https://picsum.photos/id/9/5000/3269" ],
     "category_id": 2
   },
   {
@@ -84,7 +84,7 @@
     "slug": "data-visualization-with-python",
     "description": "Learn how to use Python libraries like Matplotlib and Seaborn to create powerful data visualizations. This course teaches how to represent data visually for better decision-making.",
     "price": 179,
-    "image": "https://picsum.photos/id/10/2500/1667",
+    "image": [ "https://picsum.photos/id/10/2500/1667" ],
     "category_id": 1
   },
   {
@@ -92,7 +92,7 @@
     "slug": "advanced-machine-learning",
     "description": "Dive deeper into machine learning with advanced techniques like deep learning, reinforcement learning, and natural language processing.",
     "price": 299,
-    "image": "https://picsum.photos/id/11/2500/1667",
+    "image": [ "https://picsum.photos/id/11/2500/1667" ],
     "category_id": 1
   },
   {
@@ -100,7 +100,7 @@
     "slug": "responsive-web-design",
     "description": "Master the principles of responsive web design using HTML, CSS, and media queries to create websites that work on any device.",
     "price": 149,
-    "image": "https://picsum.photos/id/12/2500/1667",
+    "image": [ "https://picsum.photos/id/12/2500/1667" ],
     "category_id": 3
   },
   {
@@ -108,7 +108,7 @@
     "slug": "devops-essentials",
     "description": "Learn the essentials of DevOps, including continuous integration, continuous deployment, containerization, and automation to streamline software development.",
     "price": 229,
-    "image": "https://picsum.photos/id/13/2500/1667",
+    "image": [ "https://picsum.photos/id/13/2500/1667" ],
     "category_id": 1
   },
   {
@@ -116,7 +116,7 @@
     "slug": "digital-photography-masterclass",
     "description": "Explore the art of digital photography, from mastering camera settings to composition and photo editing techniques.",
     "price": 179,
-    "image": "https://picsum.photos/id/14/2500/1667",
+    "image": [ "https://picsum.photos/id/14/2500/1667" ],
     "category_id": 4
   },
   {
@@ -124,7 +124,7 @@
     "slug": "introduction-to-quantum-computing",
     "description": "Learn about the principles of quantum computing, including quantum algorithms, quantum gates, and their real-world applications.",
     "price": 299,
-    "image": "https://picsum.photos/id/15/2500/1667",
+    "image": [ "https://picsum.photos/id/15/2500/1667" ],
     "category_id": 2
   },
   {
@@ -132,7 +132,7 @@
     "slug": "full-stack-web-development",
     "description": "Become a full-stack developer by mastering both front-end and back-end web development using technologies like Node.js, React, and MongoDB.",
     "price": 249,
-    "image": "https://picsum.photos/id/16/2500/1667",
+    "image": [ "https://picsum.photos/id/16/2500/1667" ],
     "category_id": 1
   },
   {
@@ -140,7 +140,7 @@
     "slug": "cloud-security",
     "description": "Understand the security concerns in cloud computing and how to protect cloud-based systems, networks, and data.",
     "price": 219,
-    "image": "https://picsum.photos/id/17/2500/1667",
+    "image": [ "https://picsum.photos/id/17/2500/1667" ],
     "category_id": 3
   },
   {
@@ -148,7 +148,7 @@
     "slug": "blockchain-technology",
     "description": "Learn about blockchain technology and its use cases, including cryptocurrencies, smart contracts, and decentralized applications.",
     "price": 249,
-    "image": "https://picsum.photos/id/18/2500/1667",
+    "image": [ "https://picsum.photos/id/18/2500/1667" ],
     "category_id": 2
   },
   {
@@ -156,7 +156,7 @@
     "slug": "social-media-marketing",
     "description": "Learn how to effectively use social media platforms for marketing. This course covers strategies for Facebook, Instagram, Twitter, and LinkedIn.",
     "price": 179,
-    "image": "https://picsum.photos/id/19/2500/1667",
+    "image": [ "https://picsum.photos/id/19/2500/1667" ],
     "category_id": 4
   },
   {
@@ -164,7 +164,7 @@
     "slug": "introduction-to-r-programming",
     "description": "Get started with R programming for data analysis and statistical computing. Learn how to clean, manipulate, and visualize data using R.",
     "price": 179,
-    "image": "https://picsum.photos/id/20/3670/2462",
+    "image": [ "https://picsum.photos/id/20/3670/2462" ],
     "category_id": 3
   },
   {
@@ -172,7 +172,7 @@
     "slug": "internet-of-things-iot-basics",
     "description": "Learn the fundamentals of IoT, including sensors, devices, connectivity, and how IoT is transforming industries.",
     "price": 199,
-    "image": "https://picsum.photos/id/21/3008/2008",
+    "image": [ "https://picsum.photos/id/21/3008/2008" ],
     "category_id": 4
   },
   {
@@ -180,7 +180,7 @@
     "slug": "ethical-hacking-and-penetration-testing",
     "description": "Learn the basics of ethical hacking and penetration testing to identify and fix vulnerabilities in networks and applications.",
     "price": 249,
-    "image": "https://picsum.photos/id/22/4434/3729",
+    "image": [ "https://picsum.photos/id/22/4434/3729" ],
     "category_id": 1
   },
   {
@@ -188,7 +188,7 @@
     "slug": "digital-ux-design",
     "description": "Learn how to create user-centered designs for digital platforms, focusing on usability, user experience principles, and prototyping.",
     "price": 229,
-    "image": "https://picsum.photos/id/23/3887/4899",
+    "image": [ "https://picsum.photos/id/23/3887/4899" ],
     "category_id": 1
   },
   {
@@ -196,7 +196,7 @@
     "slug": "augmented-reality-ar-development",
     "description": "Discover how to create augmented reality experiences using tools like ARKit and Unity. Learn about AR application design and development.",
     "price": 279,
-    "image": "https://picsum.photos/id/24/4855/1803",
+    "image": [ "https://picsum.photos/id/24/4855/1803" ],
     "category_id": 1
   },
   {
@@ -204,7 +204,7 @@
     "slug": "virtual-reality-vr-programming",
     "description": "Learn the fundamentals of VR programming using Unity and C#. Create immersive VR applications for various platforms.",
     "price": 299,
-    "image": "https://picsum.photos/id/25/5000/3333",
+    "image": [ "https://picsum.photos/id/25/5000/3333" ],
     "category_id": 1
   },
   {
@@ -212,7 +212,7 @@
     "slug": "business-analytics-with-excel",
     "description": "Learn how to analyze business data using Microsoft Excel, including pivot tables, formulas, data visualization, and statistical analysis.",
     "price": 179,
-    "image": "https://picsum.photos/id/26/4209/2769",
+    "image": [ "https://picsum.photos/id/26/4209/2769" ],
     "category_id": 3
   },
   {
@@ -220,7 +220,7 @@
     "slug": "introduction-to-sql",
     "description": "Learn the basics of SQL (Structured Query Language), including querying databases, joining tables, and data manipulation.",
     "price": 169,
-    "image": "https://picsum.photos/id/27/3264/1836",
+    "image": [ "https://picsum.photos/id/27/3264/1836" ],
     "category_id": 4
   },
   {
@@ -228,7 +228,7 @@
     "slug": "agile-project-management",
     "description": "Learn how to manage projects using Agile methodologies. Understand Scrum, Kanban, and other frameworks for delivering projects effectively.",
     "price": 219,
-    "image": "https://picsum.photos/id/28/4928/3264",
+    "image": [ "https://picsum.photos/id/28/4928/3264" ],
     "category_id": 4
   },
   {
@@ -236,7 +236,7 @@
     "slug": "web-security-and-ethical-hacking",
     "description": "Understand the key aspects of web security and learn ethical hacking techniques to identify vulnerabilities and secure web applications.",
     "price": 249,
-    "image": "https://picsum.photos/id/29/4000/2670",
+    "image": [ "https://picsum.photos/id/29/4000/2670" ],
     "category_id": 4
   },
   {
@@ -244,7 +244,7 @@
     "slug": "advanced-react-and-redux",
     "description": "Take your React development skills to the next level by mastering Redux, advanced React patterns, and best practices.",
     "price": 249,
-    "image": "https://picsum.photos/id/30/1280/901",
+    "image": [ "https://picsum.photos/id/30/1280/901" ],
     "category_id": 4
   }
 ]

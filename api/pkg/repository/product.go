@@ -7,58 +7,12 @@ import (
 	"log"
 	"net/url"
 	"time"
+
+	"github.com/lib/pq"
 )
 
 type product struct {
 	store *sql.DB
-}
-
-func (p *product) Create(product *types.NewProductRequest) (*types.OneProduct, bool) {
-	query := "INSERT INTO products(name, slug, price, image, description, category_id, product_id, price_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *"
-	row := p.store.QueryRow(query,
-		product.Name,
-		product.Slug,
-		product.Price,
-		product.PrimaryImage,
-		product.Description,
-		product.CategoryID,
-		product.ProductID,
-		product.PriceID,
-	)
-
-	savedProduct, err := scanProductRow(row)
-	if err == sql.ErrNoRows {
-		return nil, true
-	}
-	if err != nil {
-		log.Printf("failed to create new product %s due to %s", product.Name, err)
-		return nil, false
-	}
-	return savedProduct, true
-}
-
-func (p *product) Update(pid int, product *types.NewProductRequest) (*types.OneProduct, bool) {
-	query := "UPDATE products SET name=$1, slug=$2, price=$3, image=$4, description=$5, category_id=$6 WHERE id=$7 AND deleted_at IS NULL RETURNING *"
-	row := p.store.QueryRow(query,
-		product.Name,
-		product.Slug,
-		product.Price,
-		product.PrimaryImage,
-		product.Description,
-		product.CategoryID,
-		pid,
-	)
-
-	savedProduct, err := scanProductRow(row)
-	if err == sql.ErrNoRows {
-		return nil, true
-	}
-
-	if err != nil {
-		log.Printf("failed to update product %s due to %s", product.Name, err)
-		return nil, false
-	}
-	return savedProduct, true
 }
 
 func (p *product) GetAll(filter url.Values) ([]*types.ProductsList, bool) {
@@ -83,7 +37,7 @@ func (p *product) GetAll(filter url.Values) ([]*types.ProductsList, bool) {
 			&product.Name,
 			&product.Slug,
 			&product.Price,
-			&product.Image,
+			pq.Array(&product.Image),
 			&product.Description,
 			&product.CreatedAt,
 			&product.Category.ID,
@@ -114,6 +68,55 @@ func (m *product) GetOne(id int) (*types.OneProduct, bool) {
 	}
 
 	return product, true
+}
+
+func (p *product) Create(product *types.NewProductRequest) (*types.OneProduct, bool) {
+	query := "INSERT INTO products(name, slug, price, image, description, category_id, product_id, price_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *"
+
+	row := p.store.QueryRow(query,
+		product.Name,
+		product.Slug,
+		product.Price,
+		pq.Array(product.Image),
+		product.Description,
+		product.CategoryID,
+		product.ProductID,
+		product.PriceID,
+	)
+
+	savedProduct, err := scanProductRow(row)
+	if err == sql.ErrNoRows {
+		return nil, true
+	}
+	if err != nil {
+		log.Printf("failed to create new product %s due to %s", product.Name, err)
+		return nil, false
+	}
+	return savedProduct, true
+}
+
+func (p *product) Update(pid int, product *types.NewProductRequest) (*types.OneProduct, bool) {
+	query := "UPDATE products SET name=$1, slug=$2, price=$3, image=$4, description=$5, category_id=$6 WHERE id=$7 AND deleted_at IS NULL RETURNING *"
+	row := p.store.QueryRow(query,
+		product.Name,
+		product.Slug,
+		product.Price,
+		product.Image,
+		product.Description,
+		product.CategoryID,
+		pid,
+	)
+
+	savedProduct, err := scanProductRow(row)
+	if err == sql.ErrNoRows {
+		return nil, true
+	}
+
+	if err != nil {
+		log.Printf("failed to update product %s due to %s", product.Name, err)
+		return nil, false
+	}
+	return savedProduct, true
 }
 
 func (m *product) Delete(id int) bool {
@@ -188,7 +191,7 @@ func scanProductRow(rows *sql.Row) (*types.OneProduct, error) {
 		&product.Slug,
 		&product.Price,
 		&product.PriceID,
-		&product.Image,
+		pq.Array(&product.Image),
 		&product.Description,
 		&product.CategoryID,
 		&product.CreatedAt,
@@ -205,4 +208,17 @@ func newProduct(store *sql.DB) *product {
 	return &product{
 		store: store,
 	}
+}
+
+func makeImageString(images []string) (image string) {
+	image = "{"
+	for i, img := range images {
+		image = fmt.Sprintf("%s'%s'", image, img)
+		if i < len(images)-1 {
+			image = fmt.Sprintf("%s,", image)
+		} else {
+			image = fmt.Sprintf("%s}", image)
+		}
+	}
+	return
 }

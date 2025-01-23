@@ -31,17 +31,6 @@ func (u *product) GetOne(ctx context.Context, w http.ResponseWriter, r *http.Req
 	return writeJson(w, http.StatusOK, foundProduct)
 }
 
-func (u *product) Delete(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
-	id, err := parseId(r.PathValue("id"))
-	if err != nil {
-		return err
-	}
-	if err := u.service.Delete(id); err != nil {
-		return err
-	}
-	return writeJson(w, http.StatusOK, "deleted successfully")
-}
-
 func (u *product) Create(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
 	a := &types.NewProductRequest{}
 	if err := DecodeBody(r.Body, &a); err != nil {
@@ -68,6 +57,17 @@ func (u *product) Update(ctx context.Context, w http.ResponseWriter, r *http.Req
 		return err
 	}
 	return writeJson(w, http.StatusCreated, product)
+}
+
+func (u *product) Delete(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
+	id, err := parseId(r.PathValue("id"))
+	if err != nil {
+		return err
+	}
+	if err := u.service.Delete(id); err != nil {
+		return err
+	}
+	return writeJson(w, http.StatusOK, "deleted successfully")
 }
 
 func newProduct(service types.ProductServicer) types.ProductHandler {

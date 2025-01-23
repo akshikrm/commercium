@@ -7,7 +7,7 @@ var SCHEMA = map[string]string{
 	"product_categories": "id SERIAL PRIMARY KEY, name VARCHAR(30) NOT NULL, slug VARCHAR(30) NOT NULL,enabled BOOLEAN DEFAULT true, description VARCHAR(120) NOT NULL, created_at TIMESTAMP DEFAULT NOW() NOT NULL, updated_at TIMESTAMP DEFAULT NOW() NOT NULL, deleted_at TIMESTAMP DEFAULT NULL",
 	"products": `id SERIAL PRIMARY KEY, product_id VARCHAR(30) NOT NULL,
 	name VARCHAR(50), slug VARCHAR(50), price INTEGER NOT NULL DEFAULT 0,
-	price_id VARCHAR(30) NOT NULL, image VARCHAR(100),  description VARCHAR(300) NOT NULL,
+	price_id VARCHAR(30) NOT NULL, image VARCHAR[],  description VARCHAR(300) NOT NULL,
 	category_id INTEGER NOT NULL, created_at TIMESTAMP DEFAULT NOW() NOT NULL,
 	updated_at TIMESTAMP DEFAULT NOW() NOT NULL, deleted_at TIMESTAMP DEFAULT NULL,
 	CONSTRAINT fk_category FOREIGN KEY (category_id) REFERENCES product_categories(id)`,

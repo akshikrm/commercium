@@ -107,7 +107,7 @@ func parseId(id string) (int, error) {
 
 func DecodeBody(body io.ReadCloser, a any) error {
 	if err := json.NewDecoder(body).Decode(a); err != nil {
-		log.Printf("failed to decode body %v", body)
+		log.Printf("failed to decode request")
 		if err == io.EOF {
 			return utils.InvalidRequest
 		}

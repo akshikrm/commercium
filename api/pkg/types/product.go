@@ -8,15 +8,14 @@ import (
 )
 
 type NewProductRequest struct {
-	Name         string   `json:"name"`
-	ProductID    string   `json:"product_id"`
-	CategoryID   uint     `json:"category_id"`
-	Slug         string   `json:"slug"`
-	Price        uint     `json:"price"`
-	PriceID      string   `json:"price_id"`
-	ImageIDS     []string `json:"image_ids"`
-	PrimaryImage string   `json:"image"`
-	Description  string   `json:"description"`
+	Name        string   `json:"name"`
+	ProductID   string   `json:"product_id"`
+	CategoryID  uint     `json:"category_id"`
+	Slug        string   `json:"slug"`
+	Price       uint     `json:"price"`
+	PriceID     string   `json:"price_id"`
+	Image       []string `json:"image"`
+	Description string   `json:"description"`
 }
 
 type ProductsList struct {
@@ -24,7 +23,7 @@ type ProductsList struct {
 	Name        string    `json:"name"`
 	Slug        string    `json:"slug"`
 	Price       string    `json:"price"`
-	Image       string    `json:"image"`
+	Image       []string  `json:"image"`
 	Description string    `json:"description"`
 	CreatedAt   time.Time `json:"created_at"`
 	Category    struct {
@@ -43,7 +42,7 @@ type OneProduct struct {
 	Name        string     `json:"name"`
 	Slug        string     `json:"slug"`
 	Price       uint       `json:"price"`
-	Image       string     `json:"images"`
+	Image       []string   `json:"image"`
 	Description string     `json:"description"`
 	CreatedAt   time.Time  `json:"created_at"`
 	UpdatedAt   time.Time  `json:"updated_at"`
