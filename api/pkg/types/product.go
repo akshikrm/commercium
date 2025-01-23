@@ -7,15 +7,15 @@ import (
 	"time"
 )
 
-type CreateNewProduct struct {
-	Name        string `json:"name"`
-	ProductID   string `json:"product_id"`
-	CategoryID  uint   `json:"category_id"`
-	Slug        string `json:"slug"`
-	Price       uint   `json:"price"`
-	PriceID     string `json:"price_id"`
-	Image       string `json:"image"`
-	Description string `json:"description"`
+type NewProductRequest struct {
+	Name        string   `json:"name"`
+	ProductID   string   `json:"product_id"`
+	CategoryID  uint     `json:"category_id"`
+	Slug        string   `json:"slug"`
+	Price       uint     `json:"price"`
+	PriceID     string   `json:"price_id"`
+	Image       []string `json:"image"`
+	Description string   `json:"description"`
 }
 
 type ProductsList struct {
@@ -42,7 +42,7 @@ type OneProduct struct {
 	Name        string     `json:"name"`
 	Slug        string     `json:"slug"`
 	Price       uint       `json:"price"`
-	Image       string     `json:"image"`
+	Image       []string   `json:"image"`
 	Description string     `json:"description"`
 	CreatedAt   time.Time  `json:"created_at"`
 	UpdatedAt   time.Time  `json:"updated_at"`
@@ -50,18 +50,19 @@ type OneProduct struct {
 }
 
 type ProductRepository interface {
-	GetAll(url.Values) ([]*ProductsList, error)
-	GetOne(int) (*OneProduct, error)
-	Create(*CreateNewProduct) (*OneProduct, error)
-	Update(int, *CreateNewProduct) (*OneProduct, error)
-	Delete(int) error
+	GetAll(url.Values) ([]*ProductsList, bool)
+	GetOne(int) (*OneProduct, bool)
+	Create(*NewProductRequest) (*OneProduct, bool)
+	Update(int, *NewProductRequest) (*OneProduct, bool)
+	Delete(int) bool
+	InsertImages(uint32, []string) bool
 }
 
 type ProductServicer interface {
 	Get(url.Values) ([]*ProductsList, error)
 	GetOne(int) (*OneProduct, error)
-	Create(*CreateNewProduct) error
-	Update(int, *CreateNewProduct) (*OneProduct, error)
+	Create(*NewProductRequest) error
+	Update(int, *NewProductRequest) (*OneProduct, error)
 	Delete(int) error
 }
 

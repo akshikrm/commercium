@@ -1,20 +1,20 @@
-import fileServer from "@utils/file"
-import { AxiosResponse } from "axios"
+import cloudinary from "@utils/file"
 
 type Upload = {
-    id: number
-    path: string
+    asset_id: number
+    url: string
+    secure_url: string
+    public_id: string
 }
 
 export const uploadSingleFile = async (file: File): Promise<Upload> => {
     const reqData = new FormData()
     reqData.append("file", file)
+    reqData.append("upload_preset", "ml_default")
     try {
-        const { data } = await fileServer.post("upload", reqData)
-        return data.data
+        const { data } = await cloudinary.post("image/upload", reqData)
+        return data
     } catch (err) {
-        const { data } = err as AxiosResponse
-        console.error(data)
         return Promise.reject({ message: "failed to get products" })
     }
 }

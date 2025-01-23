@@ -19,6 +19,8 @@
         "arrowParens": "avoid"
     },
     "dependencies": {
+        "@cloudinary/react": "^1.13.1",
+        "@cloudinary/url-gen": "^1.21.0",
         "@emotion/react": "^11.13.5",
         "@emotion/styled": "^11.13.5",
         "@hookform/resolvers": "^3.9.1",

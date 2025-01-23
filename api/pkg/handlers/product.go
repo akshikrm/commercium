@@ -31,19 +31,8 @@ func (u *product) GetOne(ctx context.Context, w http.ResponseWriter, r *http.Req
 	return writeJson(w, http.StatusOK, foundProduct)
 }
 
-func (u *product) Delete(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
-	id, err := parseId(r.PathValue("id"))
-	if err != nil {
-		return err
-	}
-	if err := u.service.Delete(id); err != nil {
-		return err
-	}
-	return writeJson(w, http.StatusOK, "deleted successfully")
-}
-
 func (u *product) Create(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
-	a := &types.CreateNewProduct{}
+	a := &types.NewProductRequest{}
 	if err := DecodeBody(r.Body, &a); err != nil {
 		return err
 	}
@@ -55,7 +44,7 @@ func (u *product) Create(ctx context.Context, w http.ResponseWriter, r *http.Req
 }
 
 func (u *product) Update(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
-	a := types.CreateNewProduct{}
+	a := types.NewProductRequest{}
 	if err := DecodeBody(r.Body, &a); err != nil {
 		return err
 	}
@@ -70,7 +59,18 @@ func (u *product) Update(ctx context.Context, w http.ResponseWriter, r *http.Req
 	return writeJson(w, http.StatusCreated, product)
 }
 
-func NewProduct(service types.ProductServicer) types.ProductHandler {
+func (u *product) Delete(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
+	id, err := parseId(r.PathValue("id"))
+	if err != nil {
+		return err
+	}
+	if err := u.service.Delete(id); err != nil {
+		return err
+	}
+	return writeJson(w, http.StatusOK, "deleted successfully")
+}
+
+func newProduct(service types.ProductServicer) types.ProductHandler {
 	handler := new(product)
 	handler.service = service
 	return handler

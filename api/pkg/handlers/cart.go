@@ -71,7 +71,7 @@ func (c *cartHandler) Delete(ctx context.Context, w http.ResponseWriter, r *http
 	return writeJson(w, http.StatusOK, "deleted successfully")
 }
 
-func NewCart(service types.CartServicer) types.CartHandler {
+func newCart(service types.CartServicer) types.CartHandler {
 	handler := new(cartHandler)
 	handler.service = service
 	return handler

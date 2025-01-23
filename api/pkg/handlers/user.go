@@ -1,7 +1,9 @@
 package handlers
 
 import (
+	"akshidas/e-com/pkg/services"
 	"akshidas/e-com/pkg/types"
+	"akshidas/e-com/pkg/utils"
 	"context"
 	"log"
 	"net/http"
@@ -78,6 +80,18 @@ func (u *user) Create(w http.ResponseWriter, r *http.Request) error {
 	if err := DecodeBody(r.Body, &a); err != nil {
 		return err
 	}
+	if u.service.Exists(a.Email) {
+		return utils.Conflict
+	}
+	paddlePayment := services.NewPaddlePayment()
+	if err := paddlePayment.Init(); err != nil {
+		return utils.ServerError
+	}
+
+	if err := paddlePayment.CreateCustomer(a); err != nil {
+		return utils.ServerError
+	}
+
 	token, err := u.service.Create(*a)
 	if err != nil {
 		return err
@@ -110,7 +124,7 @@ func (u *user) Delete(ctx context.Context, w http.ResponseWriter, r *http.Reques
 	return writeJson(w, http.StatusOK, "deleted successfully")
 }
 
-func NewUser(service types.UserServicer) types.UserHandler {
+func newUser(service types.UserServicer) types.UserHandler {
 	handler := new(user)
 	handler.service = service
 	return handler

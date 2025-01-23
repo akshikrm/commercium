@@ -1,16 +1,15 @@
 import axios, { AxiosError } from "axios"
-import { BASE_URL } from "@config"
 import toast from "react-hot-toast"
 
-const fileServer = axios.create({
-    baseURL: BASE_URL,
+const cloudinary = axios.create({
+    baseURL: "https://api.cloudinary.com/v1_1/commercium/",
     headers: {
         "Content-Type": "multipart/form-data"
     }
 })
 
 const TOAST_ID = "network_error"
-fileServer.interceptors.response.use(
+cloudinary.interceptors.response.use(
     function (response) {
         return response
     },
@@ -23,10 +22,13 @@ fileServer.interceptors.response.use(
                 "there seems to be some problem with your network connection, trying again...",
                 { id: TOAST_ID }
             )
+            return Promise.reject(
+                "there seems to be some problem with your network connection, trying again..."
+            )
         }
 
         return Promise.reject(response)
     }
 )
 
-export default fileServer
+export default cloudinary

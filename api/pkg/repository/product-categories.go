@@ -2,7 +2,6 @@ package repository
 
 import (
 	"akshidas/e-com/pkg/types"
-	"akshidas/e-com/pkg/utils"
 	"database/sql"
 	"fmt"
 	"log"
@@ -14,33 +13,33 @@ type productCategories struct {
 	store *sql.DB
 }
 
-func (p *productCategories) Create(newCategory *types.NewProductCategoryRequest) (*types.ProductCategory, error) {
+func (p *productCategories) Create(newCategory *types.NewProductCategoryRequest) (*types.ProductCategory, bool) {
 	query := "INSERT INTO product_categories(name, slug, description, enabled) VALUES($1, $2, $3, $4) RETURNING *"
 	row := p.store.QueryRow(query, newCategory.Name, newCategory.Slug, newCategory.Description, newCategory.Enabled)
 
 	savedCategory, err := scanCategoryRow(row)
 	if err == sql.ErrNoRows {
-		return nil, utils.NotFound
+		return nil, true
 	}
 
 	if err != nil {
 		log.Printf("Failed to create category %s due to %s", newCategory.Name, err)
-		return nil, utils.ServerError
+		return nil, false
 	}
 
-	return savedCategory, nil
+	return savedCategory, true
 
 }
 
-func (p *productCategories) GetNames() ([]*types.ProductCategoryName, error) {
+func (p *productCategories) GetNames() ([]*types.ProductCategoryName, bool) {
 	query := "SELECT id, name, slug FROM  product_categories WHERE deleted_at IS NULL AND enabled='t'"
 	rows, err := p.store.Query(query)
 	if err == sql.ErrNoRows {
-		return nil, utils.NotFound
+		return nil, true
 	}
 	if err != nil {
 		log.Printf("failed to get product_categories due to %s", err)
-		return nil, utils.ServerError
+		return nil, false
 	}
 	productsCategories := []*types.ProductCategoryName{}
 
@@ -53,47 +52,47 @@ func (p *productCategories) GetNames() ([]*types.ProductCategoryName, error) {
 		)
 		if err != nil {
 			log.Printf("failed to scan category due to %s", err)
-			return nil, utils.ServerError
+			return nil, false
 		}
 		productsCategories = append(productsCategories, productCategory)
 	}
-	return productsCategories, nil
+	return productsCategories, true
 }
 
-func (p *productCategories) GetAll(filter url.Values) ([]*types.ProductCategory, error) {
+func (p *productCategories) GetAll(filter url.Values) ([]*types.ProductCategory, bool) {
 	query := buildFilterQuery("SELECT * FROM product_categories as p WHERE deleted_at IS NULL", filter)
 	fmt.Println(query)
 	rows, err := p.store.Query(query)
 	if err == sql.ErrNoRows {
-		return nil, utils.NotFound
+		return nil, true
 	}
 	if err != nil {
 		log.Printf("failed to get product_categories due to %s", err)
-		return nil, utils.ServerError
+		return nil, false
 	}
 	productsCategories, err := scanCategoryRows(rows)
 	if err != nil {
 		log.Printf("failed to get all products due to %s", err)
-		return nil, utils.ServerError
+		return nil, false
 	}
-	return productsCategories, nil
+	return productsCategories, true
 }
 
-func (p *productCategories) GetOne(id int) (*types.ProductCategory, error) {
+func (p *productCategories) GetOne(id int) (*types.ProductCategory, bool) {
 	query := "SELECT * FROM product_categories WHERE id=$1 AND deleted_at IS NULL"
 	row := p.store.QueryRow(query, id)
 	productCategory, err := scanCategoryRow(row)
 	if err != nil {
-		log.Printf("failed to get product category with %d due to %s", id, err)
 		if err == sql.ErrNoRows {
-			return nil, utils.NotFound
+			return nil, true
 		}
-		return nil, utils.ServerError
+		log.Printf("failed to get product category with %d due to %s", id, err)
+		return nil, false
 	}
-	return productCategory, err
+	return productCategory, true
 }
 
-func (p *productCategories) Update(id int, updateProductCategory *types.UpdateProductCategoryRequest) (*types.ProductCategory, error) {
+func (p *productCategories) Update(id int, updateProductCategory *types.UpdateProductCategoryRequest) (*types.ProductCategory, bool) {
 	query := "UPDATE product_categories SET name=$1, slug=$2, description=$3, enabled=$4 WHERE id=$5 AND deleted_at IS NULL RETURNING *"
 	row := p.store.QueryRow(
 		query,
@@ -107,20 +106,20 @@ func (p *productCategories) Update(id int, updateProductCategory *types.UpdatePr
 	if err != nil {
 		log.Printf("failed to update product category with id %d due to %s", id, err)
 		if err == sql.ErrNoRows {
-			return nil, utils.NotFound
+			return nil, false
 		}
-		return nil, utils.ServerError
+		return nil, true
 	}
-	return productCategory, err
+	return productCategory, true
 }
 
-func (p *productCategories) Delete(id int) error {
+func (p *productCategories) Delete(id int) bool {
 	query := "UPDATE product_categories set deleted_at=$1 where id=$2 AND deleted_at IS NULL"
 	if _, err := p.store.Exec(query, time.Now(), id); err != nil {
 		log.Printf("failed to delete product category with id %d due to %s", id, err)
-		return utils.ServerError
+		return false
 	}
-	return nil
+	return true
 }
 
 func scanCategoryRow(row *sql.Row) (*types.ProductCategory, error) {
@@ -164,6 +163,6 @@ func scanCategoryRows(rows *sql.Rows) ([]*types.ProductCategory, error) {
 	return productsCategories, nil
 }
 
-func newProductCategory(store *sql.DB) *productCategories {
+func newProductCategory(store *sql.DB) types.ProductCategoriesRepository {
 	return &productCategories{store: store}
 }

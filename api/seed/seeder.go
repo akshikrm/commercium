@@ -1,14 +1,14 @@
 package main
 
 import (
-	"akshidas/e-com/pkg/repository"
 	"akshidas/e-com/pkg/services"
 	"akshidas/e-com/pkg/types"
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"io"
 	"os"
+
+	"github.com/PaddleHQ/paddle-go-sdk"
 )
 
 var ROLES = []types.CreateRoleRequest{
@@ -25,14 +25,11 @@ var ROLES = []types.CreateRoleRequest{
 }
 
 type Seeder struct {
-	store   *sql.DB
 	service *services.Service
+	paddle  *services.PaddlePayment
 }
 
 func (s *Seeder) INIT() {
-	storage := repository.New()
-	s.service = services.New(storage)
-
 	s.seedRoles()
 	s.seedUsers()
 	s.seedProductCategories()
@@ -40,7 +37,7 @@ func (s *Seeder) INIT() {
 }
 
 func (s *Seeder) seedRoles() {
-	fmt.Print("Seeding Role...")
+	fmt.Print("SEEDING Role...")
 	for _, role := range ROLES {
 		if err := s.service.Role.Create(&role); err != nil {
 			fmt.Printf("FAILED, %s\n", role.Name)
@@ -51,20 +48,36 @@ func (s *Seeder) seedRoles() {
 }
 
 func (s Seeder) seedUsers() {
-	fmt.Print("Seeding Users...")
+	fmt.Println("SEEDING Users...")
 
 	byteValue := readFile("./seed/mock/users.json")
 	users := []types.CreateUserRequest{}
 	json.Unmarshal(byteValue, &users)
-
 	for _, element := range users {
-		if _, err := s.service.User.Create(element); err != nil {
-			fmt.Println("FAILED")
-			fmt.Printf("ERR: %s\n", err)
-			os.Exit(1)
+		if s.service.User.Exists(element.Email) {
+			fmt.Printf("SKIPPING %s already exists\n", element.Email)
+			continue
+		}
+		if err := s.paddle.CreateCustomer(&element); err != nil {
+			if err == paddle.ErrCustomerAlreadyExists {
+				if customerID, err := s.paddle.GetCustomerByEmail(element.Email); err == nil {
+					element.CustomerID = customerID
+				} else {
+					fmt.Printf("paddle error failed to get user %s\n", element.Email)
+					continue
+				}
+			} else {
+				fmt.Printf("failed to create %s for paddle due to %s\n", element.Email, err)
+				continue
+			}
+		}
+		_, err := s.service.User.Create(element)
+		if err != nil {
+			fmt.Printf("SEEDING %s FAILED\n", element.Email)
+		} else {
+			fmt.Printf("SEEDING %s SUCCESS\n", element.Email)
 		}
 	}
-	fmt.Println("SUCCESS")
 }
 
 func (s Seeder) seedProductCategories() {
@@ -72,32 +85,42 @@ func (s Seeder) seedProductCategories() {
 	productCategories := []types.NewProductCategoryRequest{}
 	json.Unmarshal(file, &productCategories)
 
-	fmt.Print("Seeding product categories...")
+	fmt.Println("SEEDING product categories...")
 	for _, product := range productCategories {
 		if _, err := s.service.ProductCategory.Create(&product); err != nil {
-			fmt.Println("FAILED")
+			fmt.Printf("SEEDING %s FAILED\n", product.Name)
 			fmt.Printf("ERR: %s\n", err)
-			os.Exit(1)
+		} else {
+			fmt.Printf("SEEDING %s SUCCESS\n", product.Name)
 		}
 	}
-	fmt.Println("SUCCESS")
-
 }
 
 func (s Seeder) seedProducts() {
-	fmt.Print("Seeding products...")
+	fmt.Println("SEEDING products...")
 	file := readFile("./seed/mock/products.json")
-	products := []types.CreateNewProduct{}
+	products := []types.NewProductRequest{}
 	json.Unmarshal(file, &products)
 
 	for _, product := range products {
 		if err := s.service.Product.Create(&product); err != nil {
-			fmt.Println("FAILED")
+			fmt.Printf("SEEDING %s FAILED\n", product.Name)
 			fmt.Printf("ERR: %s\n", err)
-			os.Exit(1)
+		} else {
+			fmt.Printf("SEEDING %s SUCCESS\n", product.Name)
+
 		}
 	}
-	fmt.Println("SUCCESS")
+}
+
+func NewSeeder(service *services.Service) *Seeder {
+	s := new(Seeder)
+	s.service = service
+	s.paddle = services.NewPaddlePayment()
+	if err := s.paddle.Init(); err != nil {
+		panic("failed to initialize paddle")
+	}
+	return s
 }
 
 func readFile(filePath string) []byte {
@@ -108,7 +131,6 @@ func readFile(filePath string) []byte {
 		os.Exit(1)
 	}
 	defer file.Close()
-
 	byteValue, err := io.ReadAll(file)
 	if err != nil {
 		fmt.Println("FAILED")
@@ -116,5 +138,4 @@ func readFile(filePath string) []byte {
 		os.Exit(1)
 	}
 	return byteValue
-
 }

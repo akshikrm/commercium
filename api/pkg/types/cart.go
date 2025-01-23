@@ -12,6 +12,12 @@ type CreateCartRequest struct {
 	Quantity  uint   `json:"quantity"`
 }
 
+type UpdateCartQuantityRequest struct {
+	UserID    uint32 `json:"user_id"`
+	ProductID uint32 `json:"product_id"`
+	Quantity  uint   `json:"quantity"`
+}
+
 type UpdateCartRequest struct {
 	Quantity uint `json:"quantity"`
 }
@@ -42,14 +48,14 @@ type CartList struct {
 }
 
 type CartRepository interface {
-	GetAll(uint32) ([]*CartList, error)
-	GetOne(uint32) (*CartList, error)
-	Create(*CreateCartRequest) (*Cart, error)
-	Update(uint32, *UpdateCartRequest) (*CartList, error)
-	Delete(uint32) error
-	CheckIfEntryExist(uint32, uint32) (bool, error)
-	UpdateQuantity(uint32, uint32, uint) error
-	HardDeleteByUserID(string) error
+	GetAll(uint32) ([]*CartList, bool)
+	GetOne(uint32) (*CartList, bool)
+	Create(*CreateCartRequest) (*Cart, bool)
+	Update(uint32, *UpdateCartRequest) (*CartList, bool)
+	Delete(uint32) bool
+	CheckIfEntryExist(uint32, uint32) bool
+	UpdateQuantity(*CreateCartRequest) bool
+	HardDeleteByUserID(string) bool
 }
 
 type CartServicer interface {

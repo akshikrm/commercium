@@ -1,12 +1,17 @@
 package utils
 
 import (
+	"log"
+
 	"golang.org/x/crypto/bcrypt"
 )
 
-func HashPassword(password []byte) (string, error) {
+func HashPassword(password []byte) (string, bool) {
 	hashedPassword, err := bcrypt.GenerateFromPassword(password, bcrypt.DefaultCost)
-	return string(hashedPassword), err
+	if err != nil {
+		log.Printf("failed to hash password due to %s", err)
+	}
+	return string(hashedPassword), true
 }
 
 func ValidateHash(hashedpassword []byte, plainTextPassword string) error {

@@ -12,11 +12,10 @@ type user struct {
 }
 
 func (u *user) Login(payload *types.LoginUserRequest) (string, error) {
-	user, err := u.userRepository.GetPasswordByEmail(payload.Email)
-	if err != nil {
-		return "", err
+	user, ok := u.userRepository.GetPasswordByEmail(payload.Email)
+	if !ok {
+		return "", utils.ServerError
 	}
-
 	if err := utils.ValidateHash([]byte(user.Password), payload.Password); err != nil {
 		log.Printf("invalid password for user %s", payload.Email)
 		return "", utils.Unauthorized
@@ -26,12 +25,15 @@ func (u *user) Login(payload *types.LoginUserRequest) (string, error) {
 	if err != nil {
 		return "", err
 	}
-
 	return token, nil
 }
 
 func (u *user) Get() ([]*types.User, error) {
-	return u.userRepository.Get()
+	user, ok := u.userRepository.Get()
+	if !ok {
+		return nil, utils.ServerError
+	}
+	return user, nil
 }
 
 func (u *user) GetCustomerID(id uint32) (*string, error) {
@@ -43,49 +45,47 @@ func (u *user) GetCustomerID(id uint32) (*string, error) {
 }
 
 func (u *user) GetProfile(userId uint32) (*types.Profile, error) {
-	return u.profileRepository.GetByUserId(userId)
-}
-
-func (u *user) GetOne(id uint32) (*types.User, error) {
-	user, err := u.userRepository.GetOne(id)
-	if err != nil {
-		return nil, err
+	user, ok := u.profileRepository.GetByUserId(userId)
+	if !ok {
+		return nil, utils.ServerError
 	}
-
 	return user, nil
 }
 
+func (u *user) GetOne(id uint32) (*types.User, error) {
+	user, ok := u.userRepository.GetOne(id)
+	if !ok {
+		return nil, utils.ServerError
+	}
+	return user, nil
+}
+
+func (u *user) Exists(email string) bool {
+	exists := u.profileRepository.CheckIfUserExists(email)
+	return exists
+}
+
 func (u *user) Create(user types.CreateUserRequest) (string, error) {
-	hashedPassword, err := utils.HashPassword([]byte(user.Password))
-	if err != nil {
-		return "", err
+	hashedPassword, ok := utils.HashPassword([]byte(user.Password))
+	if !ok {
+		return "", utils.ServerError
 	}
 
-	exists := u.profileRepository.CheckIfUserExists(user.Email)
-	if exists {
-		return "", utils.Conflict
-	}
 	user.Password = hashedPassword
-	paddlePayment := new(PaddlePayment)
-	if err := paddlePayment.Init(); err != nil {
-		return "", err
+	savedUser, ok := u.userRepository.Create(user)
+	if !ok {
+		return "", utils.ServerError
 	}
 
-	if err := paddlePayment.CreateCustomer(&user); err != nil {
-		return "", err
-	}
-	savedUser, err := u.userRepository.Create(user)
-	if err != nil {
-		return "", err
-	}
 	newUserProfile := types.NewProfileRequest{
 		FirstName: user.FirstName,
 		LastName:  user.LastName,
 		Email:     user.Email,
 		UserID:    savedUser.ID,
 	}
-	if _, err := u.profileRepository.Create(&newUserProfile); err != nil {
-		return "", err
+
+	if _, ok := u.profileRepository.Create(&newUserProfile); !ok {
+		return "", utils.ServerError
 	}
 	token, err := utils.CreateJwt(savedUser.ID, savedUser.Role)
 	if err != nil {
@@ -95,15 +95,19 @@ func (u *user) Create(user types.CreateUserRequest) (string, error) {
 }
 
 func (u *user) Update(id uint32, user *types.UpdateProfileRequest) (*types.Profile, error) {
-	err := u.profileRepository.UpdateProfileByUserID(id, user)
-	if err != nil {
-		return nil, err
+	ok := u.profileRepository.UpdateProfileByUserID(id, user)
+	if !ok {
+		return nil, utils.ServerError
 	}
 	return u.GetProfile(id)
 }
 
 func (u *user) Delete(id uint32) error {
-	return u.userRepository.Delete(id)
+	ok := u.userRepository.Delete(id)
+	if !ok {
+		return utils.ServerError
+	}
+	return nil
 }
 
 func newUserService(userRepository types.UserRepository, profileRepository types.ProfileRepository) *user {

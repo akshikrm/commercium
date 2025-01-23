@@ -19,11 +19,11 @@ type Role struct {
 }
 
 type RoleRepository interface {
-	GetAll() ([]*Role, error)
-	GetOne(int) (*Role, error)
-	Create(*CreateRoleRequest) error
-	Update(int, *CreateRoleRequest) (*Role, error)
-	Delete(int) error
+	GetAll() ([]*Role, bool)
+	GetOne(int) (*Role, bool)
+	Create(*CreateRoleRequest) bool
+	Update(int, *CreateRoleRequest) (*Role, bool)
+	Delete(int) bool
 }
 
 type RoleService interface {

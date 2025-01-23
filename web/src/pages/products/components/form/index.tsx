@@ -9,27 +9,26 @@ type Add = (inputData: NewProduct) => void
 type Edit = (inputData: EditProduct) => void
 
 type Props = {
-    defaultValues?: EditProduct
-    buttonLabel: string
-    onSubmit: Add | Edit
+	defaultValues?: EditProduct
+	buttonLabel: string
+	onSubmit: Add | Edit
 }
 
 const ProductForm = ({ buttonLabel, defaultValues, onSubmit }: Props) => {
-    const methods = useProductForm(defaultValues)
-
-    return (
-        <RHFProvider methods={methods} onSubmit={onSubmit}>
-            <Stack>
-                <RHFTextField name='name' label='Product Name' />
-                <RHFTextField name='slug' label='Product URL' />
-                <RHFTextField name='description' label='Description' />
-                <RHFImageUpload name='image' label='Image' />
-                <ProductCategoryNames />
-                <RHFTextField name='price' label='Price' />
-                <Button type='submit'>{buttonLabel}</Button>
-            </Stack>
-        </RHFProvider>
-    )
+	const methods = useProductForm(defaultValues)
+	return (
+		<RHFProvider methods={methods} onSubmit={onSubmit}>
+			<Stack>
+				<RHFTextField name='name' label='Product Name' />
+				<RHFTextField name='slug' label='Product URL' />
+				<RHFTextField name='description' label='Description' />
+				<RHFImageUpload name='image' label='Image' />
+				<ProductCategoryNames />
+				<RHFTextField name='price' label='Price' />
+				<Button type='submit'>{buttonLabel}</Button>
+			</Stack>
+		</RHFProvider>
+	)
 }
 
 export default ProductForm
