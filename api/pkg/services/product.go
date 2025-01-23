@@ -20,7 +20,7 @@ func (r *product) Get(filter url.Values) ([]*types.ProductsList, error) {
 }
 
 func (r *product) Create(newProduct *types.NewProductRequest) error {
-	paddlePayment := new(PaddlePayment)
+	paddlePayment := NewPaddlePayment()
 	if err := paddlePayment.Init(); err != nil {
 		return err
 	}

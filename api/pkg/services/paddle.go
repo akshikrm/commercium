@@ -9,6 +9,7 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"strings"
 
 	"github.com/PaddleHQ/paddle-go-sdk"
 )
@@ -23,7 +24,7 @@ func (p *PaddlePayment) Init() error {
 	client, err := paddle.New(paddle_key, paddle.WithBaseURL(paddle.SandboxBaseURL))
 	if err != nil {
 		log.Printf("failed to connect to paddle due to %s", err)
-		return utils.ServerError
+		return utils.PaddleError
 	}
 	p.Client = client
 	return nil
@@ -31,20 +32,40 @@ func (p *PaddlePayment) Init() error {
 
 func (p *PaddlePayment) CreateCustomer(newUser *types.CreateUserRequest) error {
 	ctx := context.Background()
-
 	customerName := fmt.Sprintf("%s %s", newUser.FirstName, newUser.LastName)
 	customer, err := p.Client.CreateCustomer(ctx, &paddle.CreateCustomerRequest{
 		Name:  &customerName,
 		Email: newUser.Email,
 	})
-
 	if err != nil {
-		log.Printf("failed to add customer to paddle due to %s", err)
-		return utils.ServerError
+		if ok := strings.Contains(err.Error(), paddle.ErrCustomerAlreadyExists.Error()); ok {
+			return paddle.ErrCustomerAlreadyExists
+		}
+		return utils.PaddleError
 	}
-
 	newUser.CustomerID = customer.ID
 	return nil
+}
+
+func (p *PaddlePayment) GetCustomerByEmail(email string) (string, error) {
+	ctx := context.Background()
+	emails := []string{email}
+	customer, err := p.Client.ListCustomers(ctx, &paddle.ListCustomersRequest{
+		Email: emails,
+	})
+	if err != nil {
+		fmt.Println("user not found")
+	}
+	var customerID string
+	err = customer.Iter(ctx, func(v *paddle.Customer) (bool, error) {
+		customerID = v.ID
+		return true, nil
+	})
+	if err != nil {
+		fmt.Println(err)
+		return "", err
+	}
+	return customerID, nil
 }
 
 func (p *PaddlePayment) GetInvoice(txnId string) *string {
@@ -138,4 +159,9 @@ func (p PaddlePayment) SyncPrice(store *repository.Storage) {
 		}
 	}
 	log.Println("sync complete")
+}
+
+func NewPaddlePayment() *PaddlePayment {
+	p := new(PaddlePayment)
+	return p
 }

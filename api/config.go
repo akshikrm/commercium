@@ -26,7 +26,7 @@ func NewTestConfig() *Config {
 	return config
 }
 
-func NewConfig() *Config {
+func New() *Config {
 	if err := godotenv.Load(); err != nil {
 		log.Fatal("Error loading .env file")
 	}

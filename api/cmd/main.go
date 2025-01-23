@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	config := config.NewConfig()
+	config := config.New()
 	store := repository.New(config)
 	services := services.New(store)
 	handlers := handlers.New(services)

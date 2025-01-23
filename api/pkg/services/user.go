@@ -20,6 +20,7 @@ func (u *user) Login(payload *types.LoginUserRequest) (string, error) {
 		log.Printf("invalid password for user %s", payload.Email)
 		return "", utils.Unauthorized
 	}
+
 	token, err := utils.CreateJwt(user.ID, user.Role)
 	if err != nil {
 		return "", err
@@ -59,34 +60,30 @@ func (u *user) GetOne(id uint32) (*types.User, error) {
 	return user, nil
 }
 
+func (u *user) Exists(email string) bool {
+	exists := u.profileRepository.CheckIfUserExists(email)
+	return exists
+}
+
 func (u *user) Create(user types.CreateUserRequest) (string, error) {
 	hashedPassword, ok := utils.HashPassword([]byte(user.Password))
 	if !ok {
 		return "", utils.ServerError
 	}
-	exists := u.profileRepository.CheckIfUserExists(user.Email)
-	if exists {
-		return "", utils.Conflict
-	}
-	user.Password = hashedPassword
-	paddlePayment := new(PaddlePayment)
-	if err := paddlePayment.Init(); err != nil {
-		return "", err
-	}
 
-	if err := paddlePayment.CreateCustomer(&user); err != nil {
-		return "", err
-	}
+	user.Password = hashedPassword
 	savedUser, ok := u.userRepository.Create(user)
 	if !ok {
 		return "", utils.ServerError
 	}
+
 	newUserProfile := types.NewProfileRequest{
 		FirstName: user.FirstName,
 		LastName:  user.LastName,
 		Email:     user.Email,
 		UserID:    savedUser.ID,
 	}
+
 	if _, ok := u.profileRepository.Create(&newUserProfile); !ok {
 		return "", utils.ServerError
 	}

@@ -100,13 +100,12 @@ func (m *user) Create(user types.CreateUserRequest) (*types.User, bool) {
 	if user.Role != "" {
 		role = user.Role
 	}
+
 	row := m.store.QueryRow(query,
 		user.Password,
 		role,
 		user.CustomerID,
 	)
-	log.Printf("Created user %v", user)
-
 	savedUser := types.User{}
 	if err := row.Scan(&savedUser.ID, &savedUser.Role); err != nil {
 		log.Printf("failed to scan user after writing %d %s", savedUser.ID, err)

@@ -35,7 +35,7 @@ func (p *profile) GetByUserId(userId uint32) (*types.Profile, bool) {
 		log.Printf("failed to get profile of user with id: %d due to: %s", userId, err)
 		return nil, false
 	}
-	return savedProfile, false
+	return savedProfile, true
 }
 
 func (p *profile) Create(profile *types.NewProfileRequest) (uint32, bool) {
@@ -45,7 +45,6 @@ func (p *profile) Create(profile *types.NewProfileRequest) (uint32, bool) {
 	returning id
 	`
 
-	log.Println("Creating profile")
 	row := p.DB.QueryRow(query,
 		profile.FirstName,
 		profile.LastName,
@@ -56,9 +55,9 @@ func (p *profile) Create(profile *types.NewProfileRequest) (uint32, bool) {
 	savedProfile := types.Profile{}
 	if err := row.Scan(&savedProfile.ID); err != nil {
 		log.Printf("failed to scan user after writing %d %s", savedProfile.ID, err)
-		return 0, true
+		return 0, false
 	}
-	return savedProfile.ID, false
+	return savedProfile.ID, true
 }
 
 func (p *profile) CheckIfUserExists(email string) bool {

@@ -102,7 +102,8 @@ type UserServicer interface {
 	Create(CreateUserRequest) (string, error)
 	Update(uint32, *UpdateProfileRequest) (*Profile, error)
 	Delete(uint32) error
-	GetCustomerID(id uint32) (*string, error)
+	GetCustomerID(uint32) (*string, error)
+	Exists(string) bool
 }
 
 type UserHandler interface {
