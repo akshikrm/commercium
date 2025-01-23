@@ -104,12 +104,10 @@ func (p *product) Update(pid int, product *types.NewProductRequest) (*types.OneP
 		product.CategoryID,
 		pid,
 	)
-
 	savedProduct, err := scanProductRow(row)
 	if err == sql.ErrNoRows {
 		return nil, true
 	}
-
 	if err != nil {
 		log.Printf("failed to update product %s due to %s", product.Name, err)
 		return nil, false
