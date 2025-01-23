@@ -1,23 +1,29 @@
 import { Cloudinary } from "@cloudinary/url-gen"
 import { scale } from "@cloudinary/url-gen/actions/resize"
 import { AdvancedImage } from "@cloudinary/react"
-import { Box, CircularProgress } from "@mui/material"
-import Render from "@components/render"
+import { Box, IconButton, Stack } from "@mui/material"
+import RenderIcon from "./render-icon"
+import icons from "@/icons"
 
-const Image = ({ preview }: { preview: Preview }) => {
-	const { publicID, status } = preview
-	const cld = new Cloudinary({ cloud: { cloudName: "commercium" } })
-	const img = cld.image(publicID).resize(scale().width(100).height(100))
+type Props = {
+    publicID: string
+    onClick?: () => void
+}
 
-	return (
-		<Box>
-			<Render
-				when={status === "pending"}
-				show={<CircularProgress variant='indeterminate' />}
-				otherwise={<AdvancedImage cldImg={img} />}
-			/>
-		</Box>
-	)
+const Image = ({ publicID, onClick }: Props) => {
+    const cld = new Cloudinary({ cloud: { cloudName: "commercium" } })
+    const img = cld.image(publicID).resize(scale().width(100).height(100))
+
+    return (
+        <Stack justifyContent='flex-end'>
+            <Box sx={{ textAlign: "right" }}>
+                <IconButton size='small' onClick={onClick}>
+                    <RenderIcon icon={icons.close} />
+                </IconButton>
+            </Box>
+            <AdvancedImage cldImg={img} />
+        </Stack>
+    )
 }
 
 export default Image

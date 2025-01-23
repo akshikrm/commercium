@@ -82,15 +82,18 @@ func (p *PaddlePayment) GetInvoice(txnId string) *string {
 
 }
 
-func (p *PaddlePayment) CreateProduct(newProduct *types.NewProductRequest) error {
+func (p *PaddlePayment) CreateProduct(newProductRequest *types.NewProductRequest) error {
 	ctx := context.Background()
 
-	product, err := p.Client.CreateProduct(ctx, &paddle.CreateProductRequest{
-		Name:        newProduct.Name,
-		Description: &newProduct.Description,
-		TaxCategory: paddle.TaxCategoryStandard,
-		ImageURL:    &newProduct.Image[0],
-	})
+	paddleProductRequest := new(paddle.CreateProductRequest)
+	paddleProductRequest.Name = newProductRequest.Name
+	paddleProductRequest.Description = &newProductRequest.Description
+	paddleProductRequest.TaxCategory = paddle.TaxCategoryStandard
+
+	if len(newProductRequest.Image) > 0 {
+		paddleProductRequest.ImageURL = &newProductRequest.Image[0]
+	}
+	product, err := p.Client.CreateProduct(ctx, paddleProductRequest)
 
 	if err != nil {
 		log.Printf("failed to add product to paddle due to %s", err)
@@ -100,7 +103,7 @@ func (p *PaddlePayment) CreateProduct(newProduct *types.NewProductRequest) error
 	price, err := p.Client.CreatePrice(ctx, &paddle.CreatePriceRequest{
 		ProductID: product.ID,
 		UnitPrice: paddle.Money{
-			Amount:       strconv.Itoa(int(newProduct.Price)),
+			Amount:       strconv.Itoa(int(newProductRequest.Price)),
 			CurrencyCode: paddle.CurrencyCodeINR,
 		},
 		Description: "Main Price",
@@ -111,13 +114,13 @@ func (p *PaddlePayment) CreateProduct(newProduct *types.NewProductRequest) error
 		return utils.ServerError
 	}
 
-	newProduct.ProductID = product.ID
+	newProductRequest.ProductID = product.ID
 	if amount, err := strconv.Atoi(price.UnitPrice.Amount); err != nil {
 		log.Printf("failed to add price to product due to %s", err)
 		return utils.ServerError
 	} else {
-		newProduct.Price = uint(amount)
-		newProduct.PriceID = price.ID
+		newProductRequest.Price = uint(amount)
+		newProductRequest.PriceID = price.ID
 	}
 	return nil
 }
