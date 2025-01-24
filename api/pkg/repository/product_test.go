@@ -3,6 +3,7 @@ package repository
 import (
 	config "akshidas/e-com"
 	"akshidas/e-com/pkg/types"
+	"fmt"
 	"testing"
 )
 
@@ -37,7 +38,13 @@ func TestGetOneProduct(t *testing.T) {
 func TestGetAllProduct(t *testing.T) {
 	testConfig := config.NewTestConfig()
 	store := New(testConfig)
-	_, ok := store.Product.GetAll(nil)
+	products, ok := store.Product.GetAll(nil)
+	for _, p := range products {
+		if p.Image != nil {
+			fmt.Println(*p.Image)
+		}
+	}
+
 	if !ok {
 		t.Error("failed to get all product")
 	}

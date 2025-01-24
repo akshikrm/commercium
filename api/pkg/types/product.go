@@ -23,7 +23,7 @@ type ProductsList struct {
 	Name        string    `json:"name"`
 	Slug        string    `json:"slug"`
 	Price       string    `json:"price"`
-	Image       []string  `json:"image"`
+	Image       *string   `json:"image"`
 	Description string    `json:"description"`
 	CreatedAt   time.Time `json:"created_at"`
 	Category    struct {

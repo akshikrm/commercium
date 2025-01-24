@@ -16,7 +16,7 @@ type product struct {
 }
 
 func (p *product) GetAll(filter url.Values) ([]*types.ProductsList, bool) {
-	query := buildFilterQuery("SELECT p.id, p.name, p.slug, p.price, p.image, p.description, p.created_at, c.id as c_id, c.name as c_name,c.slug as c_slug,c.description as c_description FROM products p INNER JOIN product_categories c ON p.category_id=c.id AND c.enabled='t' where p.deleted_at IS NULL", filter)
+	query := buildFilterQuery("SELECT p.id, p.name, p.slug, p.price, p.image[1], p.description, p.created_at, c.id as c_id, c.name as c_name,c.slug as c_slug,c.description as c_description FROM products p INNER JOIN product_categories c ON p.category_id=c.id AND c.enabled='t' where p.deleted_at IS NULL", filter)
 	rows, err := p.store.Query(query)
 	if err == sql.ErrNoRows {
 		return nil, true
@@ -35,7 +35,7 @@ func (p *product) GetAll(filter url.Values) ([]*types.ProductsList, bool) {
 			&product.Name,
 			&product.Slug,
 			&product.Price,
-			pq.Array(product.Image),
+			&product.Image,
 			&product.Description,
 			&product.CreatedAt,
 			&product.Category.ID,
