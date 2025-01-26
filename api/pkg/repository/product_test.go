@@ -38,12 +38,7 @@ func TestGetOneProduct(t *testing.T) {
 func TestGetAllProduct(t *testing.T) {
 	testConfig := config.NewTestConfig()
 	store := New(testConfig)
-	products, ok := store.Product.GetAll(nil)
-	for _, p := range products {
-		if p.Image != nil {
-			fmt.Println(*p.Image)
-		}
-	}
+	_, ok := store.Product.GetAll(nil)
 
 	if !ok {
 		t.Error("failed to get all product")
