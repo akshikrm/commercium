@@ -12,6 +12,7 @@ type Config struct {
 	Password string
 	Host     string
 	Port     string
+	Mode     string
 }
 
 func NewTestConfig() *Config {
@@ -22,6 +23,7 @@ func NewTestConfig() *Config {
 	config.Password = "root"
 	config.Host = "localhost"
 	config.Port = "9000"
+	config.Mode = "testing"
 
 	return config
 }
@@ -38,6 +40,7 @@ func New() *Config {
 	config.Password = os.Getenv("DB_PASSWORD")
 	config.Host = os.Getenv("DB_HOST")
 	config.Port = os.Getenv("DB_PORT")
+	config.Mode = "DEV"
 
 	return config
 }

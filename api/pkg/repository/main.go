@@ -53,7 +53,8 @@ func connect(config *config.Config) *sql.DB {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-
-	fmt.Println("🗃️ connected to database")
+	if config.Mode != "testing" {
+		fmt.Println("🗃️ connected to database")
+	}
 	return db
 }
