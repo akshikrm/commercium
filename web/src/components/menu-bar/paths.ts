@@ -33,6 +33,10 @@ export const ADMIN_MENUS: Paths[] = [
             {
                 label: "product",
                 path: ADMIN_PATHS.products.root
+            },
+            {
+                label: "shipping",
+                path: ADMIN_PATHS.shipping.root
             }
         ]
     },

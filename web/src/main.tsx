@@ -2,7 +2,7 @@ import { StrictMode } from "react"
 import { createRoot } from "react-dom/client"
 import { BrowserRouter, Navigate, Route, Routes } from "react-router"
 import Login from "./pages/login"
-import { Container, ThemeProvider } from "@mui/material"
+import { Container, ThemeProvider, Typography } from "@mui/material"
 import theme from "./theme"
 import AddProduct from "./pages/products/add"
 import EditProduct from "./pages/products/edit"
@@ -23,6 +23,7 @@ import Orders from "./pages/store/orders/index.tsx"
 import Cart from "./pages/cart/index.tsx"
 import { USER_PATHS } from "./paths.ts"
 import OrderView from "./pages/store/orders/view/index.tsx"
+import Shipping from "./pages/shipping/index.tsx"
 
 const client = new QueryClient()
 
@@ -101,6 +102,10 @@ createRoot(document.getElementById("root")!).render(
                                     }
                                 >
                                     <Route path='orders' element={<Orders />} />
+                                    <Route
+                                        path='shipping'
+                                        element={<Shipping />}
+                                    />
                                     <Route path='products'>
                                         <Route index element={<Products />} />
                                         <Route

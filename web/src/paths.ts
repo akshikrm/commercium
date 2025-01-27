@@ -11,6 +11,9 @@ export const ADMIN_PATHS = {
                 `/admin/products/categories/${slug}`
         }
     },
+    shipping: {
+        root: "/admin/shipping"
+    },
     orders: {
         root: "/admin/orders",
         view: (orderID: string) => `admin/orders/${orderID}`
