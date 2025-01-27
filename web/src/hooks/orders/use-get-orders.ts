@@ -5,10 +5,9 @@ import toast from "react-hot-toast"
 
 const useGetOrders = () => {
     const query = useQuery({
+        initialData: [],
         queryKey: ["ordersList"],
-        queryFn: () => {
-            return order.getMyOrders()
-        }
+        queryFn: () => order.getMyOrders()
     })
     const { status } = query
 

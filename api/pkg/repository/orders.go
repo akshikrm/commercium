@@ -94,7 +94,8 @@ func (m *orders) GetOrdersByUserID(id uint32) ([]*types.OrderList, bool) {
 				'product_id',p.id,
 				'name',p.name,
 				'price',p.price,
-				'quantity', o.quantity
+				'quantity', o.quantity,
+				'shipping_status', o.status
 			)
 		)
 	AS orders,
@@ -129,7 +130,8 @@ func (m *orders) GetAllOrders() ([]*types.OrderList, bool) {
 				'product_id',p.id,
 				'name',p.name,
 				'price',p.price,
-				'quantity', o.quantity
+				'quantity', o.quantity,
+				'shipping_status', o.status
 			)
 		)
 	AS orders,

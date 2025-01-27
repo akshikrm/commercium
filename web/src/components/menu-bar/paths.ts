@@ -26,7 +26,6 @@ export const ADMIN_MENUS: Paths[] = [
         label: "dashboard",
         path: ADMIN_PATHS.root
     },
-
     {
         label: "e-commerce",
         path: ADMIN_PATHS.products.root,
@@ -34,6 +33,16 @@ export const ADMIN_MENUS: Paths[] = [
             {
                 label: "product",
                 path: ADMIN_PATHS.products.root
+            }
+        ]
+    },
+    {
+        label: "sales",
+        path: ADMIN_PATHS.orders.root,
+        children: [
+            {
+                label: "orders",
+                path: ADMIN_PATHS.orders.root
             }
         ]
     }

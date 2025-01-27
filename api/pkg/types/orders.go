@@ -40,11 +40,12 @@ type PurchaseList struct {
 }
 
 type OrderProduct struct {
-	ID        uint32 `json:"id"`
-	ProductID uint32 `json:"product_id"`
-	Name      string `json:"name"`
-	Price     uint   `json:"price"`
-	Quantity  uint   `json:"quantity"`
+	ID             uint32 `json:"id"`
+	ProductID      uint32 `json:"product_id"`
+	ShippingStatus string `json:"shipping_status"`
+	Name           string `json:"name"`
+	Price          uint   `json:"price"`
+	Quantity       uint   `json:"quantity"`
 }
 
 type OrderList struct {

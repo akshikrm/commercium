@@ -10,6 +10,10 @@ export const ADMIN_PATHS = {
             edit: (slug: number | string) =>
                 `/admin/products/categories/${slug}`
         }
+    },
+    orders: {
+        root: "/admin/orders",
+        view: (orderID: string) => `admin/orders/${orderID}`
     }
 }
 

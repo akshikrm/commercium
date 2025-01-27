@@ -16,7 +16,6 @@ import icons from "@/icons"
 import IconButton from "@mui/material/IconButton"
 import { useMemo } from "react"
 import { Typography } from "@mui/material"
-import parseToLocaleAmount from "@utils/convert-to-locale-amount"
 import { order } from "@api"
 
 const Orders = () => {
@@ -37,6 +36,7 @@ const Orders = () => {
                             <TableCell>Invoice Number</TableCell>
                             <TableCell>Payment Status</TableCell>
                             <TableCell>Items</TableCell>
+
                             <TableCell>Price</TableCell>
                             <TableCell>Purchased On</TableCell>
                             <TableCell>Download</TableCell>
