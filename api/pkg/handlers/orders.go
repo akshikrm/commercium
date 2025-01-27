@@ -43,10 +43,20 @@ func (a *purchase) HandleTransactionHook(w http.ResponseWriter, r *http.Request)
 	return writeJson(w, http.StatusOK, "waiting...")
 }
 
-func (a *purchase) GetMyOrders(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
-	userID := uint(ctx.Value("userID").(int))
-	orders, err := a.service.GetOrdersByUserID(userID)
-	if err != nil {
+func (a *purchase) GetAllOrders(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
+	userID := ctx.Value("userID")
+	role := ctx.Value("role")
+
+	var orders = []*types.OrderList{}
+	var err error = nil
+	if role == "admin" {
+		if orders, err = a.service.GetAllOrders(); err != nil {
+			return err
+		}
+		return writeJson(w, http.StatusOK, orders)
+	}
+
+	if orders, err = a.service.GetOrdersByUserID(userID.(uint32)); err != nil {
 		return err
 	}
 	return writeJson(w, http.StatusOK, orders)
@@ -63,7 +73,6 @@ func (a *purchase) GetOrderStatus(ctx context.Context, w http.ResponseWriter, r 
 	if err != nil {
 		return err
 	}
-
 	return writeJson(w, http.StatusOK, transactionStatus)
 }
 

@@ -5,11 +5,19 @@ import (
 	"akshidas/e-com/pkg/handlers"
 	"akshidas/e-com/pkg/repository"
 	"akshidas/e-com/pkg/services"
+	"akshidas/e-com/pkg/types"
 	"bytes"
+	"context"
+	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 )
+
+type AllOrdersResponse struct {
+	Data []*types.OrderList `json:"data"`
+}
 
 func TestPurchase(t *testing.T) {
 	config := config.NewTestConfig()
@@ -27,6 +35,67 @@ func TestPurchase(t *testing.T) {
 		want := 200
 		if got != want {
 			t.Errorf("got %q, want %q", got, want)
+		}
+	})
+}
+
+func TestOrderStatus(t *testing.T) {
+	config := config.NewTestConfig()
+	store := repository.New(config)
+	services := services.New(store)
+	handlers := handlers.New(services)
+
+	ctx := context.Background()
+
+	// t.Run("get my orders", func(t *testing.T) {
+	// 	req, _ := http.NewRequest(http.MethodGet, "/orders", nil)
+	// 	res := httptest.NewRecorder()
+	// 	ctx = context.WithValue(ctx, "userID", uint32(2))
+	// 	ctx = context.WithValue(ctx, "role", "user")
+	// 	handlers.Purchase.GetAllOrders(ctx, res, req)
+	// 	got := res.Body.String()
+	// 	fmt.Println(got)
+	// 	want := "admin route"
+	// 	if got != want {
+	// 		t.Errorf("got %s, want %s", got, want)
+	// 	}
+	// })
+
+	t.Run("get orders of user", func(t *testing.T) {
+		req, _ := http.NewRequest(http.MethodGet, "/orders", nil)
+		res := httptest.NewRecorder()
+		ctx = context.WithValue(ctx, "userID", uint32(1))
+		ctx = context.WithValue(ctx, "role", "admin")
+		handlers.Purchase.GetAllOrders(ctx, res, req)
+		orders := &AllOrdersResponse{}
+		if err := json.NewDecoder(res.Body).Decode(orders); err != nil {
+			panic("failed to decode orders")
+		}
+
+		fmt.Println(orders)
+		got := res.Result().StatusCode
+		want := 200
+		if got != want {
+			t.Errorf("got %d, want %d", got, want)
+		}
+	})
+
+	t.Run("get all orders", func(t *testing.T) {
+		req, _ := http.NewRequest(http.MethodGet, "/orders", nil)
+		res := httptest.NewRecorder()
+		ctx = context.WithValue(ctx, "userID", uint32(1))
+		ctx = context.WithValue(ctx, "role", "admin")
+		handlers.Purchase.GetAllOrders(ctx, res, req)
+		orders := &AllOrdersResponse{}
+		if err := json.NewDecoder(res.Body).Decode(orders); err != nil {
+			panic("failed to decode orders")
+		}
+
+		fmt.Println(orders)
+		got := res.Result().StatusCode
+		want := 200
+		if got != want {
+			t.Errorf("got %d, want %d", got, want)
 		}
 	})
 

@@ -42,39 +42,8 @@ func (m *orders) GetPurchaseByOrderID(id uint) ([]*types.PurchaseList, bool) {
 	return purchases, true
 }
 
-func (m *orders) GetOrdersByUserID(id uint) ([]*types.OrderList, bool) {
-	query := `
-	 SELECT 
-		t.id,
-		t.transaction_id AS txn_id,
-		t.status AS payment_status,
-		t.invoice_number,
-		t.grand_total,
-		JSON_AGG(
-			JSON_BUILD_OBJECT(
-				'id',o.id,
-				'product_id',p.id,
-				'name',p.name,
-				'price',p.price,
-				'quantity', o.quantity
-			)
-		)
-	AS orders,
-	t.created_at
-	FROM 
-		transactions AS t 
-	JOIN 
-		orders AS o ON t.id=o.transaction_id
-	JOIN 
-		products as p on o.product_id=p.product_id 
-	JOIN 
-		users as u on t.customer_id=u.customer_id 
-	WHERE 
-		u.id=$1
-	GROUP BY 
-		t.id, t.transaction_id, t.status, t.tax, t.sub_total, t.grand_total, u.id;
-`
-	rows, err := m.store.Query(query, id)
+func (m *orders) getAllOrders(query string) ([]*types.OrderList, bool) {
+	rows, err := m.store.Query(query)
 	if err != nil {
 		log.Printf("failed to retrieve orders due to %s", err)
 		return nil, false
@@ -108,6 +77,76 @@ func (m *orders) GetOrdersByUserID(id uint) ([]*types.OrderList, bool) {
 		orders = append(orders, &order)
 	}
 	return orders, true
+
+}
+
+func (m *orders) GetOrdersByUserID(id uint32) ([]*types.OrderList, bool) {
+	query := fmt.Sprintf(`
+	 SELECT 
+		t.id,
+		t.transaction_id AS txn_id,
+		t.status AS payment_status,
+		t.invoice_number,
+		t.grand_total,
+		JSON_AGG(
+			JSON_BUILD_OBJECT(
+				'id',o.id,
+				'product_id',p.id,
+				'name',p.name,
+				'price',p.price,
+				'quantity', o.quantity
+			)
+		)
+	AS orders,
+	t.created_at
+	FROM 
+		transactions AS t 
+	JOIN 
+		orders AS o ON t.id=o.transaction_id
+	JOIN 
+		products as p on o.product_id=p.product_id 
+	JOIN 
+		users as u on t.customer_id=u.customer_id 
+	WHERE 
+		u.id=%d
+	GROUP BY 
+		t.id, t.transaction_id, t.status, t.tax, t.sub_total, t.grand_total, u.id;
+`, id)
+	return m.getAllOrders(query)
+}
+
+func (m *orders) GetAllOrders() ([]*types.OrderList, bool) {
+	query := fmt.Sprintf(`
+	 SELECT 
+		t.id,
+		t.transaction_id AS txn_id,
+		t.status AS payment_status,
+		t.invoice_number,
+		t.grand_total,
+		JSON_AGG(
+			JSON_BUILD_OBJECT(
+				'id',o.id,
+				'product_id',p.id,
+				'name',p.name,
+				'price',p.price,
+				'quantity', o.quantity
+			)
+		)
+	AS orders,
+	t.created_at
+	FROM 
+		transactions AS t 
+	JOIN 
+		orders AS o ON t.id=o.transaction_id
+	JOIN 
+		products as p on o.product_id=p.product_id 
+	JOIN 
+		users as u on t.customer_id=u.customer_id 
+	GROUP BY 
+		t.id, t.transaction_id, t.status, t.tax, t.sub_total, t.grand_total, u.id;
+`)
+	fmt.Println(query)
+	return m.getAllOrders(query)
 }
 
 func (m *orders) CreateOrder(orders []*types.NewOrder) bool {

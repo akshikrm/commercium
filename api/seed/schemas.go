@@ -36,12 +36,15 @@ var SCHEMA = map[string]string{
 	"uploads": "id SERIAL PRIMARY KEY, path VARCHAR(200) NOT NULL, created_at TIMESTAMP DEFAULT NOW() NOT NULL, updated_at TIMESTAMP DEFAULT NOW() NOT NULL, deleted_at TIMESTAMP DEFAULT NULL",
 	"transactions": `id SERIAL PRIMARY KEY,
 	transaction_id VARCHAR(30) NOT NULL,
+	invoice_number VARCHAR(20) NOT NULL DEFAULT '',
 	status VARCHAR(30) NOT NULL,
 	customer_id VARCHAR(30) NOT NULL DEFAULT '',
 	tax  varchar(20) NOT NULL,
 	sub_total  varchar(20) NOT NULL,
 	grand_total  varchar(20) NOT NULL,
-	created_at TIMESTAMP DEFAULT NOW() NOT NULL`,
+	created_at TIMESTAMP DEFAULT NOW() NOT NULL,
+	updated_at TIMESTAMP DEFAULT NOW() NOT NULL
+	`,
 }
 
 var KEYS = []string{

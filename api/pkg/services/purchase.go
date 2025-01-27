@@ -111,8 +111,16 @@ func (s *transaction) GetPurchaseByOrderID(id uint) ([]*types.PurchaseList, erro
 	return purchases, nil
 }
 
-func (s *transaction) GetOrdersByUserID(id uint) ([]*types.OrderList, error) {
+func (s *transaction) GetOrdersByUserID(id uint32) ([]*types.OrderList, error) {
 	orders, ok := s.orderRepository.GetOrdersByUserID(id)
+	if !ok {
+		return nil, utils.ServerError
+	}
+	return orders, nil
+}
+
+func (s *transaction) GetAllOrders() ([]*types.OrderList, error) {
+	orders, ok := s.orderRepository.GetAllOrders()
 	if !ok {
 		return nil, utils.ServerError
 	}

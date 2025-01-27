@@ -77,9 +77,10 @@ type OrderView struct {
 }
 
 type OrdersRepository interface {
-	GetOrdersByUserID(uint) ([]*OrderList, bool)
+	GetOrdersByUserID(uint32) ([]*OrderList, bool)
 	GetPurchaseByOrderID(uint) ([]*PurchaseList, bool)
 	CreateOrder([]*NewOrder) bool
+	GetAllOrders() ([]*OrderList, bool)
 }
 
 type PurchaseServicer interface {
@@ -89,7 +90,7 @@ type PurchaseServicer interface {
 
 type PurchaseHandler interface {
 	HandleTransactionHook(http.ResponseWriter, *http.Request) error
-	GetMyOrders(context.Context, http.ResponseWriter, *http.Request) error
+	GetAllOrders(context.Context, http.ResponseWriter, *http.Request) error
 	GetOrderStatus(context.Context, http.ResponseWriter, *http.Request) error
 	GetInvoice(context.Context, http.ResponseWriter, *http.Request) error
 }
