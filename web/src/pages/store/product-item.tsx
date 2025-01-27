@@ -66,7 +66,7 @@ const ProductItem = ({ product, addToCart, buyNow }: Props) => {
                         onChange={v => setQuanitity(v)}
                     />
                     <Typography variant='body1'>
-                        <Currency>{quantity * price}</Currency>
+                        <Currency amount={quantity * price} />
                     </Typography>
                 </Stack>
             </CardContent>

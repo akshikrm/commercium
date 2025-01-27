@@ -59,11 +59,7 @@ const CartItemList = ({ data }: { data: Cart[] }) => {
                                     />
                                 </Typography>
                                 <Typography variant='body2'>
-                                    <Currency>
-                                        {parseToLocaleAmount(
-                                            totalAmount.toString()
-                                        )}
-                                    </Currency>
+                                    <Currency amount={totalAmount} />
                                 </Typography>
                                 <IconButton
                                     size='small'

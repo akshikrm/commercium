@@ -16,7 +16,6 @@ import icons from "@/icons"
 import IconButton from "@mui/material/IconButton"
 import { useMemo } from "react"
 import { Typography } from "@mui/material"
-import server from "@utils/server"
 import parseToLocaleAmount from "@utils/convert-to-locale-amount"
 import { order } from "@api"
 
@@ -69,9 +68,7 @@ const Orders = () => {
                                             />
                                         </TableCell>
                                         <TableCell>
-                                            <Currency>
-                                                {parseToLocaleAmount(row.total)}
-                                            </Currency>
+                                            <Currency amount={row.total} />
                                         </TableCell>
                                         <TableCell>
                                             {dayjs(row.created_at).format(

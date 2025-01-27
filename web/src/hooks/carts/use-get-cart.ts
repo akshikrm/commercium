@@ -15,19 +15,16 @@ const useGetCart = (opts: HookOptions = defaultHookOptions) => {
 
     const { status, error, data: carts } = query
 
-    const total = useMemo(() => {
-        if (carts?.length === 0) {
+    const total: number = useMemo(() => {
+        if (!carts) return 0
+        if (carts.length === 0) {
             return 0
         }
 
-        const total = carts?.reduce((acc, curr) => {
+        return carts.reduce((acc, curr) => {
             acc += parseFloat(curr.product.price) * curr.quantity
             return acc
         }, 0)
-        if (total) {
-            return parseToLocaleAmount(total.toString())
-        }
-        return ""
     }, [carts])
 
     const paddlePurchaseItems: PaddlePurchaseItem[] = useMemo(() => {
