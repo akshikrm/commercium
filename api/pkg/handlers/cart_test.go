@@ -24,7 +24,7 @@ func TestCart(t *testing.T) {
 		request, _ := http.NewRequest(http.MethodGet, "/carts", nil)
 		response := httptest.NewRecorder()
 		ctx := context.Background()
-		ctx = context.WithValue(ctx, "userID", 2)
+		ctx = context.WithValue(ctx, "userID", uint32(2))
 		ctx = context.WithValue(ctx, "role", "user")
 		handlers.Cart.GetAll(ctx, response, request)
 		got := response.Result().StatusCode
@@ -48,7 +48,7 @@ func TestCart(t *testing.T) {
 		request, _ := http.NewRequest(http.MethodPost, "/carts", reader)
 		response := httptest.NewRecorder()
 		ctx := context.Background()
-		ctx = context.WithValue(ctx, "userID", 2)
+		ctx = context.WithValue(ctx, "userID", uint32(2))
 		ctx = context.WithValue(ctx, "role", "user")
 		handlers.Cart.Create(ctx, response, request)
 		got := response.Result().StatusCode

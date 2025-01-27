@@ -17,7 +17,7 @@ var SCHEMA = map[string]string{
 	"orders": `id SERIAL PRIMARY KEY, 
 	user_id INTEGER,
 	order_id VARCHAR(20),
-	transaction_id INT UNIQUE NOT NULL,
+	transaction_id INT NOT NULL,
 	quantity INT NOT NULL,
 	price_id varchar(30) NOT NULL,
 	product_id varchar(30) NOT NULL,
