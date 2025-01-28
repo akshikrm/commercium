@@ -240,6 +240,62 @@ func (m *product) GetOrderStatus(txnId string) string {
 	return transactionStatus
 }
 
+func (m *orders) GetShippingInformation() ([]*types.ShippingInformation, bool) {
+	query := `SELECT 
+	o.id,
+	o.status,
+	o.quantity,
+	o.Amount,
+	t.transaction_id AS transaction_id,
+	pr.id AS user_id,
+	pr.first_name AS first_name,
+	pr.last_name AS last_name,
+	pr.email AS user_email,
+	p.id AS product_id,
+	p.name AS product_name,
+	o.created_at AS created_at
+	FROM 
+		orders o 
+	INNER JOIN 
+		products p ON p.product_id=o.product_id 
+	INNER JOIN 
+		transactions t ON t.id=o.transaction_id 
+	INNER JOIN 
+		users u ON t.customer_id=u.customer_id 
+	INNER JOIN 
+		profiles pr ON pr.user_id=u.id;
+	`
+
+	rows, err := m.store.Query(query)
+	if err != nil {
+		log.Printf("query failed %s", err)
+		return nil, false
+	}
+	shippingInformattions := []*types.ShippingInformation{}
+	for rows.Next() {
+		shippingInformation := new(types.ShippingInformation)
+		if err := rows.Scan(
+			&shippingInformation.ID,
+			&shippingInformation.Status,
+			&shippingInformation.Quantity,
+			&shippingInformation.Amount,
+			&shippingInformation.TransactionID,
+			&shippingInformation.User.ID,
+			&shippingInformation.User.FirstName,
+			&shippingInformation.User.LastName,
+			&shippingInformation.User.Email,
+			&shippingInformation.Product.ID,
+			&shippingInformation.Product.Name,
+			&shippingInformation.CreatedAt,
+		); err != nil {
+			log.Printf("scan failed %s", err)
+			return nil, false
+		}
+		shippingInformattions = append(shippingInformattions, shippingInformation)
+	}
+	return shippingInformattions, true
+}
+
 func newOrders(store *sql.DB) types.OrdersRepository {
 	return &orders{store: store}
 }

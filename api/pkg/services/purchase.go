@@ -127,6 +127,14 @@ func (s *transaction) GetAllOrders() ([]*types.OrderList, error) {
 	return orders, nil
 }
 
+func (s *transaction) GetShippingInformation() ([]*types.ShippingInformation, error) {
+	orders, ok := s.orderRepository.GetShippingInformation()
+	if !ok {
+		return nil, utils.ServerError
+	}
+	return orders, nil
+}
+
 func newPurchaseService(
 	repository types.TransactionRepository,
 	orderRepository types.OrdersRepository,

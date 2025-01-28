@@ -40,4 +40,5 @@ type PurchaseService interface {
 	GetPurchaseByOrderID(id uint) ([]*PurchaseList, error)
 	GetOrdersByUserID(id uint32) ([]*OrderList, error)
 	GetAllOrders() ([]*OrderList, error)
+	GetShippingInformation() ([]*ShippingInformation, error)
 }

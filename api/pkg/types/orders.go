@@ -80,14 +80,16 @@ type OrderView struct {
 type ShippingStatus string
 
 type ShippingInformation struct {
-	ID       uint32         `json:"id"`
-	Status   ShippingStatus `json:"status"`
-	Amount   uint           `json:"amount"`
-	Quantity uint           `json:"quantity"`
-	User     struct {
-		ID    uint32 `json:"id"`
-		Name  string `json:"name"`
-		Email string `json:"email"`
+	ID            uint32         `json:"id"`
+	Status        ShippingStatus `json:"status"`
+	TransactionID string         `json:"transaction_id"`
+	Amount        uint           `json:"amount"`
+	Quantity      uint           `json:"quantity"`
+	User          struct {
+		ID        uint32 `json:"id"`
+		FirstName string `json:"first_name"`
+		LastName  string `json:"last_name"`
+		Email     string `json:"email"`
 	} `json:"user"`
 	Product struct {
 		ID   uint32 `json:"id"`
@@ -101,11 +103,12 @@ type OrdersRepository interface {
 	GetPurchaseByOrderID(uint) ([]*PurchaseList, bool)
 	CreateOrder([]*NewOrder) bool
 	GetAllOrders() ([]*OrderList, bool)
+	GetShippingInformation() ([]*ShippingInformation, bool)
 }
 
 type PurchaseServicer interface {
 	GetOrdersByUserID(uint) ([]*OrderList, error)
-	GetPurchaseByOrderID(id uint) ([]*PurchaseList, error)
+	GetPurchaseByOrderID(uint) ([]*PurchaseList, error)
 }
 
 type PurchaseHandler interface {

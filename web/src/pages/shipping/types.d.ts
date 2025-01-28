@@ -1,4 +1,5 @@
 type ShippingStatus = "delivered" | "pending" | "in-transit"
+
 type ShippingInformation = {
     id: number
     status: ShippingStatus
@@ -6,7 +7,8 @@ type ShippingInformation = {
     quantity: number
     user: {
         id: number
-        name: string
+        first_name: string
+        last_name: string
         email: string
     }
     product: {

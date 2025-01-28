@@ -59,7 +59,10 @@ const Shipping = () => {
                                         }}
                                     >
                                         <TableCell>1</TableCell>
-                                        <TableCell>{row.user.name}</TableCell>
+                                        <TableCell>
+                                            {row.user.first_name}&nbsp;
+                                            {row.user.last_name}
+                                        </TableCell>
                                         <TableCell>
                                             <StatusButton status={row.status} />
                                         </TableCell>
@@ -80,18 +83,13 @@ const Shipping = () => {
                         />
                     </TableBody>
                 </Table>
-            </TableContainer>{" "}
+            </TableContainer>
         </>
     )
 }
 
-const StatusButton = ({ status }: { status: ShippingStatus }) => {
-    const [anchorEl, setAnchor] = useState<Element | null>(null)
-    const handleClose = () => {
-        setAnchor(null)
-    }
-
-    const color = useMemo(() => {
+const useGetStatusColor = (status: ShippingStatus) => {
+    return useMemo(() => {
         switch (status) {
             case "delivered": {
                 return "success"
@@ -104,14 +102,25 @@ const StatusButton = ({ status }: { status: ShippingStatus }) => {
             }
         }
     }, [status])
+}
 
-    console.log(color)
+const StatusButton = ({ status }: { status: ShippingStatus }) => {
+    const [anchorEl, setAnchor] = useState<Element | null>(null)
+    const [selected, setSelected] = useState<ShippingStatus>(status)
+
+    const handleChange = (status?: ShippingStatus) => {
+        if (status) {
+            setSelected(status)
+        }
+        setAnchor(null)
+    }
+    const color = useGetStatusColor(selected)
 
     return (
         <>
             <ButtonGroup>
                 <Button variant='outlined' size='small' color={color}>
-                    {status}
+                    {selected}
                 </Button>
                 <Button
                     variant='outlined'
@@ -128,24 +137,27 @@ const StatusButton = ({ status }: { status: ShippingStatus }) => {
                 id='basic-menu'
                 anchorEl={anchorEl}
                 open={Boolean(anchorEl)}
-                onClose={handleClose}
+                onClose={() => handleChange()}
                 MenuListProps={{
                     "aria-labelledby": "basic-button"
                 }}
             >
                 <MenuItem
-                    onClick={handleClose}
-                    selected={status === "delivered"}
+                    onClick={() => handleChange("delivered")}
+                    selected={selected === "delivered"}
                 >
                     Delivered
                 </MenuItem>
                 <MenuItem
-                    onClick={handleClose}
-                    selected={status === "in-transit"}
+                    onClick={() => handleChange("in-transit")}
+                    selected={selected === "in-transit"}
                 >
                     In Transit
                 </MenuItem>
-                <MenuItem onClick={handleClose} selected={status === "pending"}>
+                <MenuItem
+                    onClick={() => handleChange("pending")}
+                    selected={selected === "pending"}
+                >
                     Pending
                 </MenuItem>
             </Menu>
