@@ -77,6 +77,25 @@ type OrderView struct {
 	CreatedAt time.Time `json:"created_at"`
 }
 
+type ShippingStatus string
+
+type ShippingInformation struct {
+	ID       uint32         `json:"id"`
+	Status   ShippingStatus `json:"status"`
+	Amount   uint           `json:"amount"`
+	Quantity uint           `json:"quantity"`
+	User     struct {
+		ID    uint32 `json:"id"`
+		Name  string `json:"name"`
+		Email string `json:"email"`
+	} `json:"user"`
+	Product struct {
+		ID   uint32 `json:"id"`
+		Name string `json:"name"`
+	} `json:"product"`
+	CreatedAt time.Time `json:"created_at"`
+}
+
 type OrdersRepository interface {
 	GetOrdersByUserID(uint32) ([]*OrderList, bool)
 	GetPurchaseByOrderID(uint) ([]*PurchaseList, bool)
@@ -92,6 +111,7 @@ type PurchaseServicer interface {
 type PurchaseHandler interface {
 	HandleTransactionHook(http.ResponseWriter, *http.Request) error
 	GetAllOrders(context.Context, http.ResponseWriter, *http.Request) error
+	GetShippingInformation(context.Context, http.ResponseWriter, *http.Request) error
 	GetOrderStatus(context.Context, http.ResponseWriter, *http.Request) error
 	GetInvoice(context.Context, http.ResponseWriter, *http.Request) error
 }
