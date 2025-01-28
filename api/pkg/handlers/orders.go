@@ -7,12 +7,6 @@ import (
 	"net/http"
 )
 
-const (
-	pending   types.ShippingStatus = "pending"
-	delivered types.ShippingStatus = "delivered"
-	inTransit types.ShippingStatus = "in-transit"
-)
-
 type purchase struct {
 	service types.PurchaseService
 }
@@ -94,82 +88,28 @@ func (a *purchase) GetInvoice(ctx context.Context, w http.ResponseWriter, r *htt
 }
 
 func (a *purchase) GetShippingInformation(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
-	// shippingInformation := []*types.ShippingInformation{
-	// 	{
-	// 		ID:       1,
-	// 		Status:   delivered,
-	// 		Amount:   4999,
-	// 		Quantity: 2,
-	// 		User: struct {
-	// 			ID    uint32 `json:"id"`
-	// 			Name  string `json:"name"`
-	// 			Email string `json:"email"`
-	// 		}{
-	// 			ID:    101,
-	// 			Name:  "John Doe",
-	// 			Email: "john.doe@example.com",
-	// 		},
-	// 		Product: struct {
-	// 			ID   uint32 `json:"id"`
-	// 			Name string `json:"name"`
-	// 		}{
-	// 			ID:   501,
-	// 			Name: "Wireless Mouse",
-	// 		},
-	// 		CreatedAt: time.Now().AddDate(0, 0, -1),
-	// 	},
-	// 	{
-	// 		ID:       2,
-	// 		Status:   inTransit,
-	// 		Amount:   29999,
-	// 		Quantity: 1,
-	// 		User: struct {
-	// 			ID    uint32 `json:"id"`
-	// 			Name  string `json:"name"`
-	// 			Email string `json:"email"`
-	// 		}{
-	// 			ID:    102,
-	// 			Name:  "Jane Smith",
-	// 			Email: "jane.smith@example.com",
-	// 		},
-	// 		Product: struct {
-	// 			ID   uint32 `json:"id"`
-	// 			Name string `json:"name"`
-	// 		}{
-	// 			ID:   502,
-	// 			Name: "Gaming Keyboard",
-	// 		},
-	// 		CreatedAt: time.Now().AddDate(0, 0, -3),
-	// 	},
-	// 	{
-	// 		ID:       3,
-	// 		Status:   pending,
-	// 		Amount:   1999,
-	// 		Quantity: 3,
-	// 		User: struct {
-	// 			ID    uint32 `json:"id"`
-	// 			Name  string `json:"name"`
-	// 			Email string `json:"email"`
-	// 		}{
-	// 			ID:    103,
-	// 			Name:  "Alice Johnson",
-	// 			Email: "alice.johnson@example.com",
-	// 		},
-	// 		Product: struct {
-	// 			ID   uint32 `json:"id"`
-	// 			Name string `json:"name"`
-	// 		}{
-	// 			ID:   503,
-	// 			Name: "USB-C Cable",
-	// 		},
-	// 		CreatedAt: time.Now().AddDate(0, 0, -7),
-	// 	},
-	// }
 	shippingInformation, err := a.service.GetShippingInformation()
 	if err != nil {
 		return err
 	}
 	return writeJson(w, http.StatusOK, &shippingInformation)
+}
+
+func (a *purchase) UpdateShippingStatus(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
+	orderID, err := parseId(r.PathValue("orderId"))
+	if err != nil {
+		return err
+	}
+
+	var shippingStatus types.ShippingStatus
+	if err := DecodeBody(r.Body, &shippingStatus); err != nil {
+		return err
+	}
+
+	if err := a.service.UpdateShippingStatus(uint(orderID), shippingStatus); err != nil {
+		return err
+	}
+	return writeJson(w, http.StatusOK, "updated shipping status")
 }
 
 func newPurchase(service types.PurchaseService) types.PurchaseHandler {

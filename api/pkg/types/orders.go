@@ -104,11 +104,7 @@ type OrdersRepository interface {
 	CreateOrder([]*NewOrder) bool
 	GetAllOrders() ([]*OrderList, bool)
 	GetShippingInformation() ([]*ShippingInformation, bool)
-}
-
-type PurchaseServicer interface {
-	GetOrdersByUserID(uint) ([]*OrderList, error)
-	GetPurchaseByOrderID(uint) ([]*PurchaseList, error)
+	UpdateOrderStatus(uint, ShippingStatus) bool
 }
 
 type PurchaseHandler interface {
@@ -117,4 +113,5 @@ type PurchaseHandler interface {
 	GetShippingInformation(context.Context, http.ResponseWriter, *http.Request) error
 	GetOrderStatus(context.Context, http.ResponseWriter, *http.Request) error
 	GetInvoice(context.Context, http.ResponseWriter, *http.Request) error
+	UpdateShippingStatus(context.Context, http.ResponseWriter, *http.Request) error
 }

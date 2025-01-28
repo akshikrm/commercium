@@ -240,6 +240,22 @@ func (m *product) GetOrderStatus(txnId string) string {
 	return transactionStatus
 }
 
+const (
+	PENDING    types.ShippingStatus = "pending"
+	DELIVERED  types.ShippingStatus = "delivered"
+	IN_TRANSIT types.ShippingStatus = "in-transit"
+)
+
+func (m *orders) UpdateOrderStatus(orderID uint, status types.ShippingStatus) bool {
+	query := "UPDATE orders SET status=$1 WHERE id=$2"
+	_, err := m.store.Exec(query, status, orderID)
+	if err != nil {
+		fmt.Printf("query failed: %s", err)
+		return false
+	}
+	return true
+}
+
 func (m *orders) GetShippingInformation() ([]*types.ShippingInformation, bool) {
 	query := `SELECT 
 	o.id,

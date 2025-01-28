@@ -5,7 +5,6 @@ import useUpdateCart from "@hooks/carts/use-update-cart"
 import { Card, IconButton, Stack, TextField, Typography } from "@mui/material"
 import icons from "@/icons"
 import RenderIcon from "@components/render-icon"
-import parseToLocaleAmount from "@utils/convert-to-locale-amount"
 
 const CartItemList = ({ data }: { data: Cart[] }) => {
     const { mutate: update } = useUpdateCart()

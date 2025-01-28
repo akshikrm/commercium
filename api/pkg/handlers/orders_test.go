@@ -71,8 +71,6 @@ func TestOrderStatus(t *testing.T) {
 		if err := json.NewDecoder(res.Body).Decode(orders); err != nil {
 			panic("failed to decode orders")
 		}
-
-		fmt.Println(orders)
 		got := res.Result().StatusCode
 		want := 200
 		if got != want {
@@ -90,15 +88,12 @@ func TestOrderStatus(t *testing.T) {
 		if err := json.NewDecoder(res.Body).Decode(orders); err != nil {
 			panic("failed to decode orders")
 		}
-
-		fmt.Println(orders)
 		got := res.Result().StatusCode
 		want := 200
 		if got != want {
 			t.Errorf("got %d, want %d", got, want)
 		}
 	})
-
 }
 
 var transactionCreatedEvent []byte = []byte(`{

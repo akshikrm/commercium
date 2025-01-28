@@ -135,6 +135,14 @@ func (s *transaction) GetShippingInformation() ([]*types.ShippingInformation, er
 	return orders, nil
 }
 
+func (s *transaction) UpdateShippingStatus(orderID uint, status types.ShippingStatus) error {
+	ok := s.orderRepository.UpdateOrderStatus(orderID, status)
+	if !ok {
+		return utils.ServerError
+	}
+	return nil
+}
+
 func newPurchaseService(
 	repository types.TransactionRepository,
 	orderRepository types.OrdersRepository,
