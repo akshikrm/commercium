@@ -6,7 +6,6 @@ import OrderInformation from "./order-information"
 
 const Cart = () => {
     const { data: carts, total, paddlePurchaseItems } = useGetCart()
-
     return (
         <>
             <HeaderBreadcrumbs

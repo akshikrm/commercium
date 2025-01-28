@@ -279,7 +279,9 @@ func (m *orders) GetShippingInformation() ([]*types.ShippingInformation, bool) {
 	INNER JOIN 
 		users u ON t.customer_id=u.customer_id 
 	INNER JOIN 
-		profiles pr ON pr.user_id=u.id;
+		profiles pr ON pr.user_id=u.id
+	WHERE
+		t.status='completed';
 	`
 
 	rows, err := m.store.Query(query)

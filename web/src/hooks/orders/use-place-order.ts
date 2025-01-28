@@ -4,7 +4,6 @@ import toast from "react-hot-toast"
 import { useNavigate } from "react-router"
 import { USER_PATHS } from "@/paths"
 import useConnectPaddle from "./use-connect-paddle"
-import server from "@utils/server"
 import { order } from "@api"
 
 const ORDER_TOAST = "order_toast"
