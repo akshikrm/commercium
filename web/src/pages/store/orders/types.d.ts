@@ -2,7 +2,7 @@ type Order = {
     id: number
     transaction_id: string
     invoice_number: string
-    total: string
+    total: number
     payment_status: string
     products: OrderItems[]
     created_at: string
@@ -12,8 +12,9 @@ type OrderItems = {
     id: number
     product_id: number
     name: string
-    price: string
+    price: number
     quantity: number
+    shipping_status: ShippingStatus
 }
 
 type OrderView = {

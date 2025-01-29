@@ -4,7 +4,7 @@ import RenderIcon from "@components/render-icon"
 import usePlaceOrder from "@hooks/orders/use-place-order"
 
 type Props = {
-    total: number | string
+    total: number
     paddlePurchaseItems: PaddlePurchaseItem[]
 }
 
@@ -18,7 +18,7 @@ const OrderInformation = ({ total, paddlePurchaseItems }: Props) => {
                         Total
                     </Typography>
                     <Typography variant='body1'>
-                        <Currency>{total}</Currency>
+                        <Currency amount={total} />
                     </Typography>
                 </CardContent>
             </Card>

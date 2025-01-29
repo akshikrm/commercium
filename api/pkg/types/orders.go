@@ -40,11 +40,12 @@ type PurchaseList struct {
 }
 
 type OrderProduct struct {
-	ID        uint32 `json:"id"`
-	ProductID uint32 `json:"product_id"`
-	Name      string `json:"name"`
-	Price     uint   `json:"price"`
-	Quantity  uint   `json:"quantity"`
+	ID             uint32 `json:"id"`
+	ProductID      uint32 `json:"product_id"`
+	ShippingStatus string `json:"shipping_status"`
+	Name           string `json:"name"`
+	Price          uint   `json:"price"`
+	Quantity       uint   `json:"quantity"`
 }
 
 type OrderList struct {
@@ -76,20 +77,41 @@ type OrderView struct {
 	CreatedAt time.Time `json:"created_at"`
 }
 
-type OrdersRepository interface {
-	GetOrdersByUserID(uint) ([]*OrderList, bool)
-	GetPurchaseByOrderID(uint) ([]*PurchaseList, bool)
-	CreateOrder([]*NewOrder) bool
+type ShippingStatus string
+
+type ShippingInformation struct {
+	ID            uint32         `json:"id"`
+	Status        ShippingStatus `json:"status"`
+	TransactionID string         `json:"transaction_id"`
+	Amount        uint           `json:"amount"`
+	Quantity      uint           `json:"quantity"`
+	User          struct {
+		ID        uint32 `json:"id"`
+		FirstName string `json:"first_name"`
+		LastName  string `json:"last_name"`
+		Email     string `json:"email"`
+	} `json:"user"`
+	Product struct {
+		ID   uint32 `json:"id"`
+		Name string `json:"name"`
+	} `json:"product"`
+	CreatedAt time.Time `json:"created_at"`
 }
 
-type PurchaseServicer interface {
-	GetOrdersByUserID(uint) ([]*OrderList, error)
-	GetPurchaseByOrderID(id uint) ([]*PurchaseList, error)
+type OrdersRepository interface {
+	GetOrdersByUserID(uint32) ([]*OrderList, bool)
+	GetPurchaseByOrderID(uint) ([]*PurchaseList, bool)
+	CreateOrder([]*NewOrder) bool
+	GetAllOrders() ([]*OrderList, bool)
+	GetShippingInformation() ([]*ShippingInformation, bool)
+	UpdateOrderStatus(uint, ShippingStatus) bool
 }
 
 type PurchaseHandler interface {
 	HandleTransactionHook(http.ResponseWriter, *http.Request) error
-	GetMyOrders(context.Context, http.ResponseWriter, *http.Request) error
+	GetAllOrders(context.Context, http.ResponseWriter, *http.Request) error
+	GetShippingInformation(context.Context, http.ResponseWriter, *http.Request) error
 	GetOrderStatus(context.Context, http.ResponseWriter, *http.Request) error
 	GetInvoice(context.Context, http.ResponseWriter, *http.Request) error
+	UpdateShippingStatus(context.Context, http.ResponseWriter, *http.Request) error
 }

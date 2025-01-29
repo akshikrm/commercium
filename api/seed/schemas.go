@@ -14,19 +14,37 @@ var SCHEMA = map[string]string{
 	"product_images": "id SERIAL PRIMARY KEY, product_id INTEGER NOT NULL, URI TEXT NOT NULL, created_at TIMESTAMP DEFAULT NOW() NOT NULL, updated_at TIMESTAMP DEFAULT NOW() NOT NULL, deleted_at TIMESTAMP DEFAULT NULL, CONSTRAINT fk_product FOREIGN KEY(product_id) REFERENCES products(id)",
 	"carts":          "id SERIAL PRIMARY KEY, user_id INTEGER NOT NULL, product_id INTEGER NOT NULL, quantity INTEGER DEFAULT 1 NOT NULL, created_at TIMESTAMP DEFAULT NOW() NOT NULL, updated_at TIMESTAMP DEFAULT NOW() NOT NULL, deleted_at TIMESTAMP DEFAULT NULL, CONSTRAINT fk_user FOREIGN KEY(user_id) REFERENCES users(id), CONSTRAINT fk_product FOREIGN KEY(product_id) REFERENCES products(id)",
 
-	"orders": `id SERIAL PRIMARY KEY, user_id INTEGER NOT NULL,
-	order_id VARCHAR(20) NOT NULL, price INTEGER NOT NULL DEFAULT 0, created_at
-	TIMESTAMP DEFAULT NOW() NOT NULL, updated_at TIMESTAMP DEFAULT NOW() NOT
-	NULL, deleted_at TIMESTAMP DEFAULT NULL`,
+	"orders": `id SERIAL PRIMARY KEY, 
+	user_id INTEGER,
+	order_id VARCHAR(20),
+	transaction_id INT NOT NULL,
+	quantity INT NOT NULL,
+	price_id varchar(30) NOT NULL,
+	product_id varchar(30) NOT NULL,
+	amount varchar(30) NOT NULL,
+	status varchar(20) NOT NULL DEFAULT 'pending',
+	price INTEGER NOT NULL DEFAULT 0,
+	created_at TIMESTAMP DEFAULT NOW() NOT NULL,
+	updated_at TIMESTAMP DEFAULT NOW() NOT NULL,
+	deleted_at TIMESTAMP DEFAULT NULL`,
 
 	"purchases": `id SERIAL PRIMARY KEY, 
 	product_id INTEGER NOT NULL, order_id INTEGER NOT NULL, 
 	quantity INTEGER DEFAULT 1 NOT NULL, price INTEGER NOT NULL,
 	created_at TIMESTAMP DEFAULT NOW() NOT NULL, updated_at TIMESTAMP DEFAULT NOW() NOT NULL, deleted_at TIMESTAMP DEFAULT NULL, 
 	CONSTRAINT fk_order FOREIGN KEY(order_id) REFERENCES orders(id), CONSTRAINT fk_product FOREIGN KEY(product_id) REFERENCES products(id)`,
-
-	"uploads":      "id SERIAL PRIMARY KEY, path VARCHAR(200) NOT NULL, created_at TIMESTAMP DEFAULT NOW() NOT NULL, updated_at TIMESTAMP DEFAULT NOW() NOT NULL, deleted_at TIMESTAMP DEFAULT NULL",
-	"transactions": "id SERIAL PRIMARY KEY, transaction_id VARCHAR(30) NOT NULL, status VARCHAR(30) NOT NULL, customer_id VARCHAR(30) NOT NULL, created_at TIMESTAMP DEFAULT NOW() NOT NULL",
+	"uploads": "id SERIAL PRIMARY KEY, path VARCHAR(200) NOT NULL, created_at TIMESTAMP DEFAULT NOW() NOT NULL, updated_at TIMESTAMP DEFAULT NOW() NOT NULL, deleted_at TIMESTAMP DEFAULT NULL",
+	"transactions": `id SERIAL PRIMARY KEY,
+	transaction_id VARCHAR(30) NOT NULL,
+	invoice_number VARCHAR(20) NOT NULL DEFAULT '',
+	status VARCHAR(30) NOT NULL,
+	customer_id VARCHAR(30) NOT NULL DEFAULT '',
+	tax  varchar(20) NOT NULL,
+	sub_total  varchar(20) NOT NULL,
+	grand_total  varchar(20) NOT NULL,
+	created_at TIMESTAMP DEFAULT NOW() NOT NULL,
+	updated_at TIMESTAMP DEFAULT NOW() NOT NULL
+	`,
 }
 
 var KEYS = []string{

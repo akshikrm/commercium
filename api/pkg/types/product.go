@@ -22,7 +22,7 @@ type ProductsList struct {
 	ID          uint32    `json:"id"`
 	Name        string    `json:"name"`
 	Slug        string    `json:"slug"`
-	Price       string    `json:"price"`
+	Price       uint      `json:"price"`
 	Image       *string   `json:"image"`
 	Description string    `json:"description"`
 	CreatedAt   time.Time `json:"created_at"`

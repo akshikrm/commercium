@@ -23,6 +23,7 @@ import Orders from "./pages/store/orders/index.tsx"
 import Cart from "./pages/cart/index.tsx"
 import { USER_PATHS } from "./paths.ts"
 import OrderView from "./pages/store/orders/view/index.tsx"
+import Shipping from "./pages/shipping/index.tsx"
 
 const client = new QueryClient()
 
@@ -101,6 +102,10 @@ createRoot(document.getElementById("root")!).render(
                                     }
                                 >
                                     <Route path='orders' element={<Orders />} />
+                                    <Route
+                                        path='shipping'
+                                        element={<Shipping />}
+                                    />
                                     <Route path='products'>
                                         <Route index element={<Products />} />
                                         <Route

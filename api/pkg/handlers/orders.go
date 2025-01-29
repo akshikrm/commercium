@@ -43,10 +43,20 @@ func (a *purchase) HandleTransactionHook(w http.ResponseWriter, r *http.Request)
 	return writeJson(w, http.StatusOK, "waiting...")
 }
 
-func (a *purchase) GetMyOrders(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
-	userID := uint(ctx.Value("userID").(int))
-	orders, err := a.service.GetOrdersByUserID(userID)
-	if err != nil {
+func (a *purchase) GetAllOrders(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
+	userID := ctx.Value("userID")
+	role := ctx.Value("role")
+
+	var orders = []*types.OrderList{}
+	var err error = nil
+	if role == "admin" {
+		if orders, err = a.service.GetAllOrders(); err != nil {
+			return err
+		}
+		return writeJson(w, http.StatusOK, orders)
+	}
+
+	if orders, err = a.service.GetOrdersByUserID(userID.(uint32)); err != nil {
 		return err
 	}
 	return writeJson(w, http.StatusOK, orders)
@@ -63,7 +73,6 @@ func (a *purchase) GetOrderStatus(ctx context.Context, w http.ResponseWriter, r 
 	if err != nil {
 		return err
 	}
-
 	return writeJson(w, http.StatusOK, transactionStatus)
 }
 
@@ -76,6 +85,31 @@ func (a *purchase) GetInvoice(ctx context.Context, w http.ResponseWriter, r *htt
 
 	invoiceURL := paddle.GetInvoice(txnId)
 	return writeJson(w, http.StatusOK, *invoiceURL)
+}
+
+func (a *purchase) GetShippingInformation(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
+	shippingInformation, err := a.service.GetShippingInformation()
+	if err != nil {
+		return err
+	}
+	return writeJson(w, http.StatusOK, &shippingInformation)
+}
+
+func (a *purchase) UpdateShippingStatus(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
+	orderID, err := parseId(r.PathValue("orderId"))
+	if err != nil {
+		return err
+	}
+
+	var shippingStatus types.ShippingStatus
+	if err := DecodeBody(r.Body, &shippingStatus); err != nil {
+		return err
+	}
+
+	if err := a.service.UpdateShippingStatus(uint(orderID), shippingStatus); err != nil {
+		return err
+	}
+	return writeJson(w, http.StatusOK, "updated shipping status")
 }
 
 func newPurchase(service types.PurchaseService) types.PurchaseHandler {

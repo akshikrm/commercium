@@ -12,7 +12,7 @@ type cartHandler struct {
 
 func (c *cartHandler) GetAll(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
 	userID := ctx.Value("userID")
-	carts, err := c.service.GetAll(uint32(userID.(int)))
+	carts, err := c.service.GetAll(userID.(uint32))
 	if err != nil {
 		return err
 	}
@@ -36,8 +36,9 @@ func (c *cartHandler) Create(ctx context.Context, w http.ResponseWriter, r *http
 	if err := DecodeBody(r.Body, &newCart); err != nil {
 		return err
 	}
+
 	userID := ctx.Value("userID")
-	newCart.UserID = uint32(userID.(int))
+	newCart.UserID = userID.(uint32)
 	if err := c.service.Create(&newCart); err != nil {
 		return err
 	}

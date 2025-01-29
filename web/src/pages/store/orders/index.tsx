@@ -14,14 +14,16 @@ import useGetOrders from "@hooks/orders/use-get-orders"
 import RenderIcon from "@components/render-icon"
 import icons from "@/icons"
 import IconButton from "@mui/material/IconButton"
-import { useMemo } from "react"
-import { Typography } from "@mui/material"
-import server from "@utils/server"
-import parseToLocaleAmount from "@utils/convert-to-locale-amount"
+import { useMemo, useState } from "react"
+import { Box, Button, Chip, Popover, Stack, Typography } from "@mui/material"
 import { order } from "@api"
+import useGetStatusColor from "@hooks/shipping/use-get-status-color"
 
 const Orders = () => {
     const { data: orders } = useGetOrders()
+    const [orderItems, setOrderItems] = useState<OrderItems[]>([])
+    const [menuEl, setMenuEl] = useState<Element | null>(null)
+
     return (
         <>
             <HeaderBreadcrumbs
@@ -66,19 +68,20 @@ const Orders = () => {
                                         <TableCell>
                                             <PurchaseItem
                                                 products={row.products}
+                                                onClickMoreItem={e => {
+                                                    setMenuEl(e.currentTarget)
+                                                    setOrderItems(row.products)
+                                                }}
                                             />
                                         </TableCell>
                                         <TableCell>
-                                            <Currency>
-                                                {parseToLocaleAmount(row.total)}
-                                            </Currency>
+                                            <Currency amount={row.total} />
                                         </TableCell>
                                         <TableCell>
                                             {dayjs(row.created_at).format(
                                                 DATE_VIEW_FORMAT
                                             )}
                                         </TableCell>
-
                                         <TableCell>
                                             <IconButton
                                                 onClick={() =>
@@ -99,11 +102,67 @@ const Orders = () => {
                     </TableBody>
                 </Table>
             </TableContainer>
+            <Popover
+                open={Boolean(menuEl)}
+                anchorEl={menuEl}
+                onClose={() => {
+                    setMenuEl(null)
+                    setTimeout(() => {
+                        setOrderItems([])
+                    }, 300)
+                }}
+                anchorOrigin={{
+                    vertical: "bottom",
+                    horizontal: "center"
+                }}
+            >
+                <RenderList
+                    list={orderItems}
+                    render={orderItem => {
+                        return <OrderItem data={orderItem} />
+                    }}
+                />
+            </Popover>
         </>
     )
 }
 
-const PurchaseItem = ({ products }: { products: OrderItems[] }) => {
+const OrderItem = ({ data }: { data: OrderItems }) => {
+    const color = useGetStatusColor(data.shipping_status)
+    return (
+        <Box
+            key={data.id}
+            sx={{ borderBottom: "1px solid #c9c9c9", padding: 2 }}
+        >
+            <Typography variant='body1'>{data.name}</Typography>
+            <Chip
+                label={data.shipping_status}
+                color={color}
+                size='small'
+                variant='outlined'
+            />
+            <Stack direction='row' mt={2}>
+                <Typography variant='body2' color='textSecondary'>
+                    Price:&nbsp;
+                    <Currency amount={data.price} />
+                </Typography>
+                <Typography variant='body2' color='textSecondary'>
+                    Quantity:&nbsp;{data.quantity}
+                </Typography>
+            </Stack>
+        </Box>
+    )
+}
+
+const PurchaseItem = ({
+    products,
+    onClickMoreItem
+}: {
+    products: OrderItems[]
+    onClickMoreItem: (
+        target: React.MouseEvent<HTMLSpanElement, MouseEvent>
+    ) => void
+}) => {
     const [name, moreCount] = useMemo(() => {
         const [firstProduct, ...rest] = products
         return [firstProduct.name, rest.length]
@@ -112,7 +171,12 @@ const PurchaseItem = ({ products }: { products: OrderItems[] }) => {
     return (
         <Typography>
             {name}
-            <Typography variant='caption'>
+            <Typography
+                variant='caption'
+                color='textSecondary'
+                sx={{ cursor: "pointer" }}
+                onClick={onClickMoreItem}
+            >
                 {moreCount > 0 ? `(+${moreCount}more)` : null}
             </Typography>
         </Typography>

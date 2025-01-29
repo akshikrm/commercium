@@ -3,7 +3,6 @@ package repository
 import (
 	config "akshidas/e-com"
 	"akshidas/e-com/pkg/types"
-	"fmt"
 	"testing"
 )
 

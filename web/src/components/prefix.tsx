@@ -1,5 +1,7 @@
-import { ReactNode } from "react"
+const DENOMINATION = 100
 
-export const Currency = ({ children }: { children: ReactNode }) => {
-    return <>&#8377;{children || 0}</>
+const showCommonAmount = (amount: number) => (amount / DENOMINATION).toFixed(2)
+
+export const Currency = ({ amount }: { amount: number }) => {
+    return <>&#8377;{showCommonAmount(amount) || 0}</>
 }

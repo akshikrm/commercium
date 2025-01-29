@@ -13,6 +13,36 @@ export const getOrders = async (): Promise<Order[]> => {
     }
 }
 
+export const getShippingInformation = async (): Promise<
+    ShippingInformation[]
+> => {
+    try {
+        const { data } = await server.get("/shipping")
+        return data.data
+    } catch (err) {
+        const { data } = err as AxiosResponse
+        console.error(data)
+        return Promise.reject({
+            message: "failed to retreive shipping information"
+        })
+    }
+}
+
+export const updateShippingStatus = async (
+    orderID: number,
+    status: ShippingStatus
+) => {
+    try {
+        const { data } = await server.put(`/shipping/${orderID}/status`, status)
+        return data.data
+    } catch (err) {
+        const { data } = err as AxiosResponse
+        console.error(data)
+        return Promise.reject({
+            message: "failed to retreive shipping information"
+        })
+    }
+}
 export const placeOrder = async () => {
     try {
         const { data } = await server.post("/orders")

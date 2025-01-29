@@ -20,8 +20,10 @@ import {
     getByOrderID,
     getInvoiceURI,
     getOrders,
+    getShippingInformation,
     isOrderComplete,
-    placeOrder
+    placeOrder,
+    updateShippingStatus
 } from "./orders.ts"
 import { getCustomerId, profile } from "./user"
 
@@ -66,5 +68,7 @@ export const order = {
     getMyOrders: getOrders,
     gerOrderByID: getByOrderID,
     getInvoiceURI: getInvoiceURI,
-    isOrderComplete: isOrderComplete
+    isOrderComplete: isOrderComplete,
+    getShippingInformation: getShippingInformation,
+    updateShippingStatus: updateShippingStatus
 }

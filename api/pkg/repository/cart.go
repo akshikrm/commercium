@@ -70,12 +70,13 @@ func (c *cart) GetAllProductIDByUserID(userID uint32) ([]*uint32, bool) {
 }
 
 func (c *cart) GetOne(cid uint32) (*types.CartList, bool) {
-	query := "SELECT c.id, c.quantity, p.id, p.name, p.slug, p.price, p.description, p.image, c.created_at FROM carts c INNER JOIN products p ON c.product_id=p.id WHERE c.id=$1 AND c.deleted_at IS NULL"
+	query := "SELECT c.id, c.quantity, p.price_id, p.id, p.name, p.slug, p.price, p.description, p.image, c.created_at FROM carts c INNER JOIN products p ON c.product_id=p.id WHERE c.id=$1 AND c.deleted_at IS NULL"
 	row := c.store.QueryRow(query, cid)
 	cart := types.CartList{}
 	err := row.Scan(
 		&cart.ID,
 		&cart.Quantity,
+		&cart.PriceID,
 		&cart.Product.ID,
 		&cart.Product.Name,
 		&cart.Product.Slug,

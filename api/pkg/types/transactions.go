@@ -38,5 +38,8 @@ type PurchaseService interface {
 	FailedTransaction(*Data) error
 	GetOrderStatus(string) (string, error)
 	GetPurchaseByOrderID(id uint) ([]*PurchaseList, error)
-	GetOrdersByUserID(id uint) ([]*OrderList, error)
+	GetOrdersByUserID(id uint32) ([]*OrderList, error)
+	GetAllOrders() ([]*OrderList, error)
+	GetShippingInformation() ([]*ShippingInformation, error)
+	UpdateShippingStatus(uint, ShippingStatus) error
 }
