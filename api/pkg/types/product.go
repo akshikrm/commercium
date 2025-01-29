@@ -8,16 +8,17 @@ import (
 )
 
 type NewProductRequest struct {
-	Name        string   `json:"name"`
-	ProductID   string   `json:"product_id"`
-	CategoryID  uint     `json:"category_id"`
-	Slug        string   `json:"slug"`
-	Status      string   `json:"status"`
-	Type        string   `json:"type"`
-	Price       uint     `json:"price"`
-	PriceID     string   `json:"price_id"`
-	Image       []string `json:"image"`
-	Description string   `json:"description"`
+	Name         string   `json:"name"`
+	ProductID    string   `json:"product_id"`
+	CategoryID   uint     `json:"category_id"`
+	Slug         string   `json:"slug"`
+	Status       string   `json:"status"`
+	Type         string   `json:"type"`
+	Price        uint     `json:"price"`
+	PriceID      string   `json:"price_id"`
+	PrimaryImage string   `json:"primary_image"`
+	Image        []string `json:"image"`
+	Description  string   `json:"description"`
 }
 
 type ProductsList struct {

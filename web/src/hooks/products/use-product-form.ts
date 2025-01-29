@@ -11,6 +11,7 @@ const productSchema = z.object({
         })
         .min(1, { message: "name is required" }),
     image: z.array(z.string()).min(1, { message: "image is requred" }),
+    primary_image: z.string().min(1, { message: "image is requred" }),
     slug: z
         .string({
             required_error: "product url is required",
@@ -52,6 +53,7 @@ const productSchema = z.object({
 const newProductDefaultValues: NewProduct = {
     name: "",
     image: [],
+    primary_image: "",
     slug: "",
     status: "enabled",
     type: "one-time",

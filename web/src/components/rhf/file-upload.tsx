@@ -20,6 +20,7 @@ const RHFImageUpload: FunctionComponent<Props> = ({ name, label }) => {
     useEffect(() => {
         if (status === "success") {
             setValue("image", [...getValues("image"), data.public_id])
+            setValue("primary_image", data.secure_url)
         }
     }, [status, data])
 

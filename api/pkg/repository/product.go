@@ -69,7 +69,12 @@ func (m *product) GetOne(id int) (*types.OneProduct, bool) {
 }
 
 func (p *product) Create(product *types.NewProductRequest) (*types.OneProduct, bool) {
-	query := "INSERT INTO products(name, slug, price, image, description, category_id, product_id, price_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *"
+	query := `INSERT INTO products
+		(name, slug, price, image, description, category_id, product_id, price_id) 
+	VALUES 
+		($1, $2, $3, $4, $5, $6, $7, $8) 
+	RETURNING 
+		id, product_id, name, slug, price, price_id, image, description, category_id`
 
 	row := p.store.QueryRow(query,
 		product.Name,
@@ -82,7 +87,18 @@ func (p *product) Create(product *types.NewProductRequest) (*types.OneProduct, b
 		product.PriceID,
 	)
 
-	savedProduct, err := scanProductRow(row)
+	savedProduct := types.OneProduct{}
+	err := row.Scan(
+		&savedProduct.ID,
+		&savedProduct.ProductID,
+		&savedProduct.Name,
+		&savedProduct.Slug,
+		&savedProduct.Price,
+		&savedProduct.PriceID,
+		pq.Array(&savedProduct.Image),
+		&savedProduct.Description,
+		&savedProduct.CategoryID,
+	)
 	if err == sql.ErrNoRows {
 		return nil, true
 	}
@@ -90,7 +106,7 @@ func (p *product) Create(product *types.NewProductRequest) (*types.OneProduct, b
 		log.Printf("failed to create new product %s due to %s", product.Name, err)
 		return nil, false
 	}
-	return savedProduct, true
+	return &savedProduct, true
 }
 
 func (p *product) Update(pid int, product *types.NewProductRequest) (*types.OneProduct, bool) {

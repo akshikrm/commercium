@@ -90,8 +90,8 @@ func (p *PaddlePayment) CreateProduct(newProductRequest *types.NewProductRequest
 	paddleProductRequest.Description = &newProductRequest.Description
 	paddleProductRequest.TaxCategory = paddle.TaxCategoryStandard
 
-	if len(newProductRequest.Image) > 0 {
-		paddleProductRequest.ImageURL = &newProductRequest.Image[0]
+	if len(newProductRequest.PrimaryImage) > 0 {
+		paddleProductRequest.ImageURL = &newProductRequest.PrimaryImage
 	}
 	product, err := p.Client.CreateProduct(ctx, paddleProductRequest)
 

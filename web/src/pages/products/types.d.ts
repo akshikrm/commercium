@@ -3,6 +3,7 @@ type ProductType = "one-time" | "subscription"
 
 type NewProduct = {
     name: string
+    primary_image: string
     image: string[]
     slug: string
     status: ProductStatus
@@ -15,6 +16,7 @@ type NewProduct = {
 type EditProduct = {
     name?: string
     image?: string[]
+    primary_image: string
     slug?: string
     status?: ProductStatus
     type?: ProductType
