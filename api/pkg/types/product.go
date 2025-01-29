@@ -12,6 +12,8 @@ type NewProductRequest struct {
 	ProductID   string   `json:"product_id"`
 	CategoryID  uint     `json:"category_id"`
 	Slug        string   `json:"slug"`
+	Status      string   `json:"status"`
+	Type        string   `json:"type"`
 	Price       uint     `json:"price"`
 	PriceID     string   `json:"price_id"`
 	Image       []string `json:"image"`
