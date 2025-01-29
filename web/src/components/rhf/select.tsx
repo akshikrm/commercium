@@ -21,6 +21,7 @@ const RHFSelect: FunctionComponent<Props> = ({ label, name, children }) => {
                     <TextField
                         label={label}
                         select
+                        fullWidth
                         slotProps={{
                             select: {
                                 native: true
