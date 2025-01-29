@@ -53,10 +53,38 @@ func (p *product) GetAll(filter url.Values) ([]*types.ProductsList, bool) {
 }
 
 func (m *product) GetOne(id int) (*types.OneProduct, bool) {
-	query := "SELECT * FROM products WHERE id=$1 AND deleted_at IS NULL"
+	query := `SELECT 
+		id,
+		category_id,
+		name,
+		slug,
+		price,
+		image,
+		description,
+		created_at,
+		updated_at,
+		deleted_at
+	FROM 
+		products 
+	WHERE 
+		id=$1 
+	AND 
+		deleted_at IS NULL`
 	row := m.store.QueryRow(query, id)
 
-	product, err := scanProductRow(row)
+	product := types.OneProduct{}
+	err := row.Scan(
+		&product.ID,
+		&product.CategoryID,
+		&product.Name,
+		&product.Slug,
+		&product.Price,
+		pq.Array(&product.Image),
+		&product.Description,
+		&product.CreatedAt,
+		&product.UpdatedAt,
+		&product.DeletedAt,
+	)
 	if err == sql.ErrNoRows {
 		return nil, true
 	}
@@ -65,7 +93,7 @@ func (m *product) GetOne(id int) (*types.OneProduct, bool) {
 		return nil, false
 	}
 
-	return product, true
+	return &product, true
 }
 
 func (p *product) Create(product *types.NewProductRequest) (*types.OneProduct, bool) {
@@ -110,7 +138,22 @@ func (p *product) Create(product *types.NewProductRequest) (*types.OneProduct, b
 }
 
 func (p *product) Update(pid int, product *types.NewProductRequest) (*types.OneProduct, bool) {
-	query := "UPDATE products SET name=$1, slug=$2, price=$3, image=$4, description=$5, category_id=$6 WHERE id=$7 AND deleted_at IS NULL RETURNING *"
+	query := `UPDATE 
+		products 
+	SET 
+		name=$1,
+		slug=$2,
+		price=$3,
+		image=$4,
+		description=$5,
+		category_id=$6 
+	WHERE 
+		id=$7 
+	AND 
+		deleted_at IS NULL 
+	RETURNING 
+			id, product_id, name, slug, price, price_id, image, description, category_id
+	`
 	row := p.store.QueryRow(query,
 		product.Name,
 		product.Slug,
@@ -120,7 +163,19 @@ func (p *product) Update(pid int, product *types.NewProductRequest) (*types.OneP
 		product.CategoryID,
 		pid,
 	)
-	savedProduct, err := scanProductRow(row)
+
+	savedProduct := types.OneProduct{}
+	err := row.Scan(
+		&savedProduct.ID,
+		&savedProduct.ProductID,
+		&savedProduct.Name,
+		&savedProduct.Slug,
+		&savedProduct.Price,
+		&savedProduct.PriceID,
+		pq.Array(&savedProduct.Image),
+		&savedProduct.Description,
+		&savedProduct.CategoryID,
+	)
 	if err == sql.ErrNoRows {
 		return nil, true
 	}
@@ -129,7 +184,7 @@ func (p *product) Update(pid int, product *types.NewProductRequest) (*types.OneP
 		log.Printf("failed to update product %s due to %s", product.Name, err)
 		return nil, false
 	}
-	return savedProduct, true
+	return &savedProduct, true
 }
 
 func (m *product) Delete(id int) bool {
@@ -171,67 +226,8 @@ func (m *product) InsertImages(productID uint32, uris []string) bool {
 	return true
 }
 
-func scanProductRows(rows *sql.Rows) ([]*types.OneProduct, error) {
-	products := []*types.OneProduct{}
-	for rows.Next() {
-		product := types.OneProduct{}
-		err := rows.Scan(
-			&product.ID,
-			&product.Name,
-			&product.Slug,
-			&product.Price,
-			&product.Image,
-			&product.Description,
-			&product.CategoryID,
-			&product.CreatedAt,
-			&product.UpdatedAt,
-			&product.DeletedAt,
-		)
-		if err != nil {
-			return nil, err
-		}
-		products = append(products, &product)
-	}
-	return products, nil
-}
-
-func scanProductRow(rows *sql.Row) (*types.OneProduct, error) {
-	product := types.OneProduct{}
-	err := rows.Scan(
-		&product.ID,
-		&product.ProductID,
-		&product.Name,
-		&product.Slug,
-		&product.Price,
-		&product.PriceID,
-		pq.Array(&product.Image),
-		&product.Description,
-		&product.CategoryID,
-		&product.CreatedAt,
-		&product.UpdatedAt,
-		&product.DeletedAt,
-	)
-	if err != nil {
-		return nil, err
-	}
-	return &product, nil
-}
-
 func newProduct(store *sql.DB) *product {
 	return &product{
 		store: store,
 	}
-}
-
-func makeImageString(images []string) (image string) {
-	image = "{"
-	for i, img := range images {
-		image = fmt.Sprintf("%s'%s'", image, img)
-		if i < len(images)-1 {
-			image = fmt.Sprintf("%s,", image)
-		} else {
-			image = fmt.Sprintf("%s}", image)
-		}
-	}
-	return
 }
