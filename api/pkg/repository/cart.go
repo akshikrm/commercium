@@ -6,6 +6,8 @@ import (
 	"database/sql"
 	"log"
 	"time"
+
+	"github.com/lib/pq"
 )
 
 type cart struct {
@@ -34,7 +36,7 @@ func (c *cart) GetAll(userID uint32) ([]*types.CartList, bool) {
 			&cart.Product.Slug,
 			&cart.Product.Price,
 			&cart.Product.Description,
-			&cart.Product.Image,
+			pq.Array(&cart.Product.Image),
 			&cart.CreatedAt,
 		)
 		if err != nil {
@@ -82,7 +84,7 @@ func (c *cart) GetOne(cid uint32) (*types.CartList, bool) {
 		&cart.Product.Slug,
 		&cart.Product.Price,
 		&cart.Product.Description,
-		&cart.Product.Image,
+		pq.Array(&cart.Product.Image),
 		&cart.CreatedAt,
 	)
 	if err == sql.ErrNoRows {

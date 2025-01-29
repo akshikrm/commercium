@@ -13,6 +13,8 @@ import { useState } from "react"
 import QuantityField from "./quanitity-field"
 import icons from "@/icons"
 import RenderIcon from "@components/render-icon"
+import { Cloudinary } from "@cloudinary/url-gen"
+import { scale } from "@cloudinary/url-gen/actions/resize"
 
 type Props = {
     product: Product
@@ -22,7 +24,11 @@ type Props = {
 
 const ProductItem = ({ product, addToCart, buyNow }: Props) => {
     const { id, name, description, image, price } = product
+    const cld = new Cloudinary({
+        cloud: { cloudName: "commercium" }
+    })
 
+    const img = cld.image(image).resize(scale().width(100).height(100))
     const [quantity, setQuanitity] = useState<number>(1)
 
     return (
@@ -40,7 +46,7 @@ const ProductItem = ({ product, addToCart, buyNow }: Props) => {
             <CardMedia
                 sx={{ height: 200 }}
                 component='img'
-                image={image}
+                image={img.toURL()}
                 title='green iguana'
                 onError={e => {
                     e.target.onerror = null

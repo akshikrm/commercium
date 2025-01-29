@@ -37,12 +37,12 @@ type CartList struct {
 	Quantity uint   `json:"quantity"`
 	PriceID  string `json:"price_id"`
 	Product  struct {
-		ID          uint32 `json:"id"`
-		Name        string `json:"name"`
-		Slug        string `json:"slug"`
-		Price       uint   `json:"price"`
-		Description string `json:"description"`
-		Image       string `json:"image"`
+		ID          uint32   `json:"id"`
+		Name        string   `json:"name"`
+		Slug        string   `json:"slug"`
+		Price       uint     `json:"price"`
+		Description string   `json:"description"`
+		Image       []string `json:"image"`
 	} `json:"product"`
 	CreatedAt time.Time `json:"created_at"`
 }
