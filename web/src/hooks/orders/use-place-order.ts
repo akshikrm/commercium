@@ -5,11 +5,14 @@ import { useNavigate } from "react-router"
 import { USER_PATHS } from "@/paths"
 import useConnectPaddle from "./use-connect-paddle"
 import { order } from "@api"
+import useAuth from "@hooks/auth/use-auth"
 
 const ORDER_TOAST = "order_toast"
 
 const usePlaceOrder = (purchaseItems: PaddlePurchaseItem[]) => {
     const customerID = useGetCustomerID()
+    const { user } = useAuth()
+    const { email } = user
     const navigate = useNavigate()
 
     const { paddle, event } = useConnectPaddle(customerID)
@@ -20,7 +23,7 @@ const usePlaceOrder = (purchaseItems: PaddlePurchaseItem[]) => {
                 paddle.Checkout.open({
                     settings: {
                         displayMode: "overlay",
-                        variant: "one-page"
+                        variant: "multi-page"
                     },
                     items: purchaseItems,
                     customer: {
@@ -33,7 +36,7 @@ const usePlaceOrder = (purchaseItems: PaddlePurchaseItem[]) => {
             toast.error(err.message, { id: ORDER_TOAST })
             console.log(err)
         }
-    }, [customerID, purchaseItems, paddle])
+    }, [customerID, purchaseItems, paddle, email])
 
     const { name, data } = event || {}
     const { transaction_id } = data || {}
