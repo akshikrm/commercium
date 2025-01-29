@@ -1,4 +1,3 @@
-import { Card } from "@mui/material"
 import HeaderBreadcrumbs from "@components/header"
 import ProductForm from "../components/form"
 import useCreateProduct from "@hooks/products/use-create-product"
@@ -23,9 +22,7 @@ const AddProduct = () => {
                     }
                 ]}
             />
-            {/* <Card> */}
             <ProductForm onSubmit={mutate} buttonLabel='save product' />
-            {/* </Card> */}
         </>
     )
 }

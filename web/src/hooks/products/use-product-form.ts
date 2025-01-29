@@ -34,7 +34,19 @@ const productSchema = z.object({
             required_error: "price is requred",
             invalid_type_error: "price should be a number"
         })
-        .gte(1, { message: "price should be greater than zero" })
+        .gte(1, { message: "price should be greater than zero" }),
+    status: z
+        .string({
+            required_error: "status is required",
+            invalid_type_error: "status is required"
+        })
+        .min(1, { message: "status is required" }),
+    type: z
+        .string({
+            required_error: "product type is required",
+            invalid_type_error: "product type is required"
+        })
+        .min(1, { message: "product type is required" })
 })
 
 const newProductDefaultValues: NewProduct = {
