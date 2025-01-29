@@ -15,8 +15,9 @@ import { Currency } from "@components/prefix"
 import { Button, ButtonGroup, Menu, MenuItem } from "@mui/material"
 import RenderIcon from "@components/render-icon"
 import icons from "@/icons"
-import { useMemo, useState } from "react"
+import { useState } from "react"
 import toast from "react-hot-toast"
+import useGetStatusColor from "@hooks/shipping/use-get-status-color"
 
 const Shipping = () => {
     const queryClient = useQueryClient()
@@ -128,22 +129,6 @@ const Shipping = () => {
             </TableContainer>
         </>
     )
-}
-
-const useGetStatusColor = (status: ShippingStatus) => {
-    return useMemo(() => {
-        switch (status) {
-            case "delivered": {
-                return "success"
-            }
-            case "in-transit": {
-                return "primary"
-            }
-            case "pending": {
-                return "warning"
-            }
-        }
-    }, [status])
 }
 
 const StatusButton = ({

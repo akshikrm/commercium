@@ -12,8 +12,9 @@ type OrderItems = {
     id: number
     product_id: number
     name: string
-    price: string
+    price: number
     quantity: number
+    shipping_status: ShippingStatus
 }
 
 type OrderView = {
