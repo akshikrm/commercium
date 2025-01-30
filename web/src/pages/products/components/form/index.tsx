@@ -22,31 +22,25 @@ const ProductForm = ({ buttonLabel, defaultValues, onSubmit }: Props) => {
             <Box sx={{ textAlign: "right", marginBottom: 2 }}>
                 <Button type='submit'>{buttonLabel}</Button>
             </Box>
-            <Grid container spacing={2} alignItems='stretch'>
-                <Grid
-                    size={4}
-                    sx={{ display: "flex", flexDirection: "column" }}
-                >
-                    <ProductFormCard title='Product Images'>
-                        <RHFImageUpload name='image' label='Image' />
-                    </ProductFormCard>
+            <Grid container spacing={2}>
+                <Grid container size={4} spacing={2}>
+                    <Grid size={12}>
+                        <ProductFormCard title='Product Images'>
+                            <RHFImageUpload name='image' label='Image' />
+                        </ProductFormCard>
+                    </Grid>
+                    <Grid size={12}>
+                        <ProductFormCard title='Status'>
+                            <RHFSelect label='Status' name='status'>
+                                <option value='enabled'>Enabled</option>
+                                <option value='disabled'>Disabled</option>
+                            </RHFSelect>
+                        </ProductFormCard>
+                    </Grid>
                 </Grid>
-                <Grid
-                    size={8}
-                    sx={{ display: "flex", flexDirection: "column" }}
-                >
+
+                <Grid size={8}>
                     <GeneralInformation />
-                </Grid>
-                <Grid
-                    size={4}
-                    sx={{ display: "flex", flexDirection: "column" }}
-                >
-                    <ProductFormCard title='Status'>
-                        <RHFSelect label='Status' name='status'>
-                            <option value='enabled'>Enabled</option>
-                            <option value='disabled'>Disabled</option>
-                        </RHFSelect>
-                    </ProductFormCard>
                 </Grid>
             </Grid>
         </RHFProvider>

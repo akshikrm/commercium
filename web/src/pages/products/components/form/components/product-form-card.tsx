@@ -9,7 +9,7 @@ const ProductFormCard = ({
     children: ReactNode
 }) => {
     return (
-        <Card sx={{ height: "100%" }}>
+        <Card>
             <Typography
                 variant='subtitle2'
                 color='textSecondary'
