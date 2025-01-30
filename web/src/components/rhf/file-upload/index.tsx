@@ -12,7 +12,7 @@ type Props = {
 
 const RHFImageUpload: FunctionComponent<Props> = ({ name, label }) => {
     const { control } = useFormContext()
-    const { images, handleUpload } = useImage()
+    const { images, handleUpload, handleDelete } = useImage()
 
     return (
         <>
@@ -27,7 +27,12 @@ const RHFImageUpload: FunctionComponent<Props> = ({ name, label }) => {
                 <RenderList
                     list={images}
                     render={image => {
-                        return <ImageMiniPreview image={image.image} />
+                        return (
+                            <ImageMiniPreview
+                                publicID={image.publicID}
+                                handleDelete={handleDelete}
+                            />
+                        )
                     }}
                 />
             </Stack>

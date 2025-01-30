@@ -10,5 +10,5 @@ type FileUploadPayload = {
 
 type ImagePreview = {
     id: string
-    image: CloudinaryImage
+    publicID: string
 }

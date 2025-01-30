@@ -17,6 +17,7 @@ type Props = {
 
 const ProductForm = ({ buttonLabel, defaultValues, onSubmit }: Props) => {
     const methods = useProductForm(defaultValues)
+
     return (
         <RHFProvider methods={methods} onSubmit={onSubmit}>
             <Box sx={{ textAlign: "right", marginBottom: 2 }}>

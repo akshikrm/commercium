@@ -1,13 +1,19 @@
 import { Box, IconButton } from "@mui/material"
-import { CloudinaryImage } from "@cloudinary/url-gen"
 import { useState } from "react"
 import Render from "@components/render"
 import RenderIcon from "@components/render-icon"
 import icons from "@/icons"
 import { AdvancedImage } from "@cloudinary/react"
+import { genImageFromPublicID } from "@utils/gen-image"
 
-const ImageMiniPreview = ({ image }: { image: CloudinaryImage | string }) => {
+type Props = {
+    publicID: string
+    handleDelete: (publicID: string) => void
+}
+
+const ImageMiniPreview = ({ publicID, handleDelete }: Props) => {
     const [onHover, setOnHover] = useState(false)
+
     return (
         <Box
             sx={{
@@ -23,7 +29,7 @@ const ImageMiniPreview = ({ image }: { image: CloudinaryImage | string }) => {
             }}
         >
             <Render
-                when={image !== ""}
+                when={publicID !== ""}
                 show={
                     <>
                         <Render
@@ -44,13 +50,20 @@ const ImageMiniPreview = ({ image }: { image: CloudinaryImage | string }) => {
                                         alignItems: "center"
                                     }}
                                 >
-                                    <IconButton size='small'>
+                                    <IconButton
+                                        size='small'
+                                        onClick={() => {
+                                            handleDelete(publicID)
+                                        }}
+                                    >
                                         <RenderIcon icon={icons.delete} />
                                     </IconButton>
                                 </Box>
                             }
                         />
-                        <AdvancedImage cldImg={image as CloudinaryImage} />
+                        <AdvancedImage
+                            cldImg={genImageFromPublicID(publicID)}
+                        />
                     </>
                 }
                 otherwise={
