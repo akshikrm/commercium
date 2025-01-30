@@ -69,7 +69,6 @@ const useProductForm = (defaultValues?: EditProduct) => {
     })
 
     const { reset } = methods
-    console.log(methods.formState.errors, methods.watch("primary_image"))
 
     useEffect(() => {
         if (defaultValues) {
