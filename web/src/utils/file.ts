@@ -9,6 +9,7 @@ const cloudinary = axios.create({
 })
 
 const TOAST_ID = "network_error"
+
 cloudinary.interceptors.response.use(
     function (response) {
         return response
