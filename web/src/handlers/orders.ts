@@ -43,6 +43,7 @@ export const updateShippingStatus = async (
         })
     }
 }
+
 export const placeOrder = async () => {
     try {
         const { data } = await server.post("/orders")
@@ -51,6 +52,17 @@ export const placeOrder = async () => {
         const { data } = err as AxiosResponse
         console.error(data)
         return Promise.reject({ messate: "failed to place order" })
+    }
+}
+
+export const createTransaction = async () => {
+    try {
+        const { data } = await server.post("/transactions")
+        return data.data
+    } catch (err) {
+        const { data } = err as AxiosResponse
+        console.error(data)
+        return Promise.reject({ messate: "failed to create Transaction" })
     }
 }
 

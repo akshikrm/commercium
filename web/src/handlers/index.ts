@@ -17,6 +17,7 @@ import {
     updateProduct
 } from "./products"
 import {
+    createTransaction,
     getByOrderID,
     getInvoiceURI,
     getOrders,
@@ -65,6 +66,7 @@ export const cart = {
 
 export const order = {
     placeOrder: placeOrder,
+    createTransaction: createTransaction,
     getMyOrders: getOrders,
     gerOrderByID: getByOrderID,
     getInvoiceURI: getInvoiceURI,
