@@ -42,4 +42,5 @@ type PurchaseService interface {
 	GetAllOrders() ([]*OrderList, error)
 	GetShippingInformation() ([]*ShippingInformation, error)
 	UpdateShippingStatus(uint, ShippingStatus) error
+	NewTransaction(uint32) (string, error)
 }

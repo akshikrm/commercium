@@ -3,6 +3,7 @@ package services
 import (
 	"akshidas/e-com/pkg/types"
 	"akshidas/e-com/pkg/utils"
+	"fmt"
 	"log"
 )
 
@@ -10,6 +11,8 @@ type transaction struct {
 	repository      types.TransactionRepository
 	orderRepository types.OrdersRepository
 	cartService     types.CartServicer
+	userService     types.UserServicer
+	paymentProvider types.PaymentProvider
 }
 
 func (t *transaction) CreateTransaction(data *types.Data) error {
@@ -143,14 +146,41 @@ func (s *transaction) UpdateShippingStatus(orderID uint, status types.ShippingSt
 	return nil
 }
 
+func (s *transaction) NewTransaction(userID uint32) (string, error) {
+	carts, err := s.cartService.GetAll(userID)
+	if err != nil {
+		log.Printf("failed to retrieve cart due to %s", err)
+		return "", utils.NotFound
+	}
+
+	customerID, err := s.userService.GetCustomerID(userID)
+	if err != nil {
+		log.Printf("failed to retrieve customer id due to %s", err)
+		return "", utils.NotFound
+	}
+
+	fmt.Printf("%+v\n", carts[0])
+	txn, err := s.paymentProvider.CreateTransaction(*customerID, carts)
+	if err != nil {
+		return "", err
+	}
+	fmt.Println(txn)
+
+	return txn.ID, nil
+}
+
 func newPurchaseService(
 	repository types.TransactionRepository,
 	orderRepository types.OrdersRepository,
 	cartService types.CartServicer,
+	userService types.UserServicer,
+	paymentProvider types.PaymentProvider,
 ) types.PurchaseService {
 	return &transaction{
 		repository:      repository,
 		orderRepository: orderRepository,
 		cartService:     cartService,
+		userService:     userService,
+		paymentProvider: paymentProvider,
 	}
 }

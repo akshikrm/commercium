@@ -11,7 +11,7 @@ import (
 func main() {
 	config := config.New()
 	store := repository.New(config)
-	services := services.New(store)
+	services := services.New(store, config)
 	handlers := handlers.New(services)
 	server := app.New(":5234", handlers)
 

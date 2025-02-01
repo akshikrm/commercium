@@ -17,7 +17,7 @@ import (
 func TestCart(t *testing.T) {
 	config := config.NewTestConfig()
 	store := repository.New(config)
-	services := services.New(store)
+	services := services.New(store, config)
 	handlers := handlers.New(services)
 
 	t.Run("return user with id 2's cart", func(t *testing.T) {

@@ -9,11 +9,32 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 )
+
+func TestNewTransaction(t *testing.T) {
+	config := config.NewTestConfig()
+	store := repository.New(config)
+	services := services.New(store, config)
+	handlers := handlers.New(services)
+
+	t.Run("create new transaction", func(t *testing.T) {
+		req, _ := http.NewRequest(http.MethodPost, "/transactions", nil)
+		res := httptest.NewRecorder()
+		ctx := context.Background()
+		ctx = context.WithValue(ctx, "userID", uint32(2))
+		ctx = context.WithValue(ctx, "role", "user")
+		handlers.Purchase.CreateTransaction(ctx, res, req)
+		got := res.Result().StatusCode
+		want := 200
+		if got != want {
+			t.Errorf("Failed to create a new transaction")
+		}
+	})
+
+}
 
 type AllOrdersResponse struct {
 	Data []*types.OrderList `json:"data"`
@@ -22,7 +43,7 @@ type AllOrdersResponse struct {
 func TestPurchase(t *testing.T) {
 	config := config.NewTestConfig()
 	store := repository.New(config)
-	services := services.New(store)
+	services := services.New(store, config)
 	handlers := handlers.New(services)
 
 	t.Run("create a new transaction", func(t *testing.T) {
@@ -30,7 +51,6 @@ func TestPurchase(t *testing.T) {
 		req, _ := http.NewRequest(http.MethodPost, "/transactions", reader)
 		res := httptest.NewRecorder()
 		handlers.Purchase.HandleTransactionHook(res, req)
-
 		got := res.Result().StatusCode
 		want := 200
 		if got != want {
@@ -42,7 +62,7 @@ func TestPurchase(t *testing.T) {
 func TestOrderStatus(t *testing.T) {
 	config := config.NewTestConfig()
 	store := repository.New(config)
-	services := services.New(store)
+	services := services.New(store, config)
 	handlers := handlers.New(services)
 
 	ctx := context.Background()

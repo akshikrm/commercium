@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"akshidas/e-com/pkg/services"
 	"akshidas/e-com/pkg/types"
 	"akshidas/e-com/pkg/utils"
 	"context"
@@ -10,7 +9,8 @@ import (
 )
 
 type user struct {
-	service types.UserServicer
+	service         types.UserServicer
+	paymentProvider types.PaymentProvider
 }
 
 func (u *user) GetProfile(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
@@ -83,12 +83,8 @@ func (u *user) Create(w http.ResponseWriter, r *http.Request) error {
 	if u.service.Exists(a.Email) {
 		return utils.Conflict
 	}
-	paddlePayment := services.NewPaddlePayment()
-	if err := paddlePayment.Init(); err != nil {
-		return utils.ServerError
-	}
 
-	if err := paddlePayment.CreateCustomer(a); err != nil {
+	if err := u.paymentProvider.CreateCustomer(a); err != nil {
 		return utils.ServerError
 	}
 
@@ -124,8 +120,9 @@ func (u *user) Delete(ctx context.Context, w http.ResponseWriter, r *http.Reques
 	return writeJson(w, http.StatusOK, "deleted successfully")
 }
 
-func newUser(service types.UserServicer) types.UserHandler {
+func newUser(service types.UserServicer, paymentProvider types.PaymentProvider) types.UserHandler {
 	handler := new(user)
 	handler.service = service
+	handler.paymentProvider = paymentProvider
 	return handler
 }

@@ -6,7 +6,8 @@ import (
 )
 
 type cart struct {
-	repository types.CartRepository
+	repository      types.CartRepository
+	paymentProvider types.PaymentProvider
 }
 
 func (c *cart) GetAll(userID uint32) ([]*types.CartList, error) {
@@ -69,6 +70,6 @@ func (c *cart) HardDeleteByUserID(customerId string) error {
 	return nil
 }
 
-func newCartService(repository types.CartRepository) *cart {
-	return &cart{repository: repository}
+func newCartService(repository types.CartRepository, paymentProvider types.PaymentProvider) *cart {
+	return &cart{repository: repository, paymentProvider: paymentProvider}
 }

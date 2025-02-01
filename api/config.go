@@ -7,12 +7,13 @@ import (
 )
 
 type Config struct {
-	User     string
-	Name     string
-	Password string
-	Host     string
-	Port     string
-	Mode     string
+	User       string
+	Name       string
+	Password   string
+	Host       string
+	Port       string
+	Mode       string
+	Paddle_Key string
 }
 
 func NewTestConfig() *Config {
@@ -24,6 +25,7 @@ func NewTestConfig() *Config {
 	config.Host = "localhost"
 	config.Port = "9000"
 	config.Mode = "testing"
+	config.Paddle_Key = "b20c4a0db8fbdc962a6a0d5c6dbfa8dc910f0153c1a7b1b4ab"
 
 	return config
 }
@@ -40,6 +42,7 @@ func New() *Config {
 	config.Password = os.Getenv("DB_PASSWORD")
 	config.Host = os.Getenv("DB_HOST")
 	config.Port = os.Getenv("DB_PORT")
+	config.Paddle_Key = os.Getenv("PADDLE_API_KEY")
 	config.Mode = "DEV"
 
 	return config

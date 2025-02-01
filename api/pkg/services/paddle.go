@@ -1,6 +1,7 @@
 package services
 
 import (
+	config "akshidas/e-com"
 	"akshidas/e-com/pkg/repository"
 	"akshidas/e-com/pkg/types"
 	"akshidas/e-com/pkg/utils"
@@ -18,10 +19,8 @@ type PaddlePayment struct {
 	Client *paddle.SDK
 }
 
-func (p *PaddlePayment) Init() error {
-	paddle_key := os.Getenv("PADDLE_API_KEY")
-
-	client, err := paddle.New(paddle_key, paddle.WithBaseURL(paddle.SandboxBaseURL))
+func (p *PaddlePayment) Init(paddleApiKey string) error {
+	client, err := paddle.New(paddleApiKey, paddle.WithBaseURL(paddle.SandboxBaseURL))
 	if err != nil {
 		log.Printf("failed to connect to paddle due to %s", err)
 		return utils.PaddleError
@@ -73,13 +72,11 @@ func (p *PaddlePayment) GetInvoice(txnId string) *string {
 	res, err := p.Client.GetTransactionInvoice(ctx, &paddle.GetTransactionInvoiceRequest{
 		TransactionID: txnId,
 	})
-
 	if err != nil {
 		log.Printf("failed to get invoice due to %s", err)
 		return nil
 	}
 	return &res.URL
-
 }
 
 func (p *PaddlePayment) CreateProduct(newProductRequest *types.NewProductRequest) error {
@@ -125,6 +122,32 @@ func (p *PaddlePayment) CreateProduct(newProductRequest *types.NewProductRequest
 	return nil
 }
 
+func (p PaddlePayment) CreateTransaction(customerID string, carts []*types.CartList) (*paddle.Transaction, error) {
+	transactionItems := []paddle.CreateTransactionItems{}
+	for _, cart := range carts {
+		transactionItems = append(transactionItems,
+			*paddle.NewCreateTransactionItemsCatalogItem(
+				&paddle.CatalogItem{
+					PriceID:  cart.PriceID,
+					Quantity: int(cart.Quantity),
+				},
+			),
+		)
+	}
+	newTransaction := new(paddle.CreateTransactionRequest)
+	newTransaction.Items = transactionItems
+	newTransaction.CustomerID = paddle.PtrTo(customerID)
+
+	ctx := context.Background()
+	txn, err := p.Client.CreateTransaction(ctx, newTransaction)
+	if err != nil {
+		log.Printf("failed to create transaction due to %s", err)
+		return nil, utils.PaddleError
+	}
+
+	return txn, nil
+}
+
 func (p PaddlePayment) SyncPrice(store *repository.Storage) {
 	rows, err := store.DB.Query("select id, product_id, price, price_id from products;")
 	if err != nil {
@@ -164,7 +187,11 @@ func (p PaddlePayment) SyncPrice(store *repository.Storage) {
 	log.Println("sync complete")
 }
 
-func NewPaddlePayment() *PaddlePayment {
+func NewPaddlePayment(config *config.Config) *PaddlePayment {
 	p := new(PaddlePayment)
+	if err := p.Init(config.Paddle_Key); err != nil {
+		log.Printf("Failed to initialize paddle due to %s", err)
+		os.Exit(1)
+	}
 	return p
 }

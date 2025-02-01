@@ -67,7 +67,8 @@ func PurchaseRoute(s *Server) routes {
 	handler := s.handlers.Purchase
 	middleware := s.handlers.Middleware
 	return routes{
-		"POST /transactions":             handler.HandleTransactionHook,
+		"POST /transactions":             middleware.IsAuthenticated(ctx, handler.CreateTransaction),
+		"POST /transactions-hook":        handler.HandleTransactionHook,
 		"GET /orders/invoice/{txnId}":    middleware.IsAuthenticated(ctx, handler.GetInvoice),
 		"GET /orders/status/{txnId}":     middleware.IsAuthenticated(ctx, handler.GetOrderStatus),
 		"GET /orders":                    middleware.IsAuthenticated(ctx, handler.GetAllOrders),

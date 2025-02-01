@@ -7,7 +7,8 @@ import (
 )
 
 type product struct {
-	repository types.ProductRepository
+	repository      types.ProductRepository
+	paymentProvider types.PaymentProvider
 }
 
 func (r *product) Get(filter url.Values) ([]*types.ProductsList, error) {
@@ -19,12 +20,7 @@ func (r *product) Get(filter url.Values) ([]*types.ProductsList, error) {
 }
 
 func (r *product) Create(newProduct *types.NewProductRequest) error {
-	paddlePayment := NewPaddlePayment()
-	if err := paddlePayment.Init(); err != nil {
-		return err
-	}
-
-	if err := paddlePayment.CreateProduct(newProduct); err != nil {
+	if err := r.paymentProvider.CreateProduct(newProduct); err != nil {
 		return err
 	}
 
@@ -59,8 +55,9 @@ func (r *product) Delete(id int) error {
 	return nil
 }
 
-func newProductService(repository types.ProductRepository) *product {
+func newProductService(repository types.ProductRepository, paymentProvider types.PaymentProvider) *product {
 	return &product{
-		repository: repository,
+		repository:      repository,
+		paymentProvider: paymentProvider,
 	}
 }

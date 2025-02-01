@@ -19,7 +19,7 @@ type AllProductResponse struct {
 func TestProduct(t *testing.T) {
 	config := config.NewTestConfig()
 	store := repository.New(config)
-	services := services.New(store)
+	services := services.New(store, config)
 	handlers := handlers.New(services)
 
 	t.Run("get all products", func(t *testing.T) {

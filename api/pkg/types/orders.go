@@ -4,6 +4,8 @@ import (
 	"context"
 	"net/http"
 	"time"
+
+	"github.com/PaddleHQ/paddle-go-sdk"
 )
 
 type PurchaseRequest struct {
@@ -108,10 +110,21 @@ type OrdersRepository interface {
 }
 
 type PurchaseHandler interface {
+	CreateTransaction(context.Context, http.ResponseWriter, *http.Request) error
 	HandleTransactionHook(http.ResponseWriter, *http.Request) error
 	GetAllOrders(context.Context, http.ResponseWriter, *http.Request) error
 	GetShippingInformation(context.Context, http.ResponseWriter, *http.Request) error
 	GetOrderStatus(context.Context, http.ResponseWriter, *http.Request) error
 	GetInvoice(context.Context, http.ResponseWriter, *http.Request) error
 	UpdateShippingStatus(context.Context, http.ResponseWriter, *http.Request) error
+}
+
+type Transaction = *paddle.Transaction
+
+type PaymentProvider interface {
+	CreateCustomer(*CreateUserRequest) error
+	GetCustomerByEmail(string) (string, error)
+	GetInvoice(string) *string
+	CreateProduct(*NewProductRequest) error
+	CreateTransaction(string, []*CartList) (Transaction, error)
 }
