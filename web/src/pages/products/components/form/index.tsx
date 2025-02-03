@@ -31,10 +31,12 @@ const ProductForm = ({ buttonLabel, defaultValues, onSubmit }: Props) => {
                         </ProductFormCard>
                     </Grid>
                     <Grid size={12}>
-                        <ProductFormCard title='Status'>
-                            <RHFSelect label='Status' name='status'>
-                                <option value='enabled'>Enabled</option>
-                                <option value='disabled'>Disabled</option>
+                        <ProductFormCard title='Product Type'>
+                            <RHFSelect label='Product Type' name='type'>
+                                <option value='one-time'>One Time</option>
+                                <option value='subscription'>
+                                    Subscription
+                                </option>
                             </RHFSelect>
                         </ProductFormCard>
                     </Grid>

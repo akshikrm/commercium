@@ -54,7 +54,6 @@ const usePlaceOrder = (purchaseItems: PaddlePurchaseItem[]) => {
             const intervalID = setInterval(() => {
                 checkStatus(transaction_id)
             }, 3000)
-
             return () => {
                 clearInterval(intervalID)
             }

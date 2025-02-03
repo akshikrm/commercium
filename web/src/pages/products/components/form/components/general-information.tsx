@@ -21,9 +21,9 @@ const GeneralInformation = () => {
                     <RHFTextField name='price' label='Price' fullWidth />
                 </Grid>
                 <Grid size={6}>
-                    <RHFSelect label='Product Type' name='type'>
-                        <option value='one-time'>One Time</option>
-                        <option value='subscription'>Subscription</option>
+                    <RHFSelect label='Status' name='status'>
+                        <option value='enabled'>Enabled</option>
+                        <option value='disabled'>Disabled</option>
                     </RHFSelect>
                 </Grid>
                 <Grid size={12}>
