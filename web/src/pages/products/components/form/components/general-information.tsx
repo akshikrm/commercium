@@ -7,18 +7,15 @@ import RHFSelect from "@components/rhf/select"
 const GeneralInformation = () => {
     return (
         <ProductFormCard title='General Information'>
-            <Grid container spacing={1}>
+            <Grid container spacing={2}>
                 <Grid size={12}>
                     <RHFTextField name='name' label='Product Name' fullWidth />
                 </Grid>
-                <Grid size={6}>
+                <Grid size={12}>
                     <RHFTextField name='slug' label='Product URL' fullWidth />
                 </Grid>
                 <Grid size={6}>
                     <ProductCategoryNames />
-                </Grid>
-                <Grid size={6}>
-                    <RHFTextField name='price' label='Price' fullWidth />
                 </Grid>
                 <Grid size={6}>
                     <RHFSelect label='Status' name='status'>
