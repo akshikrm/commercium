@@ -1,13 +1,14 @@
 import RHFProvider from "@/components/rhf/provider"
-import { Box, Button, Grid2 as Grid, Typography } from "@mui/material"
+import { Box, Button, Grid2 as Grid } from "@mui/material"
 import useProductForm from "@hooks/products/use-product-form"
-import RHFImageUpload from "@components/rhf/file-upload"
 import ProductFormCard from "./components/product-form-card"
 import GeneralInformation from "./components/general-information"
 import RHFSelect from "@components/rhf/select"
 import RHFTextField from "@components/rhf/text-field"
 import { useMemo } from "react"
 import Render from "@components/render"
+import SubscriptionPrice from "./components/subscription-price"
+import RHFImageUpload from "@components/rhf/file-upload"
 
 type Add = (inputData: NewProduct) => void
 type Edit = (inputData: EditProduct) => void
@@ -48,12 +49,7 @@ const ProductForm = ({ buttonLabel, defaultValues, onSubmit }: Props) => {
                     <Grid size={12}>
                         <Render
                             when={isSubscriptionProduct}
-                            show={
-                                <Typography>
-                                    this is were subscription price information
-                                    goes
-                                </Typography>
-                            }
+                            show={<SubscriptionPrice />}
                             otherwise={
                                 <ProductFormCard title='Price'>
                                     <RHFTextField
@@ -80,5 +76,4 @@ const ProductForm = ({ buttonLabel, defaultValues, onSubmit }: Props) => {
         </RHFProvider>
     )
 }
-
 export default ProductForm

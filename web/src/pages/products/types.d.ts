@@ -1,6 +1,13 @@
 type ProductStatus = "enabled" | "disabled"
 type ProductType = "one-time" | "subscription"
 
+type SubscriptionPrice = {
+    [key: string]: {
+        label: string
+        value: string
+    }
+}
+
 type NewProduct = {
     name: string
     primary_image: string
@@ -10,7 +17,7 @@ type NewProduct = {
     type: ProductType
     description: string
     category_id: string
-    price: string
+    price: string | SubscriptionPrice
 }
 
 type EditProduct = {
@@ -21,7 +28,7 @@ type EditProduct = {
     status?: ProductStatus
     type?: ProductType
     description?: string
-    price?: string
+    price?: string | {}
     category_id?: string
 }
 
