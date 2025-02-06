@@ -7,13 +7,13 @@ import AddPriceButton from "./add-button"
 
 const SubscriptionPrice = () => {
     const { watch } = useFormContext()
-    const price = watch("subscriptionPrice")
+    const subscriptionPrice = watch("subscription_price")
 
     return (
         <ProductFormCard title='Price'>
             <Stack>
                 <RenderList
-                    list={Object.entries(price)}
+                    list={Object.entries(subscriptionPrice)}
                     render={([k]) => (
                         <SubscriptionPriceItem month={k} key={k} />
                     )}

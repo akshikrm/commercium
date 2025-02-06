@@ -18,7 +18,7 @@ type NewProduct = {
     description: string
     category_id: string
     price?: string | null
-    subscriptionPrice?: SubscriptionPrice | null
+    subscription_price?: SubscriptionPrice | null
 }
 
 type EditProduct = {
@@ -30,7 +30,7 @@ type EditProduct = {
     type?: ProductType
     description?: string
     price?: string | null
-    subscriptionPrice?: SubscriptionPrice | null
+    subscription_price?: SubscriptionPrice | null
     category_id?: string
 }
 

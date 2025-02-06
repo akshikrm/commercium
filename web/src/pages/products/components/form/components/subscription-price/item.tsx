@@ -10,19 +10,19 @@ const SubscriptionPriceItem = ({ month }: { month: string }) => {
     const { setValue, getValues } = useFormContext()
 
     const handleDelete = useCallback(() => {
-        const temp = { ...getValues("subscriptionPrice") }
+        const temp = { ...getValues("subscription_price") }
         delete temp[month]
-        setValue("subscriptionPrice", temp)
+        setValue("subscription_price", temp)
     }, [month])
 
     return (
         <Stack direction='row' alignItems='center'>
             <RHFTextField
-                name={`subscriptionPrice.${month}.value`}
+                name={`subscription_price.${month}.value`}
                 label={`Price ${monthNumber} month`}
             />
             <RHFTextField
-                name={`subscriptionPrice.${month}.label`}
+                name={`subscription_price.${month}.label`}
                 label={`Label ${monthNumber} month`}
             />
             <Box>
