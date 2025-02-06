@@ -36,6 +36,7 @@ const productSchema = z.object({
             invalid_type_error: "price should be a number"
         })
         .gte(1, { message: "price should be greater than zero" }),
+    subscriptionPrice: z.any().optional(),
     status: z
         .string({
             required_error: "status is required",
@@ -59,7 +60,13 @@ const newProductDefaultValues: NewProduct = {
     type: "one-time",
     description: "",
     category_id: "",
-    price: ""
+    price: "",
+    subscriptionPrice: {
+        "1_month": {
+            label: "",
+            value: ""
+        }
+    }
 }
 
 const useProductForm = (defaultValues?: EditProduct) => {
@@ -68,13 +75,14 @@ const useProductForm = (defaultValues?: EditProduct) => {
         defaultValues: newProductDefaultValues
     })
 
-    const { reset } = methods
+    const { reset, watch, setValue } = methods
+    const productType = watch("type")
 
     useEffect(() => {
         if (defaultValues) {
             reset(defaultValues)
         }
-    }, [defaultValues, reset])
+    }, [defaultValues, productType, setValue, reset])
 
     return methods
 }

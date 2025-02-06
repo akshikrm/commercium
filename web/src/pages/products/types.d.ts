@@ -17,7 +17,8 @@ type NewProduct = {
     type: ProductType
     description: string
     category_id: string
-    price: string | SubscriptionPrice
+    price?: string | null
+    subscriptionPrice?: SubscriptionPrice | null
 }
 
 type EditProduct = {
@@ -28,7 +29,8 @@ type EditProduct = {
     status?: ProductStatus
     type?: ProductType
     description?: string
-    price?: string | {}
+    price?: string | null
+    subscriptionPrice?: SubscriptionPrice | null
     category_id?: string
 }
 
