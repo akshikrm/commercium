@@ -3,6 +3,7 @@ package services
 import (
 	"akshidas/e-com/pkg/types"
 	"akshidas/e-com/pkg/utils"
+	"fmt"
 	"net/url"
 )
 
@@ -20,14 +21,18 @@ func (r *product) Get(filter url.Values) ([]*types.ProductsList, error) {
 }
 
 func (r *product) Create(newProduct *types.NewProductRequest) error {
-	if err := r.paymentProvider.CreateProduct(newProduct); err != nil {
-		return err
+	fmt.Println(newProduct.Type)
+	for _, priceItem := range newProduct.SubscriptionPrice {
+		fmt.Println(priceItem.Label, priceItem.Value)
 	}
-
-	_, ok := r.repository.Create(newProduct)
-	if !ok {
-		return utils.ServerError
-	}
+	// if err := r.paymentProvider.CreateProduct(newProduct); err != nil {
+	// 	return err
+	// }
+	//
+	// _, ok := r.repository.Create(newProduct)
+	// if !ok {
+	// 	return utils.ServerError
+	// }
 	return nil
 }
 

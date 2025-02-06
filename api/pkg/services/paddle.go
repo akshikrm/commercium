@@ -79,6 +79,24 @@ func (p *PaddlePayment) GetInvoice(txnId string) *string {
 	return &res.URL
 }
 
+func (p *PaddlePayment) CreatePrice(productID, amount string) *paddle.Price {
+	ctx := context.Background()
+	price, err := p.Client.CreatePrice(ctx, &paddle.CreatePriceRequest{
+		ProductID: productID,
+		UnitPrice: paddle.Money{
+			Amount:       amount,
+			CurrencyCode: paddle.CurrencyCodeINR,
+		},
+		Description: "Main Price",
+	})
+
+	if err != nil {
+		log.Printf("failed to add price to product due to %s", err)
+		return nil
+	}
+	return price
+}
+
 func (p *PaddlePayment) CreateProduct(newProductRequest *types.NewProductRequest) error {
 	ctx := context.Background()
 
@@ -97,18 +115,9 @@ func (p *PaddlePayment) CreateProduct(newProductRequest *types.NewProductRequest
 		return utils.ServerError
 	}
 
-	price, err := p.Client.CreatePrice(ctx, &paddle.CreatePriceRequest{
-		ProductID: product.ID,
-		UnitPrice: paddle.Money{
-			Amount:       strconv.Itoa(int(newProductRequest.Price)),
-			CurrencyCode: paddle.CurrencyCodeINR,
-		},
-		Description: "Main Price",
-	})
-
-	if err != nil {
-		log.Printf("failed to add price to product due to %s", err)
-		return utils.ServerError
+	price := p.CreatePrice(product.ID, strconv.Itoa(int(newProductRequest.Price)))
+	if price == nil {
+		return utils.PaddleError
 	}
 
 	newProductRequest.ProductID = product.ID

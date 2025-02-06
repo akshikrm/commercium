@@ -8,24 +8,30 @@ import (
 )
 
 type NewProductRequest struct {
-	Name         string   `json:"name"`
-	ProductID    string   `json:"product_id"`
-	CategoryID   uint     `json:"category_id"`
-	Slug         string   `json:"slug"`
-	Status       string   `json:"status"`
-	Type         string   `json:"type"`
-	Price        uint     `json:"price"`
-	PriceID      string   `json:"price_id"`
-	PrimaryImage string   `json:"primary_image"`
-	Image        []string `json:"image"`
-	Description  string   `json:"description"`
+	Name              string            `json:"name"`
+	ProductID         string            `json:"product_id"`
+	CategoryID        uint              `json:"category_id"`
+	Slug              string            `json:"slug"`
+	Status            string            `json:"status"`
+	Type              ProductType       `json:"type"`
+	Price             uint              `json:"price"`
+	SubscriptionPrice SubscriptionPrice `json:"subscription_price"`
+	PriceID           string            `json:"price_id"`
+	PrimaryImage      string            `json:"primary_image"`
+	Image             []string          `json:"image"`
+	Description       string            `json:"description"`
+}
+
+type SubscriptionPrice map[string]struct {
+	Label string `json:"label"`
+	Value string `json:"value"`
 }
 
 type ProductType string
 
 const (
-	OneTime      ProductType = "one-time"
-	Subscription ProductType = "subscription"
+	OneTimeProduct      ProductType = "one-time"
+	SubscriptionProduct ProductType = "subscription"
 )
 
 type ProductsList struct {
