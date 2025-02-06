@@ -22,8 +22,12 @@ type Props = {
 const ProductForm = ({ buttonLabel, defaultValues, onSubmit }: Props) => {
     const methods = useProductForm(defaultValues)
 
-    const { watch } = methods
+    const {
+        watch,
+        formState: { errors }
+    } = methods
     const productType = watch("type")
+    console.log(errors)
 
     const isSubscriptionProduct = useMemo(() => {
         return productType === "subscription"

@@ -30,12 +30,12 @@ const productSchema = z.object({
             invalid_type_error: "category is required"
         })
         .gte(1, { message: "category is required" }),
-    price: z.coerce
-        .number({
-            required_error: "price is requred",
-            invalid_type_error: "price should be a number"
-        })
-        .gte(1, { message: "price should be greater than zero" }),
+    // price: z.coerce
+    //     .number({
+    //         required_error: "price is requred",
+    //         invalid_type_error: "price should be a number"
+    //     })
+    //     .gte(1, { message: "price should be greater than zero" }),
     subscription_price: z.any().optional(),
     status: z
         .string({
@@ -75,8 +75,7 @@ const useProductForm = (defaultValues?: EditProduct) => {
         defaultValues: newProductDefaultValues
     })
 
-    const { reset, watch, setValue } = methods
-    const productType = watch("type")
+    const { reset, setValue } = methods
 
     useEffect(() => {
         if (defaultValues) {

@@ -79,16 +79,21 @@ func (p *PaddlePayment) GetInvoice(txnId string) *string {
 	return &res.URL
 }
 
-func (p *PaddlePayment) CreatePrice(productID, amount string) *paddle.Price {
+func (p *PaddlePayment) CreatePrice(productID, amount, name string) *paddle.Price {
 	ctx := context.Background()
-	price, err := p.Client.CreatePrice(ctx, &paddle.CreatePriceRequest{
-		ProductID: productID,
-		UnitPrice: paddle.Money{
-			Amount:       amount,
-			CurrencyCode: paddle.CurrencyCodeINR,
-		},
-		Description: "Main Price",
-	})
+	priceRequest := new(paddle.CreatePriceRequest)
+	priceRequest.ProductID = productID
+	priceRequest.Description = "Price"
+	priceRequest.UnitPrice = paddle.Money{
+		Amount:       amount,
+		CurrencyCode: paddle.CurrencyCodeINR,
+	}
+
+	if name != "" {
+		priceRequest.Name = &name
+	}
+
+	price, err := p.Client.CreatePrice(ctx, priceRequest)
 
 	if err != nil {
 		log.Printf("failed to add price to product due to %s", err)
@@ -115,20 +120,29 @@ func (p *PaddlePayment) CreateProduct(newProductRequest *types.NewProductRequest
 		return utils.ServerError
 	}
 
-	price := p.CreatePrice(product.ID, strconv.Itoa(int(newProductRequest.Price)))
-	if price == nil {
-		return utils.PaddleError
+	newProductRequest.ProductID = product.ID
+	if newProductRequest.Type == types.OneTimeProduct {
+		price := p.CreatePrice(product.ID, strconv.Itoa(int(newProductRequest.Price)), "")
+		if price == nil {
+			return utils.PaddleError
+		}
+
+		if amount, err := strconv.Atoi(price.UnitPrice.Amount); err != nil {
+			log.Printf("failed to add price to product due to %s", err)
+			return utils.ServerError
+		} else {
+			newProductRequest.Price = uint(amount)
+			newProductRequest.PriceID = price.ID
+		}
+		return nil
 	}
 
-	newProductRequest.ProductID = product.ID
-	if amount, err := strconv.Atoi(price.UnitPrice.Amount); err != nil {
-		log.Printf("failed to add price to product due to %s", err)
-		return utils.ServerError
-	} else {
-		newProductRequest.Price = uint(amount)
-		newProductRequest.PriceID = price.ID
+	for _, priceItem := range newProductRequest.SubscriptionPrice {
+		price := p.CreatePrice(product.ID, priceItem.Value, priceItem.Label)
+		fmt.Println(product.ID, price.ID)
 	}
 	return nil
+
 }
 
 func (p PaddlePayment) CreateTransaction(customerID string, carts []*types.CartList) (*paddle.Transaction, error) {
