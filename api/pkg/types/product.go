@@ -59,21 +59,27 @@ type ProductsList struct {
 	} `json:"category"`
 }
 
+type ProductPrice struct {
+	ID      uint   `json:"id"`
+	Price   uint   `json:"price"`
+	Label   string `json:"label"`
+	PriceID string `json:"price_id"`
+}
+
 type OneProduct struct {
-	ID          uint        `json:"id"`
-	CategoryID  uint        `json:"category_id"`
-	ProductID   string      `json:"product_id"`
-	PriceID     string      `json:"price_id"`
-	Status      string      `json:"status"`
-	Type        ProductType `json:"type"`
-	Name        string      `json:"name"`
-	Slug        string      `json:"slug"`
-	Price       uint        `json:"price"`
-	Image       []string    `json:"image"`
-	Description string      `json:"description"`
-	CreatedAt   time.Time   `json:"created_at"`
-	UpdatedAt   time.Time   `json:"updated_at"`
-	DeletedAt   *time.Time  `json:"deleted_at"`
+	ID          uint            `json:"id"`
+	CategoryID  uint            `json:"category_id"`
+	ProductID   string          `json:"product_id"`
+	Status      string          `json:"status"`
+	Type        ProductType     `json:"type"`
+	Name        string          `json:"name"`
+	Slug        string          `json:"slug"`
+	Prices      []*ProductPrice `json:"prices"`
+	Image       []string        `json:"image"`
+	Description string          `json:"description"`
+	CreatedAt   time.Time       `json:"created_at"`
+	UpdatedAt   time.Time       `json:"updated_at"`
+	DeletedAt   *time.Time      `json:"deleted_at"`
 }
 
 type ProductRepository interface {

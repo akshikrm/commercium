@@ -3,6 +3,7 @@ package repository
 import (
 	"akshidas/e-com/pkg/types"
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/url"
@@ -16,7 +17,7 @@ type product struct {
 }
 
 func (p *product) GetAll(filter url.Values) ([]*types.ProductsList, bool) {
-	query := buildFilterQuery("SELECT p.id, p.name, p.type, p.slug, p.price, p.image[1], p.description, p.created_at, c.id as c_id, c.name as c_name,c.slug as c_slug,c.description as c_description FROM products p INNER JOIN product_categories c ON p.category_id=c.id AND c.enabled='t' where p.deleted_at IS NULL", filter)
+	query := buildFilterQuery("SELECT p.id, p.name, p.type, p.slug, pr.price, p.image[1], p.description, p.created_at, c.id as c_id, c.name as c_name,c.slug as c_slug,c.description as c_description FROM products p INNER JOIN product_categories c ON p.category_id=c.id AND c.enabled='t' INNER JOIN prices pr on p.id=pr.product_id where p.deleted_at IS NULL", filter)
 	rows, err := p.store.Query(query)
 	if err == sql.ErrNoRows {
 		return nil, true
@@ -55,37 +56,47 @@ func (p *product) GetAll(filter url.Values) ([]*types.ProductsList, bool) {
 }
 
 func (m *product) GetOne(id int) (*types.OneProduct, bool) {
-	query := `SELECT 
-		id,
-		category_id,
-		name,
-		slug,
-		price,
-		image,
-		description,
-		created_at,
-		updated_at,
-		deleted_at
-	FROM 
-		products 
-	WHERE 
-		id=$1 
-	AND 
-		deleted_at IS NULL`
+	query := `SELECT
+	                p.id,
+	                category_id,
+	                name,
+	                slug,
+	                image,
+	                description,
+	                created_at,
+	                updated_at,
+	                deleted_at,
+					JSON_AGG(
+						JSON_BUILD_OBJECT(
+						'id', pr.id,
+						'price', pr.price,
+						'price_id', pr.price_id,
+						'label', pr.label
+					)) as prices 
+	FROM
+				products as p  
+			JOIN 
+					prices as pr on pr.product_id=p.id
+	        WHERE
+	                p.id=$1
+	        AND
+	                deleted_at IS NULL group by p.id;
+	`
 	row := m.store.QueryRow(query, id)
 
 	product := types.OneProduct{}
+	var prices string
 	err := row.Scan(
 		&product.ID,
 		&product.CategoryID,
 		&product.Name,
 		&product.Slug,
-		&product.Price,
 		pq.Array(&product.Image),
 		&product.Description,
 		&product.CreatedAt,
 		&product.UpdatedAt,
 		&product.DeletedAt,
+		&prices,
 	)
 	if err == sql.ErrNoRows {
 		return nil, true
@@ -93,6 +104,10 @@ func (m *product) GetOne(id int) (*types.OneProduct, bool) {
 	if err != nil {
 		log.Printf("failed to get product with id %d due to %s", id, err)
 		return nil, false
+	}
+	err = json.Unmarshal([]byte(prices), &product.Prices)
+	if err != nil {
+		log.Fatalf("Failed to unmarshal JSON: %v", err)
 	}
 
 	return &product, true
@@ -160,7 +175,6 @@ func (p *product) Update(pid int, product *types.NewProductRequest) (*types.OneP
 	SET 
 		name=$1,
 		slug=$2,
-		price=$3,
 		image=$4,
 		description=$5,
 		category_id=$6 
@@ -169,12 +183,11 @@ func (p *product) Update(pid int, product *types.NewProductRequest) (*types.OneP
 	AND 
 		deleted_at IS NULL 
 	RETURNING 
-			id, product_id, name, slug, price, price_id, image, description, category_id
+			id, product_id, name, slug, image, description, category_id
 	`
 	row := p.store.QueryRow(query,
 		product.Name,
 		product.Slug,
-		product.Price,
 		pq.Array(product.Image),
 		product.Description,
 		product.CategoryID,
@@ -187,8 +200,6 @@ func (p *product) Update(pid int, product *types.NewProductRequest) (*types.OneP
 		&savedProduct.ProductID,
 		&savedProduct.Name,
 		&savedProduct.Slug,
-		&savedProduct.Price,
-		&savedProduct.PriceID,
 		pq.Array(&savedProduct.Image),
 		&savedProduct.Description,
 		&savedProduct.CategoryID,

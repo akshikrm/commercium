@@ -33,7 +33,7 @@ func (r *product) Create(newProduct *types.NewProductRequest) error {
 		if price := r.paymentProvider.CreatePrice(
 			savedProduct.ProductID,
 			"one time price",
-			savedProduct.Price,
+			newProduct.Price,
 		); price != nil {
 			price.ProductID = savedProduct.ID
 			if ok := r.repository.CreatePrice(price); ok {
