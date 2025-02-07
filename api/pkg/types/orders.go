@@ -100,6 +100,13 @@ type ShippingInformation struct {
 	CreatedAt time.Time `json:"created_at"`
 }
 
+type NewPrice struct {
+	ID        string
+	ProductID string
+	Amount    uint
+	Label     string
+}
+
 type OrdersRepository interface {
 	GetOrdersByUserID(uint32) ([]*OrderList, bool)
 	GetPurchaseByOrderID(uint) ([]*PurchaseList, bool)
@@ -127,4 +134,5 @@ type PaymentProvider interface {
 	GetInvoice(string) *string
 	CreateProduct(*NewProductRequest) error
 	CreateTransaction(string, []*CartList) (Transaction, error)
+	CreatePrice(string, string, uint) *NewPrice
 }

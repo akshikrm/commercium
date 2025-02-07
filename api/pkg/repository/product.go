@@ -98,23 +98,40 @@ func (m *product) GetOne(id int) (*types.OneProduct, bool) {
 	return &product, true
 }
 
+func (p *product) CreatePrice(createPrice *types.NewPrice) bool {
+	query := `
+	INSERT INTO 
+		prices (price, label, price_id, product_id)
+	VALUES
+		($1, $2, $3, $4)`
+	_, err := p.store.Exec(query,
+		createPrice.Amount,
+		createPrice.Label,
+		createPrice.ID,
+		createPrice.ProductID,
+	)
+	if err != nil {
+		log.Printf("failed to add price to database due to %s", err)
+		return false
+	}
+	return true
+}
+
 func (p *product) Create(product *types.NewProductRequest) (*types.OneProduct, bool) {
 	query := `INSERT INTO products
-		(name, slug, price, image, description, category_id, product_id, price_id) 
+		(name, slug,  image, description, category_id, product_id, ) 
 	VALUES 
-		($1, $2, $3, $4, $5, $6, $7, $8) 
+		($1, $2, $3, $4, $5, $6) 
 	RETURNING 
-		id, product_id, name, slug, price, price_id, image, description, category_id`
+		id, product_id, name, slug, image, description, category_id`
 
 	row := p.store.QueryRow(query,
 		product.Name,
 		product.Slug,
-		product.Price,
 		pq.Array(product.Image),
 		product.Description,
 		product.CategoryID,
 		product.ProductID,
-		product.PriceID,
 	)
 
 	savedProduct := types.OneProduct{}
@@ -123,8 +140,6 @@ func (p *product) Create(product *types.NewProductRequest) (*types.OneProduct, b
 		&savedProduct.ProductID,
 		&savedProduct.Name,
 		&savedProduct.Slug,
-		&savedProduct.Price,
-		&savedProduct.PriceID,
 		pq.Array(&savedProduct.Image),
 		&savedProduct.Description,
 		&savedProduct.CategoryID,

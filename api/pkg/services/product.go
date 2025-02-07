@@ -24,9 +24,34 @@ func (r *product) Create(newProduct *types.NewProductRequest) error {
 		return err
 	}
 
-	_, ok := r.repository.Create(newProduct)
+	savedProduct, ok := r.repository.Create(newProduct)
 	if !ok {
 		return utils.ServerError
+	}
+
+	if savedProduct.Type == types.OneTimeProduct {
+		if price := r.paymentProvider.CreatePrice(
+			savedProduct.ProductID,
+			"one time price",
+			savedProduct.Price,
+		); price != nil {
+			if ok := r.repository.CreatePrice(price); ok {
+				return nil
+			}
+		}
+		return utils.ServerError
+	}
+
+	for _, priceItem := range newProduct.SubscriptionPrice {
+		if price := r.paymentProvider.CreatePrice(
+			savedProduct.ProductID,
+			priceItem.Label,
+			priceItem.Value,
+		); price != nil {
+			if ok := r.repository.CreatePrice(price); !ok {
+				return utils.ServerError
+			}
+		}
 	}
 	return nil
 }
