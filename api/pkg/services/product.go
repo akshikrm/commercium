@@ -35,6 +35,7 @@ func (r *product) Create(newProduct *types.NewProductRequest) error {
 			"one time price",
 			savedProduct.Price,
 		); price != nil {
+			price.ProductID = savedProduct.ID
 			if ok := r.repository.CreatePrice(price); ok {
 				return nil
 			}
@@ -48,6 +49,7 @@ func (r *product) Create(newProduct *types.NewProductRequest) error {
 			priceItem.Label,
 			priceItem.Value,
 		); price != nil {
+			price.ProductID = savedProduct.ID
 			if ok := r.repository.CreatePrice(price); !ok {
 				return utils.ServerError
 			}

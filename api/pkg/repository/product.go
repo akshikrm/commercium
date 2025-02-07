@@ -119,7 +119,7 @@ func (p *product) CreatePrice(createPrice *types.NewPrice) bool {
 
 func (p *product) Create(product *types.NewProductRequest) (*types.OneProduct, bool) {
 	query := `INSERT INTO products
-		(name, slug,  image, description, category_id, product_id, ) 
+		(name, slug,  image, description, category_id, product_id) 
 	VALUES 
 		($1, $2, $3, $4, $5, $6) 
 	RETURNING 

@@ -107,10 +107,9 @@ func (p *PaddlePayment) CreatePrice(productID, name string, price uint) *types.N
 	}
 
 	return &types.NewPrice{
-		ID:        paddlePrice.ID,
-		Label:     *paddlePrice.Name,
-		ProductID: paddlePrice.ProductID,
-		Amount:    uint(convertedAmount),
+		ID:     paddlePrice.ID,
+		Label:  *paddlePrice.Name,
+		Amount: uint(convertedAmount),
 	}
 }
 

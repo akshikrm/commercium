@@ -102,7 +102,7 @@ type ShippingInformation struct {
 
 type NewPrice struct {
 	ID        string
-	ProductID string
+	ProductID uint
 	Amount    uint
 	Label     string
 }
