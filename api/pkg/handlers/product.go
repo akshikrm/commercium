@@ -14,7 +14,7 @@ func (u *product) GetAll(ctx context.Context, w http.ResponseWriter, r *http.Req
 	filter := r.URL.Query()
 	users, err := u.service.Get(filter)
 	if err != nil {
-		return err
+		return serverError(w)
 	}
 	return writeJson(w, http.StatusOK, users)
 }
@@ -22,11 +22,11 @@ func (u *product) GetAll(ctx context.Context, w http.ResponseWriter, r *http.Req
 func (u *product) GetOne(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
 	id, err := parseId(r.PathValue("id"))
 	if err != nil {
-		return err
+		return invalidId(w)
 	}
 	foundProduct, err := u.service.GetOne(id)
 	if err != nil {
-		return err
+		return serverError(w)
 	}
 	return writeJson(w, http.StatusOK, foundProduct)
 }
@@ -34,11 +34,10 @@ func (u *product) GetOne(ctx context.Context, w http.ResponseWriter, r *http.Req
 func (u *product) Create(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
 	a := &types.NewProductRequest{}
 	if err := DecodeBody(r.Body, &a); err != nil {
-		return err
+		return invalidRequest(w)
 	}
-	err := u.service.Create(a)
-	if err != nil {
-		return err
+	if err := u.service.Create(a); err != nil {
+		return serverError(w)
 	}
 	return writeJson(w, http.StatusCreated, "product created")
 }
@@ -46,15 +45,15 @@ func (u *product) Create(ctx context.Context, w http.ResponseWriter, r *http.Req
 func (u *product) Update(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
 	a := types.NewProductRequest{}
 	if err := DecodeBody(r.Body, &a); err != nil {
-		return err
+		return invalidRequest(w)
 	}
 	id, err := parseId(r.PathValue("id"))
 	if err != nil {
-		return err
+		return invalidId(w)
 	}
 	product, err := u.service.Update(id, &a)
 	if err != nil {
-		return err
+		return serverError(w)
 	}
 	return writeJson(w, http.StatusCreated, product)
 }
@@ -62,10 +61,10 @@ func (u *product) Update(ctx context.Context, w http.ResponseWriter, r *http.Req
 func (u *product) Delete(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
 	id, err := parseId(r.PathValue("id"))
 	if err != nil {
-		return err
+		return invalidId(w)
 	}
 	if err := u.service.Delete(id); err != nil {
-		return err
+		return serverError(w)
 	}
 	return writeJson(w, http.StatusOK, "deleted successfully")
 }

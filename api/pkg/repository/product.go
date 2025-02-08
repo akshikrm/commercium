@@ -103,6 +103,8 @@ func (m *product) GetOne(id int) (*types.OneProduct, bool) {
 			slug,
 			image,
 			description,
+			p.type,
+			p.status,
 			created_at,
 			updated_at,
 			deleted_at,
@@ -136,6 +138,8 @@ func (m *product) GetOne(id int) (*types.OneProduct, bool) {
 		&product.Slug,
 		pq.Array(&product.Image),
 		&product.Description,
+		&product.Type,
+		&product.Status,
 		&product.CreatedAt,
 		&product.UpdatedAt,
 		&product.DeletedAt,
@@ -177,9 +181,9 @@ func (p *product) CreatePrice(createPrice *types.NewPrice) bool {
 
 func (p *product) Create(product *types.NewProductRequest) (*types.OneProduct, bool) {
 	query := `INSERT INTO products
-		(name, slug,  image, description, category_id, product_id) 
+		(name, slug,  image, description, category_id, product_id, status, type) 
 	VALUES 
-		($1, $2, $3, $4, $5, $6) 
+		($1, $2, $3, $4, $5, $6, $7, $8) 
 	RETURNING 
 		id, product_id, name, slug, image, description, category_id`
 
@@ -190,6 +194,8 @@ func (p *product) Create(product *types.NewProductRequest) (*types.OneProduct, b
 		product.Description,
 		product.CategoryID,
 		product.ProductID,
+		product.Status,
+		product.Type,
 	)
 
 	savedProduct := types.OneProduct{}
