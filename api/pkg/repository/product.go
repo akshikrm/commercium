@@ -95,31 +95,35 @@ func (p *product) GetAll(filter url.Values) ([]*types.ProductsList, bool) {
 }
 
 func (m *product) GetOne(id int) (*types.OneProduct, bool) {
-	query := `SELECT
-	                p.id,
-	                category_id,
-	                name,
-	                slug,
-	                image,
-	                description,
-	                created_at,
-	                updated_at,
-	                deleted_at,
-					JSON_AGG(
-						JSON_BUILD_OBJECT(
-						'id', pr.id,
-						'price', pr.price,
-						'price_id', pr.price_id,
-						'label', pr.label
-					)) as prices 
-	FROM
-				products as p  
-			JOIN 
-					prices as pr on pr.product_id=p.id
-	        WHERE
-	                p.id=$1
-	        AND
-	                deleted_at IS NULL group by p.id;
+	query := `
+		SELECT
+			p.id,
+			category_id,
+			name,
+			slug,
+			image,
+			description,
+			created_at,
+			updated_at,
+			deleted_at,
+			JSON_AGG(
+				JSON_BUILD_OBJECT(
+					'id', pr.id,
+					'price', pr.price,
+					'price_id', pr.price_id,
+					'label', pr.label
+				)
+			) AS prices 
+		FROM
+			products as p  
+		JOIN 
+			prices as pr on pr.product_id=p.id
+		WHERE
+			p.id=$1
+		AND
+			deleted_at IS NULL 
+		GROUP BY 
+			p.id;
 	`
 	row := m.store.QueryRow(query, id)
 
