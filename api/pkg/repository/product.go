@@ -46,11 +46,13 @@ func (p *product) GetAll(filter url.Values) ([]*types.ProductsList, bool) {
 			prices pr ON p.id=pr.product_id 
 		WHERE 
 			p.deleted_at IS NULL
-		GROUP BY
-			p.id, c.id;
 		`,
 		filter,
 	)
+	query = fmt.Sprintf("%s %s", query, `
+		GROUP BY
+			p.id, c.id
+		`)
 	rows, err := p.store.Query(query)
 	if err == sql.ErrNoRows {
 		return nil, true
