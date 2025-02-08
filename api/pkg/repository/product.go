@@ -187,7 +187,7 @@ func (p *product) Create(product *types.NewProductRequest) (*types.OneProduct, b
 	VALUES 
 		($1, $2, $3, $4, $5, $6, $7, $8) 
 	RETURNING 
-		id, product_id, name, slug, image, description, category_id`
+		id, product_id, name, slug, type, image, description, category_id`
 
 	row := p.store.QueryRow(query,
 		product.Name,
@@ -206,6 +206,7 @@ func (p *product) Create(product *types.NewProductRequest) (*types.OneProduct, b
 		&savedProduct.ProductID,
 		&savedProduct.Name,
 		&savedProduct.Slug,
+		&savedProduct.Type,
 		pq.Array(&savedProduct.Image),
 		&savedProduct.Description,
 		&savedProduct.CategoryID,
