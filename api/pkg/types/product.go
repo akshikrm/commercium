@@ -43,14 +43,14 @@ const (
 )
 
 type ProductsList struct {
-	ID          uint32      `json:"id"`
-	Name        string      `json:"name"`
-	Slug        string      `json:"slug"`
-	Price       uint        `json:"price"`
-	Image       *string     `json:"image"`
-	Description string      `json:"description"`
-	Type        ProductType `json:"type"`
-	CreatedAt   time.Time   `json:"created_at"`
+	ID          uint32          `json:"id"`
+	Name        string          `json:"name"`
+	Slug        string          `json:"slug"`
+	Prices      []*ProductPrice `json:"prices"`
+	Image       *string         `json:"image"`
+	Description string          `json:"description"`
+	Type        ProductType     `json:"type"`
+	CreatedAt   time.Time       `json:"created_at"`
 	Category    struct {
 		ID          uint   `json:"id"`
 		Name        string `json:"name"`

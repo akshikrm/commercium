@@ -17,7 +17,40 @@ type product struct {
 }
 
 func (p *product) GetAll(filter url.Values) ([]*types.ProductsList, bool) {
-	query := buildFilterQuery("SELECT p.id, p.name, p.type, p.slug, pr.price, p.image[1], p.description, p.created_at, c.id as c_id, c.name as c_name,c.slug as c_slug,c.description as c_description FROM products p INNER JOIN product_categories c ON p.category_id=c.id AND c.enabled='t' INNER JOIN prices pr on p.id=pr.product_id where p.deleted_at IS NULL", filter)
+	query := buildFilterQuery(`
+		SELECT 
+			p.id,
+			p.name,
+			p.type,
+			p.slug,
+			p.image[1],
+			p.description,
+			p.created_at,
+			c.id as c_id,
+			c.name as c_name,
+			c.slug as c_slug,
+			c.description as c_description,
+			JSON_AGG(
+				JSON_BUILD_OBJECT(
+					'id', pr.id,
+					'price', pr.price,
+					'price_id', pr.price_id,
+					'label', pr.label
+				)
+			) AS prices
+		FROM 
+			products p 
+		INNER JOIN 
+			product_categories c ON p.category_id=c.id AND c.enabled='t' 
+		JOIN 
+			prices pr ON p.id=pr.product_id 
+		WHERE 
+			p.deleted_at IS NULL
+		GROUP BY
+			p.id, c.id;
+		`,
+		filter,
+	)
 	rows, err := p.store.Query(query)
 	if err == sql.ErrNoRows {
 		return nil, true
@@ -31,12 +64,12 @@ func (p *product) GetAll(filter url.Values) ([]*types.ProductsList, bool) {
 	products := []*types.ProductsList{}
 	for rows.Next() {
 		product := types.ProductsList{}
+		var prices string
 		err := rows.Scan(
 			&product.ID,
 			&product.Name,
 			&product.Type,
 			&product.Slug,
-			&product.Price,
 			&product.Image,
 			&product.Description,
 			&product.CreatedAt,
@@ -44,11 +77,17 @@ func (p *product) GetAll(filter url.Values) ([]*types.ProductsList, bool) {
 			&product.Category.Name,
 			&product.Category.Slug,
 			&product.Category.Description,
+			&prices,
 		)
 		if err != nil {
 			log.Printf("failed to scan products due to %s", err)
 			return nil, false
 		}
+
+		if err = json.Unmarshal([]byte(prices), &product.Prices); err != nil {
+			log.Fatalf("Failed to unmarshal JSON: %v", err)
+		}
+
 		products = append(products, &product)
 	}
 
@@ -105,8 +144,8 @@ func (m *product) GetOne(id int) (*types.OneProduct, bool) {
 		log.Printf("failed to get product with id %d due to %s", id, err)
 		return nil, false
 	}
-	err = json.Unmarshal([]byte(prices), &product.Prices)
-	if err != nil {
+
+	if err = json.Unmarshal([]byte(prices), &product.Prices); err != nil {
 		log.Fatalf("Failed to unmarshal JSON: %v", err)
 	}
 
