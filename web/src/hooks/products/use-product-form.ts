@@ -61,10 +61,13 @@ const newProductDefaultValues: NewProduct = {
     description: "",
     category_id: "",
     price: "",
+    prices: [],
     subscription_price: {
         "1_month": {
+            id: 0,
+            price: 0,
             label: "",
-            value: ""
+            price_id: ""
         }
     }
 }
@@ -87,8 +90,10 @@ const useProductForm = (defaultValues?: EditProduct) => {
                     ? subscription_price
                     : {
                           "1_month": {
+                              id: 0,
+                              price: 0,
                               label: "",
-                              value: ""
+                              price_id: ""
                           }
                       }
             })

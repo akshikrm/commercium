@@ -47,7 +47,7 @@ func (r *product) Create(newProduct *types.NewProductRequest) error {
 		if price := r.paymentProvider.CreatePrice(
 			savedProduct.ProductID,
 			priceItem.Label,
-			priceItem.Value,
+			priceItem.Price,
 		); price != nil {
 			price.ProductID = savedProduct.ID
 			if ok := r.repository.CreatePrice(price); !ok {
@@ -70,6 +70,19 @@ func (r *product) GetOne(id int) (*types.OneProduct, error) {
 	product, ok := r.repository.GetOne(id)
 	if !ok {
 		return nil, utils.ServerError
+	}
+	if product.Type == types.OneTimeProduct {
+		product.Price = product.Prices[0].Price
+	} else {
+		product.SubscriptionPrice = make(types.SubscriptionPrice)
+		for _, price := range product.Prices {
+			product.SubscriptionPrice[price.Interval] = types.ProductPrice{
+				ID:      price.ID,
+				PriceID: price.PriceID,
+				Label:   price.Label,
+				Price:   price.Price,
+			}
+		}
 	}
 	return product, nil
 }

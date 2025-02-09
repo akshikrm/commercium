@@ -115,7 +115,8 @@ func (m *product) GetOne(id int) (*types.OneProduct, bool) {
 					'id', pr.id,
 					'price', pr.price,
 					'price_id', pr.price_id,
-					'label', pr.label
+					'label', pr.label,
+					'interval', pr.interval
 				)
 			) AS prices 
 		FROM
@@ -150,6 +151,7 @@ func (m *product) GetOne(id int) (*types.OneProduct, bool) {
 	if err == sql.ErrNoRows {
 		return nil, true
 	}
+
 	if err != nil {
 		log.Printf("failed to get product with id %d due to %s", id, err)
 		return nil, false

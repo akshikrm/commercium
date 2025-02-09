@@ -9,6 +9,7 @@ const SubscriptionPrice = () => {
     const { watch } = useFormContext()
     const subscriptionPrice = watch("subscription_price")
 
+    console.log(subscriptionPrice)
     return (
         <ProductFormCard title='Price'>
             <Stack>

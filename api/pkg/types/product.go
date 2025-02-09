@@ -7,6 +7,23 @@ import (
 	"time"
 )
 
+type ProductType string
+
+const (
+	OneTimeProduct      ProductType = "one-time"
+	SubscriptionProduct ProductType = "subscription"
+)
+
+type ProductPrice struct {
+	ID       uint   `json:"id"`
+	Price    uint   `json:"price"`
+	Label    string `json:"label"`
+	PriceID  string `json:"price_id"`
+	Interval string `json:"interval"`
+}
+
+type SubscriptionPrice map[string]ProductPrice
+
 type NewProductRequest struct {
 	Name                  string            `json:"name"`
 	ProductID             string            `json:"product_id"`
@@ -16,31 +33,12 @@ type NewProductRequest struct {
 	Type                  ProductType       `json:"type"`
 	Price                 uint              `json:"price"`
 	SubscriptionPrice     SubscriptionPrice `json:"subscription_price"`
-	SubscriptionPriceItem []*NewPrice
-	PriceID               string   `json:"price_id"`
-	PrimaryImage          string   `json:"primary_image"`
-	Image                 []string `json:"image"`
-	Description           string   `json:"description"`
+	SubscriptionPriceItem []*NewPrice       `json:"-"`
+	PriceID               string            `json:"price_id"`
+	PrimaryImage          string            `json:"primary_image"`
+	Image                 []string          `json:"image"`
+	Description           string            `json:"description"`
 }
-
-type SubscriptionPrice map[string]struct {
-	Label string `json:"label"`
-	Value uint   `json:"value"`
-}
-
-type CreatePrice struct {
-	PriceID   string `json:"price_id"`
-	ProductID string `json:"product_id"`
-	Amount    uint   `json:"amount"`
-	Label     string `json:"label"`
-}
-
-type ProductType string
-
-const (
-	OneTimeProduct      ProductType = "one-time"
-	SubscriptionProduct ProductType = "subscription"
-)
 
 type ProductsList struct {
 	ID          uint32          `json:"id"`
@@ -59,27 +57,22 @@ type ProductsList struct {
 	} `json:"category"`
 }
 
-type ProductPrice struct {
-	ID      uint   `json:"id"`
-	Price   uint   `json:"price"`
-	Label   string `json:"label"`
-	PriceID string `json:"price_id"`
-}
-
 type OneProduct struct {
-	ID          uint            `json:"id"`
-	CategoryID  uint            `json:"category_id"`
-	ProductID   string          `json:"product_id"`
-	Status      string          `json:"status"`
-	Type        ProductType     `json:"type"`
-	Name        string          `json:"name"`
-	Slug        string          `json:"slug"`
-	Prices      []*ProductPrice `json:"prices"`
-	Image       []string        `json:"image"`
-	Description string          `json:"description"`
-	CreatedAt   time.Time       `json:"created_at"`
-	UpdatedAt   time.Time       `json:"updated_at"`
-	DeletedAt   *time.Time      `json:"deleted_at"`
+	ID                uint              `json:"id"`
+	CategoryID        uint              `json:"category_id"`
+	ProductID         string            `json:"product_id"`
+	Status            string            `json:"status"`
+	Type              ProductType       `json:"type"`
+	Name              string            `json:"name"`
+	Slug              string            `json:"slug"`
+	Price             uint              `json:"price"`
+	SubscriptionPrice SubscriptionPrice `json:"subscription_price"`
+	Prices            []*ProductPrice   `json:"-"`
+	Image             []string          `json:"image"`
+	Description       string            `json:"description"`
+	CreatedAt         time.Time         `json:"created_at"`
+	UpdatedAt         time.Time         `json:"updated_at"`
+	DeletedAt         *time.Time        `json:"deleted_at"`
 }
 
 type ProductRepository interface {

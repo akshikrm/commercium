@@ -100,13 +100,6 @@ type ShippingInformation struct {
 	CreatedAt time.Time `json:"created_at"`
 }
 
-type NewPrice struct {
-	ID        string
-	ProductID uint
-	Amount    uint
-	Label     string
-}
-
 type OrdersRepository interface {
 	GetOrdersByUserID(uint32) ([]*OrderList, bool)
 	GetPurchaseByOrderID(uint) ([]*PurchaseList, bool)
@@ -127,6 +120,13 @@ type PurchaseHandler interface {
 }
 
 type Transaction = *paddle.Transaction
+
+type NewPrice struct {
+	ID        string
+	ProductID uint
+	Amount    uint
+	Label     string
+}
 
 type PaymentProvider interface {
 	CreateCustomer(*CreateUserRequest) error

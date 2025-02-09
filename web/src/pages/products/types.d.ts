@@ -3,10 +3,13 @@ type ProductType = "one-time" | "subscription"
 
 type SubscriptionPrice = {
     [key: string]: {
+        id: number
+        price: number
         label: string
-        value: string
+        price_id: string
     }
 }
+type Price = { id: string; price: number; label: string; label: string }
 
 type NewProduct = {
     name: string
@@ -18,6 +21,7 @@ type NewProduct = {
     description: string
     category_id: string
     price?: string | null
+    prices: Price[]
     subscription_price?: SubscriptionPrice | null
 }
 

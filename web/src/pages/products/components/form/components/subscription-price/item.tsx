@@ -18,7 +18,7 @@ const SubscriptionPriceItem = ({ month }: { month: string }) => {
     return (
         <Stack direction='row' alignItems='center'>
             <RHFTextField
-                name={`subscription_price.${month}.value`}
+                name={`subscription_price.${month}.price`}
                 label={`Price ${monthNumber} month`}
             />
             <RHFTextField
