@@ -79,7 +79,7 @@ type ProductRepository interface {
 	GetAll(url.Values) ([]*ProductsList, bool)
 	GetOne(int) (*OneProduct, bool)
 	InsertOne(*NewProductRequest) (*OneProduct, bool)
-	InsertPrice(*NewPrice) bool
+	InsertPrice(*string, *NewPrice) bool
 	InsertImages(uint32, []string) bool
 	Update(int, *NewProductRequest) (*OneProduct, bool)
 	Delete(int) bool

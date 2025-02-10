@@ -126,7 +126,7 @@ func (m *product) GetOne(id int) (*types.OneProduct, bool) {
 		WHERE
 			p.id=$1
 		AND
-			deleted_at IS NULL 
+			p.deleted_at IS NULL 
 		GROUP BY 
 			p.id;
 	`
@@ -164,17 +164,18 @@ func (m *product) GetOne(id int) (*types.OneProduct, bool) {
 	return &product, true
 }
 
-func (p *product) InsertPrice(createPrice *types.NewPrice) bool {
+func (p *product) InsertPrice(interval *string, createPrice *types.NewPrice) bool {
 	query := `
 	INSERT INTO 
-		prices (price, label, price_id, product_id)
+		prices (price, label, price_id, product_id, interval)
 	VALUES
-		($1, $2, $3, $4)`
+		($1, $2, $3, $4, $5)`
 	_, err := p.store.Exec(query,
 		createPrice.Amount,
 		createPrice.Label,
 		createPrice.ID,
 		createPrice.ProductID,
+		interval,
 	)
 	if err != nil {
 		log.Printf("failed to add price to database due to %s", err)

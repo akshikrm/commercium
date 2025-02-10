@@ -41,10 +41,15 @@ const productSchema = z
             .any()
             .optional()
             .transform((v: SubscriptionPrice) => {
-                return Object.entries(v).map(([k, v]) => {
-                    const price = v.price ? parseInt(v.price) : 0
-                    return { [k]: { ...v, price } }
+                const payload: SubscriptionPrice = {}
+                Object.entries(v).forEach(([k, v]) => {
+                    const price: number = v.price
+                        ? parseInt(v.price as string)
+                        : 0
+                    payload[k] = { ...v, price: price }
                 })
+
+                return payload
             }),
         status: z
             .string({
@@ -65,7 +70,8 @@ const productSchema = z
                 return data.price || 0 > 0
             }
             if (data.type === "subscription") {
-                return data.subscription_price[0]["1_month"]?.price > 0
+                const price = data.subscription_price["1_month"]?.price
+                return parseInt(price as string) > 0
             }
             return true
         },
@@ -82,7 +88,7 @@ const productSchema = z
 
 const newProductDefaultValues: NewProduct = {
     name: "",
-    image: ["006_dk6ugp"],
+    image: [],
     primary_image: "",
     slug: "",
     status: "enabled",

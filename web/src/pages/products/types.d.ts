@@ -4,7 +4,7 @@ type ProductType = "one-time" | "subscription"
 type SubscriptionPrice = {
     [key: string]: {
         id?: number
-        price: string
+        price: string | number
         label: string
         price_id?: string
     }
