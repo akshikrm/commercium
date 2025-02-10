@@ -5,6 +5,7 @@ var SCHEMA = map[string]string{
 	"users":              "id SERIAL PRIMARY KEY, customer_id VARCHAR(30) NOT NULL, password VARCHAR NOT NULL, role_code VARCHAR(10) DEFAULT user NOT NULL, created_at TIMESTAMP DEFAULT NOW() NOT NULL, updated_at TIMESTAMP DEFAULT NOW() NOT NULL, deleted_at TIMESTAMP DEFAULT NULL, CONSTRAINT fk_role FOREIGN KEY(role_code) REFERENCES roles(code)",
 	"profiles":           "id SERIAL PRIMARY KEY, user_id int UNIQUE, first_name VARCHAR(50) DEFAULT '' NOT NULL, last_name VARCHAR(50) DEFAULT '' NOT NULL, email VARCHAR(50) UNIQUE DEFAULT '' NOT NULL, pincode VARCHAR(10) DEFAULT '' NOT NULL, address_one VARCHAR(100) DEFAULT '' NOT NULL, address_two VARCHAR(100) DEFAULT '' NOT NULL, phone_number VARCHAR(15) DEFAULT '' NOT NULL, created_at TIMESTAMP DEFAULT NOW() NOT NULL, updated_at TIMESTAMP DEFAULT NOW() NOT NULL, deleted_at TIMESTAMP DEFAULT NULL, CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users(id)",
 	"product_categories": "id SERIAL PRIMARY KEY, name VARCHAR(30) NOT NULL, slug VARCHAR(30) NOT NULL,enabled BOOLEAN DEFAULT true, description VARCHAR(120) NOT NULL, created_at TIMESTAMP DEFAULT NOW() NOT NULL, updated_at TIMESTAMP DEFAULT NOW() NOT NULL, deleted_at TIMESTAMP DEFAULT NULL",
+
 	"products": `id SERIAL PRIMARY KEY, product_id VARCHAR(30) NOT NULL,
 	name VARCHAR(50),
 	type product_type NOT NULL DEFAULT 'one-time',
@@ -14,8 +15,21 @@ var SCHEMA = map[string]string{
 	category_id INTEGER NOT NULL, created_at TIMESTAMP DEFAULT NOW() NOT NULL,
 	updated_at TIMESTAMP DEFAULT NOW() NOT NULL, deleted_at TIMESTAMP DEFAULT NULL,
 	CONSTRAINT fk_category FOREIGN KEY (category_id) REFERENCES product_categories(id)`,
+
 	"product_images": "id SERIAL PRIMARY KEY, product_id INTEGER NOT NULL, URI TEXT NOT NULL, created_at TIMESTAMP DEFAULT NOW() NOT NULL, updated_at TIMESTAMP DEFAULT NOW() NOT NULL, deleted_at TIMESTAMP DEFAULT NULL, CONSTRAINT fk_product FOREIGN KEY(product_id) REFERENCES products(id)",
-	"carts":          "id SERIAL PRIMARY KEY, user_id INTEGER NOT NULL, product_id INTEGER NOT NULL, quantity INTEGER DEFAULT 1 NOT NULL, created_at TIMESTAMP DEFAULT NOW() NOT NULL, updated_at TIMESTAMP DEFAULT NOW() NOT NULL, deleted_at TIMESTAMP DEFAULT NULL, CONSTRAINT fk_user FOREIGN KEY(user_id) REFERENCES users(id), CONSTRAINT fk_product FOREIGN KEY(product_id) REFERENCES products(id)",
+	"prices": `
+		id SERIAL PRIMARY KEY,
+		product_id INTEGER NOT NULL,
+		price INTEGER NOT NULL DEFAULT 0,
+		price_id varchar(30),
+		label varchar(30),
+		interval varchar(30),
+		created_at TIMESTAMP DEFAULT NOW() NOT NULL,
+		updated_at TIMESTAMP DEFAULT NOW() NOT NULL,
+		deleted_at TIMESTAMP DEFAULT NULL
+	`,
+
+	"carts": "id SERIAL PRIMARY KEY, user_id INTEGER NOT NULL, product_id INTEGER NOT NULL, quantity INTEGER DEFAULT 1 NOT NULL, created_at TIMESTAMP DEFAULT NOW() NOT NULL, updated_at TIMESTAMP DEFAULT NOW() NOT NULL, deleted_at TIMESTAMP DEFAULT NULL, CONSTRAINT fk_user FOREIGN KEY(user_id) REFERENCES users(id), CONSTRAINT fk_product FOREIGN KEY(product_id) REFERENCES products(id)",
 
 	"orders": `id SERIAL PRIMARY KEY, 
 	user_id INTEGER,
@@ -56,6 +70,7 @@ var KEYS = []string{
 	"profiles",
 	"product_categories",
 	"products",
+	"prices",
 	"product_images",
 	"carts",
 	"orders",

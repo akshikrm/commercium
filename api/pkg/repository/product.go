@@ -107,9 +107,9 @@ func (m *product) GetOne(id int) (*types.OneProduct, bool) {
 			description,
 			p.type,
 			p.status,
-			created_at,
-			updated_at,
-			deleted_at,
+			p.created_at,
+			p.updated_at,
+			p.deleted_at,
 			JSON_AGG(
 				JSON_BUILD_OBJECT(
 					'id', pr.id,
@@ -164,7 +164,7 @@ func (m *product) GetOne(id int) (*types.OneProduct, bool) {
 	return &product, true
 }
 
-func (p *product) CreatePrice(createPrice *types.NewPrice) bool {
+func (p *product) InsertPrice(createPrice *types.NewPrice) bool {
 	query := `
 	INSERT INTO 
 		prices (price, label, price_id, product_id)
@@ -183,7 +183,7 @@ func (p *product) CreatePrice(createPrice *types.NewPrice) bool {
 	return true
 }
 
-func (p *product) Create(product *types.NewProductRequest) (*types.OneProduct, bool) {
+func (p *product) InsertOne(product *types.NewProductRequest) (*types.OneProduct, bool) {
 	query := `INSERT INTO products
 		(name, slug,  image, description, category_id, product_id, status, type) 
 	VALUES 
@@ -213,13 +213,16 @@ func (p *product) Create(product *types.NewProductRequest) (*types.OneProduct, b
 		&savedProduct.Description,
 		&savedProduct.CategoryID,
 	)
+
 	if err == sql.ErrNoRows {
 		return nil, true
 	}
+
 	if err != nil {
 		log.Printf("failed to create new product %s due to %s", product.Name, err)
 		return nil, false
 	}
+
 	return &savedProduct, true
 }
 

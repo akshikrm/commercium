@@ -24,7 +24,7 @@ func (r *product) Create(newProduct *types.NewProductRequest) error {
 		return err
 	}
 
-	savedProduct, ok := r.repository.Create(newProduct)
+	savedProduct, ok := r.repository.InsertOne(newProduct)
 	if !ok {
 		return utils.ServerError
 	}
@@ -36,7 +36,7 @@ func (r *product) Create(newProduct *types.NewProductRequest) error {
 			newProduct.Price,
 		); price != nil {
 			price.ProductID = savedProduct.ID
-			if ok := r.repository.CreatePrice(price); ok {
+			if ok := r.repository.InsertPrice(price); ok {
 				return nil
 			}
 		}
@@ -50,7 +50,7 @@ func (r *product) Create(newProduct *types.NewProductRequest) error {
 			priceItem.Price,
 		); price != nil {
 			price.ProductID = savedProduct.ID
-			if ok := r.repository.CreatePrice(price); !ok {
+			if ok := r.repository.InsertPrice(price); !ok {
 				return utils.ServerError
 			}
 		}

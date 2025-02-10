@@ -78,11 +78,11 @@ type OneProduct struct {
 type ProductRepository interface {
 	GetAll(url.Values) ([]*ProductsList, bool)
 	GetOne(int) (*OneProduct, bool)
-	Create(*NewProductRequest) (*OneProduct, bool)
-	CreatePrice(*NewPrice) bool
+	InsertOne(*NewProductRequest) (*OneProduct, bool)
+	InsertPrice(*NewPrice) bool
+	InsertImages(uint32, []string) bool
 	Update(int, *NewProductRequest) (*OneProduct, bool)
 	Delete(int) bool
-	InsertImages(uint32, []string) bool
 }
 
 type ProductServicer interface {

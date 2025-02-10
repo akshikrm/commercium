@@ -20,10 +20,10 @@ func main() {
 
 	seederConfig := config.New()
 	store := repository.New(seederConfig)
-	service := services.New(store)
+	service := services.New(store, seederConfig)
 
 	database := NewDatabase(store)
-	seeder := NewSeeder(service)
+	seeder := NewSeeder(service, seederConfig)
 
 	initdb := flag.Bool("init-db", false, "initialize db if true")
 	nukedb := flag.Bool("nuke-db", false, "clear everything in the database")
