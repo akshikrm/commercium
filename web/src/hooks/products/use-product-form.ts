@@ -2,6 +2,7 @@ import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useEffect } from "react"
+import { showCommonAmount } from "@components/prefix"
 
 const productSchema = z
     .object({
@@ -36,6 +37,7 @@ const productSchema = z
                 required_error: "price is requred",
                 invalid_type_error: "price should be a number"
             })
+            .transform(v => v * 100)
             .optional(),
         subscription_price: z
             .any()
@@ -46,7 +48,7 @@ const productSchema = z
                     const price: number = v.price
                         ? parseInt(v.price as string)
                         : 0
-                    payload[k] = { ...v, price: price }
+                    payload[k] = { ...v, price: price * 100 }
                 })
 
                 return payload
@@ -115,10 +117,19 @@ const useProductForm = (defaultValues?: EditProduct) => {
     useEffect(() => {
         if (defaultValues) {
             const { price, subscription_price, ...rest } = defaultValues
+            const temp: SubscriptionPrice = {}
+            if (subscription_price) {
+                Object.entries(subscription_price).forEach(([k, v]) => {
+                    temp[k] = {
+                        ...v,
+                        price: showCommonAmount(v.price as number)
+                    }
+                })
+            }
             reset({
                 ...rest,
-                subscription_price: subscription_price,
-                price: price ? price : ""
+                subscription_price: temp,
+                price: price ? showCommonAmount(parseInt(price as string)) : ""
             })
         }
     }, [defaultValues, setValue, reset])

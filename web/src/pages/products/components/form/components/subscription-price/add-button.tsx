@@ -5,21 +5,19 @@ const useAddSubscriptionPrice = () => {
     const { getValues, setValue } = useFormContext()
 
     const addPrice = () => {
-        const price = getValues("price")
+        const price = getValues("subscription_price")
         const power = Object.keys(price).length - 1
         const nextMonth = 2 ** power * 3
-        if (typeof price != "string") {
-            const temp: SubscriptionPrice = {
-                [`${nextMonth}_month`]: {
-                    label: "",
-                    value: ""
-                }
+        const temp: SubscriptionPrice = {
+            [`${nextMonth}_month`]: {
+                label: "",
+                price: ""
             }
-            setValue("price", {
-                ...price,
-                ...temp
-            })
         }
+        setValue("subscription_price", {
+            ...price,
+            ...temp
+        })
     }
     return { addPrice }
 }
