@@ -15,6 +15,7 @@ import icons from "@/icons"
 import RenderIcon from "@components/render-icon"
 import { Cloudinary } from "@cloudinary/url-gen"
 import { scale } from "@cloudinary/url-gen/actions/resize"
+import Render from "@components/render"
 
 type Props = {
     product: Product
@@ -23,7 +24,7 @@ type Props = {
 }
 
 const ProductItem = ({ product, addToCart, buyNow }: Props) => {
-    const { id, name, description, image, price } = product
+    const { id, name, description, image, prices, type } = product
     const cld = new Cloudinary({
         cloud: { cloudName: "commercium" }
     })
@@ -62,19 +63,24 @@ const ProductItem = ({ product, addToCart, buyNow }: Props) => {
                     {name}
                 </Typography>
                 <Typography>{description}</Typography>
-                <Stack
-                    direction='row'
-                    alignItems='center'
-                    justifyContent='space-between'
-                >
-                    <QuantityField
-                        value={quantity}
-                        onChange={v => setQuanitity(v)}
-                    />
-                    <Typography variant='body1'>
-                        <Currency amount={quantity * price} />
-                    </Typography>
-                </Stack>
+                <Render
+                    when={type === "one-time"}
+                    show={
+                        <Stack
+                            direction='row'
+                            alignItems='center'
+                            justifyContent='space-between'
+                        >
+                            <QuantityField
+                                value={quantity}
+                                onChange={v => setQuanitity(v)}
+                            />
+                            <Typography variant='body1'>
+                                <Currency amount={quantity * prices[0].price} />
+                            </Typography>
+                        </Stack>
+                    }
+                />
             </CardContent>
             <CardActions>
                 <Button

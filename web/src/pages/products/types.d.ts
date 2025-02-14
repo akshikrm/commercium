@@ -43,11 +43,19 @@ type Filter = {
     category_id?: string | null
 }
 
+type Prices = {
+    id: number
+    price: number
+    label: string
+    price_id: string
+}
+
 type Product = {
     id: number
     name: string
     image: string
     slug: string
+    type: ProductType
     description: string
-    price: number
+    prices: Prices[]
 }
