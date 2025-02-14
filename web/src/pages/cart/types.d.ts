@@ -14,11 +14,11 @@ type Cart = {
     quantity: number
     created_at: string
     price_id: string
+    price: number
     product: {
         id: number
         name: string
         slug: string
-        price: string
         description: string
         image: string
     }

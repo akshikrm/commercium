@@ -29,8 +29,7 @@ const CartItemList = ({ data }: { data: Cart[] }) => {
             <RenderList
                 list={data}
                 render={cart => {
-                    const { id, product, quantity } = cart
-                    const totalAmount = parseFloat(product.price) * quantity
+                    const { id, product, quantity, price } = cart
                     const img = cld
                         .image(product.image)
                         .resize(scale().width(100).height(100))
@@ -67,7 +66,7 @@ const CartItemList = ({ data }: { data: Cart[] }) => {
                                     />
                                 </Typography>
                                 <Typography variant='body2'>
-                                    <Currency amount={totalAmount} />
+                                    <Currency amount={quantity * price} />
                                 </Typography>
                                 <IconButton
                                     size='small'

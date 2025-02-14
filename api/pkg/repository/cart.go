@@ -15,7 +15,27 @@ type cart struct {
 }
 
 func (c *cart) GetAll(userID uint32) ([]*types.CartList, bool) {
-	query := "SELECT c.id, c.quantity, p.price_id, p.id, p.name, p.slug, p.price, p.description, p.image, c.created_at FROM carts c INNER JOIN products p ON c.product_id=p.id WHERE c.user_id=$1 AND c.deleted_at IS NULL"
+	query := `
+		SELECT 
+			c.id,
+			c.quantity,
+			pr.price_id,
+			pr.price,
+			p.id,
+			p.name,
+			p.slug,
+			p.description, 
+			p.image, 
+			c.created_at 
+		FROM 
+			carts c 
+		INNER JOIN
+			prices pr ON pr.id=c.price_id
+		INNER JOIN 
+			products p ON pr.product_id=p.id 
+		WHERE 
+			c.user_id=$1 AND c.deleted_at IS NULL
+	`
 	rows, err := c.store.Query(query, userID)
 	if err == sql.ErrNoRows {
 		return nil, true
@@ -31,10 +51,10 @@ func (c *cart) GetAll(userID uint32) ([]*types.CartList, bool) {
 			&cart.ID,
 			&cart.Quantity,
 			&cart.PriceID,
+			&cart.Price,
 			&cart.Product.ID,
 			&cart.Product.Name,
 			&cart.Product.Slug,
-			&cart.Product.Price,
 			&cart.Product.Description,
 			pq.Array(&cart.Product.Image),
 			&cart.CreatedAt,
@@ -72,7 +92,7 @@ func (c *cart) GetAllProductIDByUserID(userID uint32) ([]*uint32, bool) {
 }
 
 func (c *cart) GetOne(cid uint32) (*types.CartList, bool) {
-	query := "SELECT c.id, c.quantity, p.price_id, p.id, p.name, p.slug, p.price, p.description, p.image, c.created_at FROM carts c INNER JOIN products p ON c.product_id=p.id WHERE c.id=$1 AND c.deleted_at IS NULL"
+	query := "SELECT c.id, c.quantity, p.price_id, p.id, p.name, p.slug, p.description, p.image, c.created_at FROM carts c INNER JOIN products p ON c.product_id=p.id WHERE c.id=$1 AND c.deleted_at IS NULL"
 	row := c.store.QueryRow(query, cid)
 	cart := types.CartList{}
 	err := row.Scan(
@@ -82,7 +102,6 @@ func (c *cart) GetOne(cid uint32) (*types.CartList, bool) {
 		&cart.Product.ID,
 		&cart.Product.Name,
 		&cart.Product.Slug,
-		&cart.Product.Price,
 		&cart.Product.Description,
 		pq.Array(&cart.Product.Image),
 		&cart.CreatedAt,
@@ -122,7 +141,17 @@ func (c *cart) UpdateQuantity(updateQuantity *types.CreateCartRequest) bool {
 }
 
 func (c *cart) Create(newCart *types.CreateCartRequest) (*types.Cart, bool) {
-	query := "INSERT INTO carts(user_id, price_id, quantity) VALUES($1, $2, $3) RETURNING *"
+	query := `
+		INSERT INTO 
+			carts(
+				user_id,
+				price_id,
+				quantity
+			)
+		VALUES
+			($1, $2, $3) 
+		RETURNING *
+	`
 	row := c.store.QueryRow(query, newCart.UserID, newCart.PriceID, newCart.Quantity)
 	cart, err := scanNewCartRow(row)
 	if err != nil {
@@ -174,7 +203,7 @@ func scanNewCartRow(row *sql.Row) (*types.Cart, error) {
 	err := row.Scan(
 		&cart.ID,
 		&cart.UserID,
-		&cart.ProductID,
+		&cart.PriceID,
 		&cart.Quantity,
 		&cart.CreatedAt,
 		&cart.UpdatedAt,
@@ -193,7 +222,7 @@ func scanCartRows(rows *sql.Rows) ([]*types.Cart, error) {
 		err := rows.Scan(
 			&cart.ID,
 			&cart.UserID,
-			&cart.ProductID,
+			&cart.PriceID,
 			&cart.Quantity,
 			&cart.CreatedAt,
 			&cart.UpdatedAt,
