@@ -7,12 +7,11 @@ import (
 	"akshidas/e-com/pkg/utils"
 	"context"
 	"fmt"
+	"github.com/PaddleHQ/paddle-go-sdk"
 	"log"
 	"os"
 	"strconv"
 	"strings"
-
-	"github.com/PaddleHQ/paddle-go-sdk"
 )
 
 type PaddlePayment struct {
@@ -81,7 +80,6 @@ func (p *PaddlePayment) GetInvoice(txnId string) *string {
 
 func (p *PaddlePayment) CreatePrice(productID, name string, price uint) *types.NewPrice {
 	ctx := context.Background()
-
 	priceRequest := new(paddle.CreatePriceRequest)
 	priceRequest.ProductID = productID
 	priceRequest.Description = "Price"
@@ -111,6 +109,39 @@ func (p *PaddlePayment) CreatePrice(productID, name string, price uint) *types.N
 		Label:  *paddlePrice.Name,
 		Amount: uint(convertedAmount),
 	}
+}
+
+func (p *PaddlePayment) UpdatePrice(priceID string, updatePrice *types.UpdatePriceRequest) *types.UpdatedPrice {
+	ctx := context.Background()
+	payload := new(paddle.UpdatePriceRequest)
+	payload.PriceID = priceID
+	if updatePrice.Label != "" {
+		payload.Name = paddle.NewPatchField(&updatePrice.Label)
+	}
+	if updatePrice.Amount != 0 {
+		payload.UnitPrice = paddle.NewPatchField(paddle.Money{
+			Amount:       strconv.Itoa(int(updatePrice.Amount)),
+			CurrencyCode: paddle.CurrencyCodeINR,
+		})
+	}
+
+	updatedPrice, err := p.Client.UpdatePrice(ctx, payload)
+	if err != nil {
+		log.Printf("paddle: failed to update price due to %s", err)
+		return nil
+	}
+
+	convertedAmount, err := strconv.Atoi(updatedPrice.UnitPrice.Amount)
+	if err != nil {
+		return nil
+	}
+
+	return &types.UpdatedPrice{
+		ID:     updatedPrice.ID,
+		Amount: uint(convertedAmount),
+		Label:  *updatedPrice.Name,
+	}
+
 }
 
 func (p *PaddlePayment) CreateProduct(newProductRequest *types.NewProductRequest) error {

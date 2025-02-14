@@ -15,6 +15,11 @@ type PurchaseRequest struct {
 	Price     uint   `json:"price"`
 }
 
+type UpdatePriceRequest struct {
+	Amount uint   `json:"amount"`
+	Label  string `json:"label"`
+}
+
 type NewOrder struct {
 	TransactionID uint32 `json:"transaction_id"`
 	PriceID       string `json:"price_id"`
@@ -128,6 +133,12 @@ type NewPrice struct {
 	Label     string
 }
 
+type UpdatedPrice struct {
+	ID     string
+	Amount uint
+	Label  string
+}
+
 type PaymentProvider interface {
 	CreateCustomer(*CreateUserRequest) error
 	GetCustomerByEmail(string) (string, error)
@@ -135,4 +146,5 @@ type PaymentProvider interface {
 	CreateProduct(*NewProductRequest) error
 	CreateTransaction(string, []*CartList) (Transaction, error)
 	CreatePrice(string, string, uint) *NewPrice
+	UpdatePrice(string, *UpdatePriceRequest) *UpdatedPrice
 }

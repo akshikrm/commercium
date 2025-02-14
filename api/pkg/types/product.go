@@ -81,6 +81,7 @@ type ProductRepository interface {
 	InsertOne(*NewProductRequest) (*OneProduct, bool)
 	InsertPrice(*string, *NewPrice) bool
 	InsertImages(uint32, []string) bool
+	UpdatePrice(*UpdatedPrice) bool
 	Update(int, *NewProductRequest) (*OneProduct, bool)
 	Delete(int) bool
 }
@@ -90,6 +91,7 @@ type ProductServicer interface {
 	GetOne(int) (*OneProduct, error)
 	Create(*NewProductRequest) error
 	Update(int, *NewProductRequest) (*OneProduct, error)
+	UpdatePrice(string, *UpdatePriceRequest) error
 	Delete(int) error
 }
 
@@ -99,4 +101,5 @@ type ProductHandler interface {
 	Delete(context.Context, http.ResponseWriter, *http.Request) error
 	Create(context.Context, http.ResponseWriter, *http.Request) error
 	Update(context.Context, http.ResponseWriter, *http.Request) error
+	UpdatePrice(context.Context, http.ResponseWriter, *http.Request) error
 }

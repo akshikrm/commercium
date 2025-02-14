@@ -184,6 +184,20 @@ func (p *product) InsertPrice(interval *string, createPrice *types.NewPrice) boo
 	return true
 }
 
+func (p *product) UpdatePrice(updatePrice *types.UpdatedPrice) bool {
+	query := `UPDATE prices SET price = $1, label = $2 where price_id=$3`
+	_, err := p.store.Exec(query,
+		updatePrice.Amount,
+		updatePrice.Label,
+		updatePrice.ID,
+	)
+	if err != nil {
+		log.Printf("failed to add price to database due to %s", err)
+		return false
+	}
+	return true
+}
+
 func (p *product) InsertOne(product *types.NewProductRequest) (*types.OneProduct, bool) {
 	query := `INSERT INTO products
 		(name, slug,  image, description, category_id, product_id, status, type) 

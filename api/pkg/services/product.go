@@ -66,6 +66,17 @@ func (r *product) Update(id int, newProduct *types.NewProductRequest) (*types.On
 	return updatedProduct, nil
 }
 
+func (r *product) UpdatePrice(priceID string, updatePrice *types.UpdatePriceRequest) error {
+	updatedPrice := r.paymentProvider.UpdatePrice(priceID, updatePrice)
+	if updatePrice == nil {
+		return utils.PaddleError
+	}
+	if ok := r.repository.UpdatePrice(updatedPrice); !ok {
+		return utils.ServerError
+	}
+	return nil
+}
+
 func (r *product) GetOne(id int) (*types.OneProduct, error) {
 	product, ok := r.repository.GetOne(id)
 	if !ok {

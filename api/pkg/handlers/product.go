@@ -58,6 +58,19 @@ func (u *product) Update(ctx context.Context, w http.ResponseWriter, r *http.Req
 	return writeJson(w, http.StatusCreated, product)
 }
 
+func (u *product) UpdatePrice(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
+	a := types.UpdatePriceRequest{}
+	if err := DecodeBody(r.Body, &a); err != nil {
+		return invalidRequest(w)
+	}
+
+	id := r.PathValue("id")
+	if err := u.service.UpdatePrice(id, &a); err != nil {
+		return serverError(w)
+	}
+
+	return writeJson(w, http.StatusOK, "price updated")
+}
 func (u *product) Delete(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
 	id, err := parseId(r.PathValue("id"))
 	if err != nil {

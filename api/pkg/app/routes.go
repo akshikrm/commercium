@@ -29,11 +29,12 @@ func ProductRoute(s *Server) routes {
 	handler := s.handlers.Product
 	middleware := s.handlers.Middleware
 	return routes{
-		"GET /products":         middleware.IsAuthenticated(ctx, handler.GetAll),
-		"POST /products":        middleware.IsAdmin(ctx, handler.Create),
-		"GET /products/{id}":    middleware.IsAdmin(ctx, handler.GetOne),
-		"PUT /products/{id}":    middleware.IsAdmin(ctx, handler.Update),
-		"DELETE /products/{id}": middleware.IsAdmin(ctx, handler.Delete),
+		"GET /products":             middleware.IsAuthenticated(ctx, handler.GetAll),
+		"POST /products":            middleware.IsAdmin(ctx, handler.Create),
+		"GET /products/{id}":        middleware.IsAdmin(ctx, handler.GetOne),
+		"PUT /products/{id}":        middleware.IsAdmin(ctx, handler.Update),
+		"PUT /products/prices/{id}": middleware.IsAdmin(ctx, handler.UpdatePrice),
+		"DELETE /products/{id}":     middleware.IsAdmin(ctx, handler.Delete),
 	}
 }
 
