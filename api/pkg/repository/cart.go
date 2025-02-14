@@ -4,9 +4,10 @@ import (
 	"akshidas/e-com/pkg/types"
 	"akshidas/e-com/pkg/utils"
 	"database/sql"
-	"github.com/lib/pq"
 	"log"
 	"time"
+
+	"github.com/lib/pq"
 )
 
 type cart struct {
@@ -148,13 +149,25 @@ func (c *cart) CheckIfEntryExist(userID, priceID uint32) bool {
 	return exists
 }
 
-func (c *cart) UpdateQuantity(updateQuantity *types.CreateCartRequest) bool {
-	query := "UPDATE carts SET quantity=quantity+$1 WHERE user_id=$2 and price_id=$3"
-	if _, err := c.store.Exec(query, updateQuantity.Quantity, updateQuantity.UserID, updateQuantity.PriceID); err != nil {
+func (c *cart) UpdateQuantity(payload *types.CreateCartRequest) bool {
+	query := `
+		UPDATE
+			carts
+		SET
+			quantity=quantity+$1
+		WHERE
+			user_id=$2 AND price_id=$3
+	`
+	if _, err := c.store.Exec(
+		query,
+		payload.Quantity,
+		payload.UserID,
+		payload.PriceID,
+	); err != nil {
 		if err == sql.ErrNoRows {
 			return false
 		}
-		log.Printf("Failed to update cart %d due to %s", updateQuantity.UserID, err)
+		log.Printf("Failed to update cart %d due to %s", payload.UserID, err)
 		return false
 	}
 	return true

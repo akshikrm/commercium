@@ -30,14 +30,15 @@ func (c *cart) GetOne(cid uint32) (*types.CartList, error) {
 	return cart, nil
 }
 
-func (c *cart) Create(newCart *types.CreateCartRequest) error {
-	exists := c.repository.CheckIfEntryExist(newCart.UserID, newCart.PriceID)
+func (c *cart) Create(payload *types.CreateCartRequest) error {
+	exists := c.repository.CheckIfEntryExist(payload.UserID, payload.PriceID)
 	if exists {
-		if ok := c.repository.UpdateQuantity(newCart); !ok {
+		if ok := c.repository.UpdateQuantity(payload); !ok {
 			return utils.ServerError
 		}
+		return nil
 	}
-	if _, ok := c.repository.Create(newCart); !ok {
+	if _, ok := c.repository.Create(payload); !ok {
 		return utils.ServerError
 	}
 	return nil

@@ -7,6 +7,7 @@ import {
     CardMedia,
     Grid2 as Grid,
     Stack,
+    TextField,
     Typography
 } from "@mui/material"
 import { useState } from "react"
@@ -16,6 +17,7 @@ import RenderIcon from "@components/render-icon"
 import { Cloudinary } from "@cloudinary/url-gen"
 import { scale } from "@cloudinary/url-gen/actions/resize"
 import Render from "@components/render"
+import RenderList from "@components/render-list"
 
 type Props = {
     product: Product
@@ -66,21 +68,14 @@ const ProductItem = ({ product, addToCart, buyNow }: Props) => {
                 </Typography>
                 <Typography>{description}</Typography>
                 <Render
-                    when={!isSubscriptionType}
-                    show={
-                        <Stack
-                            direction='row'
-                            alignItems='center'
-                            justifyContent='space-between'
-                        >
-                            <QuantityField
-                                value={quantity}
-                                onChange={v => setQuanitity(v)}
-                            />
-                            <Typography variant='body1'>
-                                <Currency amount={quantity * prices[0].price} />
-                            </Typography>
-                        </Stack>
+                    when={isSubscriptionType}
+                    show={<SubscriptionTypePrice data={prices} />}
+                    otherwise={
+                        <NormalPrice
+                            quantity={quantity}
+                            price={prices[0].price}
+                            onChange={v => setQuanitity(v)}
+                        />
                     }
                 />
             </CardContent>
@@ -110,6 +105,50 @@ const ProductItem = ({ product, addToCart, buyNow }: Props) => {
                 </Button>
             </CardActions>
         </Grid>
+    )
+}
+
+const SubscriptionTypePrice = ({ data }: { data: Prices[] }) => {
+    return (
+        <TextField
+            select
+            fullWidth
+            slotProps={{
+                select: {
+                    native: true
+                }
+            }}
+        >
+            <RenderList
+                list={data}
+                render={(price: Prices) => {
+                    return <option value={price.price}>{price.label}</option>
+                }}
+            />
+        </TextField>
+    )
+}
+
+const NormalPrice = ({
+    quantity,
+    price,
+    onChange
+}: {
+    quantity: number
+    price: number
+    onChange: (v: number) => void
+}) => {
+    return (
+        <Stack
+            direction='row'
+            alignItems='center'
+            justifyContent='space-between'
+        >
+            <QuantityField value={quantity} onChange={onChange} />
+            <Typography variant='body1'>
+                <Currency amount={quantity * price} />
+            </Typography>
+        </Stack>
     )
 }
 
