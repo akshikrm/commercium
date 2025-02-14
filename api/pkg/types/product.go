@@ -87,7 +87,7 @@ type ProductRepository interface {
 }
 
 type ProductServicer interface {
-	Get(url.Values) ([]*ProductsList, error)
+	GetAll(url.Values) ([]*ProductsList, error)
 	GetOne(int) (*OneProduct, error)
 	Create(*NewProductRequest) error
 	Update(int, *NewProductRequest) (*OneProduct, error)

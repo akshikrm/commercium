@@ -12,11 +12,11 @@ type product struct {
 
 func (u *product) GetAll(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
 	filter := r.URL.Query()
-	users, err := u.service.Get(filter)
+	products, err := u.service.GetAll(filter)
 	if err != nil {
 		return serverError(w)
 	}
-	return writeJson(w, http.StatusOK, users)
+	return writeJson(w, http.StatusOK, products)
 }
 
 func (u *product) GetOne(ctx context.Context, w http.ResponseWriter, r *http.Request) error {

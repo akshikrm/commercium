@@ -11,7 +11,7 @@ type product struct {
 	paymentProvider types.PaymentProvider
 }
 
-func (r *product) Get(filter url.Values) ([]*types.ProductsList, error) {
+func (r *product) GetAll(filter url.Values) ([]*types.ProductsList, error) {
 	products, ok := r.repository.GetAll(filter)
 	if !ok {
 		return nil, utils.ServerError
