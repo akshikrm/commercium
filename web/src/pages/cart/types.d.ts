@@ -1,5 +1,5 @@
-type NewCart = {
-    product_id: number
+type NewCartEntry = {
+    price_id: number
     quantity: number
 }
 

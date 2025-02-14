@@ -19,8 +19,8 @@ import Render from "@components/render"
 
 type Props = {
     product: Product
-    addToCart: (payload: NewCart) => void
-    buyNow: (payload: NewCart) => void
+    addToCart: (payload: NewCartEntry) => void
+    buyNow: (payload: NewCartEntry) => void
 }
 
 const ProductItem = ({ product, addToCart, buyNow }: Props) => {
@@ -31,6 +31,8 @@ const ProductItem = ({ product, addToCart, buyNow }: Props) => {
 
     const img = cld.image(image).resize(scale().width(100).height(100))
     const [quantity, setQuanitity] = useState<number>(1)
+
+    const isSubscriptionType = type === "subscription"
 
     return (
         <Grid
@@ -64,7 +66,7 @@ const ProductItem = ({ product, addToCart, buyNow }: Props) => {
                 </Typography>
                 <Typography>{description}</Typography>
                 <Render
-                    when={type === "one-time"}
+                    when={!isSubscriptionType}
                     show={
                         <Stack
                             direction='row'
@@ -86,7 +88,10 @@ const ProductItem = ({ product, addToCart, buyNow }: Props) => {
                 <Button
                     startIcon={<RenderIcon icon={icons.addToCart} />}
                     onClick={() => {
-                        addToCart({ product_id: id, quantity })
+                        if (isSubscriptionType) {
+                            return
+                        }
+                        addToCart({ price_id: prices[0].id, quantity })
                     }}
                 >
                     add to cart
@@ -94,7 +99,10 @@ const ProductItem = ({ product, addToCart, buyNow }: Props) => {
                 <Button
                     color='success'
                     onClick={() => {
-                        buyNow({ product_id: id, quantity })
+                        if (isSubscriptionType) {
+                            return
+                        }
+                        buyNow({ price_id: prices[0].id, quantity })
                     }}
                     startIcon={<RenderIcon icon={icons.buyNow} />}
                 >
