@@ -91,13 +91,34 @@ func (c *cart) GetAllProductIDByUserID(userID uint32) ([]*uint32, bool) {
 }
 
 func (c *cart) GetOne(cid uint32) (*types.CartList, bool) {
-	query := "SELECT c.id, c.quantity, p.price_id, p.id, p.name, p.slug, p.description, p.image, c.created_at FROM carts c INNER JOIN products p ON c.product_id=p.id WHERE c.id=$1 AND c.deleted_at IS NULL"
+	query := `
+		SELECT 
+			c.id, 
+			c.quantity, 
+			p.price_id, 
+			pr.price,
+			p.id, 
+			p.name, 
+			p.slug, 
+			p.description, 
+			p.image, 
+			c.created_at 
+		FROM 
+			carts c 
+		INNER JOIN 
+			prices pr ON c.price_id=pr.id
+		INNER JOIN 
+			products p ON pr.product_id=p.id 
+		WHERE 
+			c.id=$1 AND c.deleted_at IS NULL
+		`
 	row := c.store.QueryRow(query, cid)
 	cart := types.CartList{}
 	err := row.Scan(
 		&cart.ID,
 		&cart.Quantity,
 		&cart.PriceID,
+		&cart.Price,
 		&cart.Product.ID,
 		&cart.Product.Name,
 		&cart.Product.Slug,
@@ -116,9 +137,9 @@ func (c *cart) GetOne(cid uint32) (*types.CartList, bool) {
 	return &cart, true
 }
 
-func (c *cart) CheckIfEntryExist(userID, productID uint32) bool {
-	query := "select exists(select 1 from carts where user_id=$1 and product_id=$2 and deleted_at IS NULL)"
-	row := c.store.QueryRow(query, userID, productID)
+func (c *cart) CheckIfEntryExist(userID, priceID uint32) bool {
+	query := "select exists(select 1 from carts where user_id=$1 and price_id=$2 and deleted_at IS NULL)"
+	row := c.store.QueryRow(query, userID, priceID)
 	var exists bool
 	if err := row.Scan(&exists); err != nil {
 		log.Printf("failed to scan due to %s", err)
@@ -128,7 +149,7 @@ func (c *cart) CheckIfEntryExist(userID, productID uint32) bool {
 }
 
 func (c *cart) UpdateQuantity(updateQuantity *types.CreateCartRequest) bool {
-	query := "UPDATE carts SET quantity=quantity+$1 WHERE user_id=$2 and product_id=$3"
+	query := "UPDATE carts SET quantity=quantity+$1 WHERE user_id=$2 and price_id=$3"
 	if _, err := c.store.Exec(query, updateQuantity.Quantity, updateQuantity.UserID, updateQuantity.PriceID); err != nil {
 		if err == sql.ErrNoRows {
 			return false
