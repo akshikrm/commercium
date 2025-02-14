@@ -11,9 +11,9 @@ func TestCreateCart(t *testing.T) {
 	testConfig := config.NewTestConfig()
 	store := repository.New(testConfig)
 	cart := types.CreateCartRequest{
-		UserID:    2,
-		ProductID: 1,
-		Quantity:  2,
+		UserID:   2,
+		PriceID:  1,
+		Quantity: 2,
 	}
 	_, ok := store.Cart.Create(&cart)
 	if !ok {

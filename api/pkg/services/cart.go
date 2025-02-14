@@ -12,6 +12,7 @@ type cart struct {
 
 func (c *cart) GetAll(userID uint32) ([]*types.CartList, error) {
 	carts, ok := c.repository.GetAll(userID)
+
 	if !ok {
 		return nil, utils.ServerError
 	}
@@ -30,7 +31,7 @@ func (c *cart) GetOne(cid uint32) (*types.CartList, error) {
 }
 
 func (c *cart) Create(newCart *types.CreateCartRequest) error {
-	exists := c.repository.CheckIfEntryExist(newCart.UserID, newCart.ProductID)
+	exists := c.repository.CheckIfEntryExist(newCart.UserID, newCart.PriceID)
 	if exists {
 		if ok := c.repository.UpdateQuantity(newCart); !ok {
 			return utils.ServerError

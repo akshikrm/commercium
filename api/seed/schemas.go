@@ -28,9 +28,19 @@ var SCHEMA = map[string]string{
 		updated_at TIMESTAMP DEFAULT NOW() NOT NULL,
 		deleted_at TIMESTAMP DEFAULT NULL
 	`,
-
-	"carts": "id SERIAL PRIMARY KEY, user_id INTEGER NOT NULL, product_id INTEGER NOT NULL, quantity INTEGER DEFAULT 1 NOT NULL, created_at TIMESTAMP DEFAULT NOW() NOT NULL, updated_at TIMESTAMP DEFAULT NOW() NOT NULL, deleted_at TIMESTAMP DEFAULT NULL, CONSTRAINT fk_user FOREIGN KEY(user_id) REFERENCES users(id), CONSTRAINT fk_product FOREIGN KEY(product_id) REFERENCES products(id)",
-
+	"carts": `
+		id SERIAL PRIMARY KEY,
+		user_id INTEGER NOT NULL,
+		price_id INTEGER NOT NULL,
+		quantity INTEGER DEFAULT 1 NOT NULL,
+		created_at TIMESTAMP DEFAULT NOW() NOT NULL,
+		updated_at TIMESTAMP DEFAULT NOW() NOT NULL,
+		deleted_at TIMESTAMP DEFAULT NULL,
+		CONSTRAINT 
+			fk_user FOREIGN KEY(user_id) REFERENCES users(id),
+		CONSTRAINT 
+			fk_price FOREIGN KEY(price_id) REFERENCES prices(id)
+	`,
 	"orders": `id SERIAL PRIMARY KEY, 
 	user_id INTEGER,
 	order_id VARCHAR(20),

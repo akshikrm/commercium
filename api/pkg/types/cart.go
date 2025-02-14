@@ -7,9 +7,9 @@ import (
 )
 
 type CreateCartRequest struct {
-	UserID    uint32 `json:"user_id"`
-	ProductID uint32 `json:"product_id"`
-	Quantity  uint   `json:"quantity"`
+	UserID   uint32 `json:"user_id"`
+	PriceID  uint32 `json:"price_id"`
+	Quantity uint   `json:"quantity"`
 }
 
 type UpdateCartQuantityRequest struct {

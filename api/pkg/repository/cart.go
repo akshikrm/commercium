@@ -111,7 +111,7 @@ func (c *cart) CheckIfEntryExist(userID, productID uint32) bool {
 
 func (c *cart) UpdateQuantity(updateQuantity *types.CreateCartRequest) bool {
 	query := "UPDATE carts SET quantity=quantity+$1 WHERE user_id=$2 and product_id=$3"
-	if _, err := c.store.Exec(query, updateQuantity.Quantity, updateQuantity.UserID, updateQuantity.ProductID); err != nil {
+	if _, err := c.store.Exec(query, updateQuantity.Quantity, updateQuantity.UserID, updateQuantity.PriceID); err != nil {
 		if err == sql.ErrNoRows {
 			return false
 		}
@@ -122,8 +122,8 @@ func (c *cart) UpdateQuantity(updateQuantity *types.CreateCartRequest) bool {
 }
 
 func (c *cart) Create(newCart *types.CreateCartRequest) (*types.Cart, bool) {
-	query := "INSERT INTO carts(user_id, product_id, quantity) VALUES($1, $2, $3) RETURNING *"
-	row := c.store.QueryRow(query, newCart.UserID, newCart.ProductID, newCart.Quantity)
+	query := "INSERT INTO carts(user_id, price_id, quantity) VALUES($1, $2, $3) RETURNING *"
+	row := c.store.QueryRow(query, newCart.UserID, newCart.PriceID, newCart.Quantity)
 	cart, err := scanNewCartRow(row)
 	if err != nil {
 		log.Printf("Failed to create new cart due to %s", err)

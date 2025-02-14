@@ -36,8 +36,8 @@ func TestCart(t *testing.T) {
 
 	t.Run("Add new cart entry for user 2", func(t *testing.T) {
 		payload := types.CreateCartRequest{
-			ProductID: 1,
-			Quantity:  2,
+			PriceID:  1,
+			Quantity: 2,
 		}
 		test, err := json.Marshal(payload)
 		if err != nil {
