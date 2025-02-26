@@ -12,7 +12,7 @@ export const getCart = async (): Promise<Cart[]> => {
     }
 }
 
-export const addToCart = async (reqData: NewCartEntry) => {
+export const addToCart = async (reqData: CreateCartPayload) => {
     try {
         const { data } = await server.post("/carts", reqData)
         return data.data

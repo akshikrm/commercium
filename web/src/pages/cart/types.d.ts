@@ -1,6 +1,12 @@
 type NewCartEntry = {
     price_id: number
     quantity: number
+    price: number
+}
+
+type CreateCartPayload = {
+    price_id: number
+    quantity: number
 }
 
 type UpdateCart = {
