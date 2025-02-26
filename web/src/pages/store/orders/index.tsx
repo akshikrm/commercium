@@ -14,15 +14,71 @@ import useGetOrders from "@hooks/orders/use-get-orders"
 import RenderIcon from "@components/render-icon"
 import icons from "@/icons"
 import IconButton from "@mui/material/IconButton"
-import { useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { Box, Button, Chip, Popover, Stack, Typography } from "@mui/material"
 import { order } from "@api"
 import useGetStatusColor from "@hooks/shipping/use-get-status-color"
+import useConnectPaddle from "@hooks/orders/use-connect-paddle"
+import useGetCustomerID from "@hooks/users/use-get-customer-id"
+import Render from "@components/render"
+
+const useCompleteTransaction = (cb: () => void) => {
+    const customerID = useGetCustomerID()
+    const { paddle, event } = useConnectPaddle(customerID)
+
+    const completeOrder = useCallback(
+        async (txnID: string) => {
+            try {
+                if (paddle) {
+                    paddle.Checkout.open({
+                        settings: {
+                            displayMode: "overlay",
+                            variant: "multi-page"
+                        },
+                        transactionId: txnID
+                    })
+                }
+            } catch (error) {
+                const err = error as Error
+                console.log(err)
+            }
+        },
+        [customerID, paddle]
+    )
+
+    const { name, data } = event || {}
+    const { transaction_id } = data || {}
+
+    useEffect(() => {
+        if (name === "checkout.completed") {
+            const checkStatus = async (txnId: string) => {
+                const isComplete = await order.isOrderComplete(txnId)
+                if (isComplete) {
+                    cb()
+                    paddle?.Checkout.close()
+                }
+            }
+
+            if (!transaction_id) return
+
+            const intervalID = setInterval(() => {
+                checkStatus(transaction_id)
+            }, 3000)
+            return () => {
+                clearInterval(intervalID)
+            }
+        }
+    }, [name, transaction_id, paddle])
+    return completeOrder
+}
 
 const Orders = () => {
-    const { data: orders } = useGetOrders()
+    const { data: orders, refetch } = useGetOrders()
     const [orderItems, setOrderItems] = useState<OrderItems[]>([])
     const [menuEl, setMenuEl] = useState<Element | null>(null)
+    const completeOrder = useCompleteTransaction(async () => {
+        await refetch()
+    })
 
     return (
         <>
@@ -42,7 +98,7 @@ const Orders = () => {
                             <TableCell>Items</TableCell>
                             <TableCell>Price</TableCell>
                             <TableCell>Purchased On</TableCell>
-                            <TableCell>Download</TableCell>
+                            <TableCell>Action</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -83,17 +139,38 @@ const Orders = () => {
                                             )}
                                         </TableCell>
                                         <TableCell>
-                                            <IconButton
-                                                onClick={() =>
-                                                    order.gerOrderByID(
-                                                        row.transaction_id
-                                                    )
+                                            <Render
+                                                when={
+                                                    row.payment_status ===
+                                                    "completed"
                                                 }
-                                            >
-                                                <RenderIcon
-                                                    icon={icons.download}
-                                                />
-                                            </IconButton>
+                                                show={
+                                                    <IconButton
+                                                        onClick={() =>
+                                                            order.gerOrderByID(
+                                                                row.transaction_id
+                                                            )
+                                                        }
+                                                    >
+                                                        <RenderIcon
+                                                            icon={
+                                                                icons.download
+                                                            }
+                                                        />
+                                                    </IconButton>
+                                                }
+                                                otherwise={
+                                                    <Button
+                                                        onClick={() => {
+                                                            completeOrder(
+                                                                row.transaction_id
+                                                            )
+                                                        }}
+                                                    >
+                                                        complete
+                                                    </Button>
+                                                }
+                                            />
                                         </TableCell>
                                     </TableRow>
                                 )
