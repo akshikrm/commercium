@@ -7,6 +7,7 @@ import icons from "@/icons"
 import RenderIcon from "@components/render-icon"
 import { Cloudinary } from "@cloudinary/url-gen"
 import { scale } from "@cloudinary/url-gen/actions/resize"
+import Render from "@components/render"
 
 const CartItemList = ({ data }: { data: Cart[] }) => {
     const { mutate: update } = useUpdateCart()
@@ -34,6 +35,8 @@ const CartItemList = ({ data }: { data: Cart[] }) => {
                         .image(product.image)
                         .resize(scale().width(100).height(100))
 
+                    const isNormal = product.type === "one-time"
+
                     return (
                         <Card key={id}>
                             <Stack direction='row' alignItems='center'>
@@ -50,21 +53,26 @@ const CartItemList = ({ data }: { data: Cart[] }) => {
                                         ...
                                     </Typography>
                                 </Stack>
-                                <Typography variant='body2'>
-                                    <TextField
-                                        size='small'
-                                        value={quantity}
-                                        type='number'
-                                        onChange={e => {
-                                            handleUpdate({
-                                                quantity: parseInt(
-                                                    e.target.value
-                                                ),
-                                                cartID: id
-                                            })
-                                        }}
-                                    />
-                                </Typography>
+                                <Render
+                                    when={isNormal}
+                                    show={
+                                        <Typography variant='body2'>
+                                            <TextField
+                                                size='small'
+                                                value={quantity}
+                                                type='number'
+                                                onChange={e => {
+                                                    handleUpdate({
+                                                        quantity: parseInt(
+                                                            e.target.value
+                                                        ),
+                                                        cartID: id
+                                                    })
+                                                }}
+                                            />
+                                        </Typography>
+                                    }
+                                />
                                 <Typography variant='body2'>
                                     <Currency amount={quantity * price} />
                                 </Typography>

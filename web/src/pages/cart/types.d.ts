@@ -25,6 +25,7 @@ type Cart = {
         id: number
         name: string
         slug: string
+        type: ProductType
         description: string
         image: string
     }
