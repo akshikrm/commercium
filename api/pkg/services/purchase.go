@@ -16,6 +16,7 @@ type transaction struct {
 
 func (t *transaction) CreateTransaction(data *types.Data) error {
 	transaction := types.NewTransaction{
+		CustomerID:    data.CustomerID,
 		TransactionID: data.ID,
 		Status:        data.Status,
 		CreatedAt:     data.CreatedAt,

@@ -43,9 +43,9 @@ func (m *transactions) TransactionReady(transaction *types.TransactionReady) boo
 func (m *transactions) NewTransaction(newTransaction *types.NewTransaction) *uint32 {
 	query := `INSERT INTO 
 			transactions
-				(transaction_id, status, created_at, tax, sub_total, grand_total) 
+				(transaction_id, status, created_at, tax, sub_total, grand_total, customer_id) 
 			VALUES
-				($1, $2, $3, $4, $5, $6) 
+				($1, $2, $3, $4, $5, $6, $7) 
 			RETURNING id;
 	`
 	row := m.store.QueryRow(query,
@@ -55,6 +55,7 @@ func (m *transactions) NewTransaction(newTransaction *types.NewTransaction) *uin
 		newTransaction.Tax,
 		newTransaction.SubTotal,
 		newTransaction.GrandTotal,
+		newTransaction.CustomerID,
 	)
 	var id uint32
 	err := row.Scan(&id)

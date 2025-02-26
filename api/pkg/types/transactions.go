@@ -3,6 +3,7 @@ package types
 import "time"
 
 type NewTransaction struct {
+	CustomerID    string    `json:"customer_id"`
 	TransactionID string    `json:"transaction_id"`
 	Status        string    `json:"status"`
 	CreatedAt     time.Time `json:"created_at"`

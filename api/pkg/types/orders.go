@@ -21,6 +21,7 @@ type UpdatePriceRequest struct {
 }
 
 type NewOrder struct {
+	UserID        uint   `json:"user_id"`
 	TransactionID uint32 `json:"transaction_id"`
 	PriceID       string `json:"price_id"`
 	ProductID     string `json:"product_id"`

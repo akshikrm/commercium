@@ -147,7 +147,6 @@ func (m *orders) GetAllOrders() ([]*types.OrderList, bool) {
 	GROUP BY 
 		t.id, t.transaction_id, t.status, t.tax, t.sub_total, t.grand_total, u.id;
 `)
-	fmt.Println(query)
 	return m.getAllOrders(query)
 }
 
@@ -186,18 +185,6 @@ func (m *orders) CreateOrder(orders []*types.NewOrder) bool {
 
 	return true
 
-}
-
-func (m *orders) NewOrder(orderRequest *types.OrderRequest) (uint, bool) {
-	query := "INSERT INTO orders(order_id, user_id, price) VALUES($1, $2, $3) RETURNING(id)"
-
-	row := m.store.QueryRow(query, orderRequest.OrderID, orderRequest.UserID, orderRequest.Price)
-	var orderID uint
-	if err := row.Scan(&orderID); err != nil {
-		log.Printf("failed to place order :%s", err)
-		return 0, false
-	}
-	return orderID, true
 }
 
 func (m *orders) NewPurchase(newPurchases []*types.PurchaseRequest) bool {
