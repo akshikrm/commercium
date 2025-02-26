@@ -80,6 +80,7 @@ const ProductItem = ({ product, addToCart, buyNow }: Props) => {
                     show={
                         <SubscriptionTypePrice
                             data={prices}
+                            value={price}
                             onChange={v => {
                                 setPrice(v)
                             }}
