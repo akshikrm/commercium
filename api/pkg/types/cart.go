@@ -40,6 +40,7 @@ type CartList struct {
 	Product  struct {
 		ID          uint32   `json:"id"`
 		Name        string   `json:"name"`
+		Type        string   `json:"type"`
 		Slug        string   `json:"slug"`
 		Description string   `json:"description"`
 		Image       []string `json:"image"`
