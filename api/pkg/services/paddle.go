@@ -83,6 +83,11 @@ func (p *PaddlePayment) CreatePrice(productID, name string, price uint) *types.N
 	priceRequest := new(paddle.CreatePriceRequest)
 	priceRequest.ProductID = productID
 	priceRequest.Description = "Price"
+	priceRequest.BillingCycle = &paddle.Duration{
+		Interval:  "month",
+		Frequency: 1,
+	}
+
 	priceRequest.UnitPrice = paddle.Money{
 		Amount:       strconv.Itoa(int(price)),
 		CurrencyCode: paddle.CurrencyCodeINR,
