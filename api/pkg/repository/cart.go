@@ -103,6 +103,7 @@ func (c *cart) GetOne(cid uint32) (*types.CartList, bool) {
 			p.id, 
 			p.name, 
 			p.slug, 
+			p.type, 
 			p.description, 
 			p.image, 
 			c.created_at 
@@ -125,6 +126,7 @@ func (c *cart) GetOne(cid uint32) (*types.CartList, bool) {
 		&cart.Product.ID,
 		&cart.Product.Name,
 		&cart.Product.Slug,
+		&cart.Product.Type,
 		&cart.Product.Description,
 		pq.Array(&cart.Product.Image),
 		&cart.CreatedAt,
