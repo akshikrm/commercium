@@ -139,12 +139,19 @@ type UpdatedPrice struct {
 	Label  string
 }
 
+type NewTransactionPayload struct {
+	CustomerID    string
+	Items         []paddle.CreateTransactionItems
+	BillingPeriod *paddle.TimePeriod
+}
+
 type PaymentProvider interface {
 	CreateCustomer(*CreateUserRequest) error
 	GetCustomerByEmail(string) (string, error)
 	GetInvoice(string) *string
 	CreateProduct(*NewProductRequest) error
-	CreateTransaction(string, []*CartList) (Transaction, error)
+	CreateTransaction(*NewTransactionPayload) (Transaction, error)
 	CreatePrice(string, string, uint) *NewPrice
 	UpdatePrice(string, *UpdatePriceRequest) *UpdatedPrice
+	CreateTransactionItemsFromCart(carts []*CartList) []paddle.CreateTransactionItems
 }

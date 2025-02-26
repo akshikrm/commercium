@@ -165,7 +165,7 @@ func (p *PaddlePayment) CreateProduct(newProductRequest *types.NewProductRequest
 	return nil
 }
 
-func (p PaddlePayment) CreateTransaction(customerID string, carts []*types.CartList) (*paddle.Transaction, error) {
+func (p PaddlePayment) CreateTransactionItemsFromCart(carts []*types.CartList) []paddle.CreateTransactionItems {
 	transactionItems := []paddle.CreateTransactionItems{}
 	for _, cart := range carts {
 		transactionItems = append(transactionItems,
@@ -177,9 +177,17 @@ func (p PaddlePayment) CreateTransaction(customerID string, carts []*types.CartL
 			),
 		)
 	}
+	return transactionItems
+}
+
+func (p PaddlePayment) CreateTransaction(payload *types.NewTransactionPayload) (*paddle.Transaction, error) {
 	newTransaction := new(paddle.CreateTransactionRequest)
-	newTransaction.Items = transactionItems
-	newTransaction.CustomerID = paddle.PtrTo(customerID)
+	newTransaction.Items = payload.Items
+	newTransaction.CustomerID = paddle.PtrTo(payload.CustomerID)
+
+	if payload.BillingPeriod != nil {
+		newTransaction.BillingPeriod = payload.BillingPeriod
+	}
 
 	ctx := context.Background()
 	txn, err := p.Client.CreateTransaction(ctx, newTransaction)

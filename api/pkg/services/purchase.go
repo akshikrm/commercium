@@ -3,7 +3,6 @@ package services
 import (
 	"akshidas/e-com/pkg/types"
 	"akshidas/e-com/pkg/utils"
-	"fmt"
 	"log"
 )
 
@@ -159,12 +158,14 @@ func (s *transaction) NewTransaction(userID uint32) (string, error) {
 		return "", utils.NotFound
 	}
 
-	fmt.Printf("%+v\n", carts[0])
-	txn, err := s.paymentProvider.CreateTransaction(*customerID, carts)
+	newTransaction := types.NewTransactionPayload{
+		CustomerID: *customerID,
+		Items:      s.paymentProvider.CreateTransactionItemsFromCart(carts),
+	}
+	txn, err := s.paymentProvider.CreateTransaction(&newTransaction)
 	if err != nil {
 		return "", err
 	}
-	fmt.Println(txn)
 
 	return txn.ID, nil
 }
