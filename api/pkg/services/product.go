@@ -38,26 +38,26 @@ func (r *product) Create(newProduct *types.NewProductRequest) error {
 
 		if price := r.paymentProvider.CreatePrice(newPrice); price != nil {
 			price.ProductID = savedProduct.ID
-			if ok := r.repository.InsertPrice(nil, price); ok {
+			if ok := r.repository.InsertPrice(price); ok {
 				return nil
 			}
 		}
 		return utils.ServerError
 	}
 
-	for key, priceItem := range newProduct.SubscriptionPrice {
+	for _, priceItem := range newProduct.SubscriptionPrice {
 		newPrice := types.NewPricePayload{
 			ProductID: savedProduct.ProductID,
 			Name:      priceItem.Label,
 			Price:     priceItem.Price,
 			BillingCycle: &types.BillingCycle{
 				Interval:  string(priceItem.Interval),
-				Frequency: 12,
+				Frequency: priceItem.Frequency,
 			},
 		}
 		if price := r.paymentProvider.CreatePrice(newPrice); price != nil {
 			price.ProductID = savedProduct.ID
-			if ok := r.repository.InsertPrice(&key, price); !ok {
+			if ok := r.repository.InsertPrice(price); !ok {
 				return utils.ServerError
 			}
 		}

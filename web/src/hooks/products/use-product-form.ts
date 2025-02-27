@@ -4,6 +4,55 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useEffect } from "react"
 import { showCommonAmount } from "@components/prefix"
 
+const newProductDefaultValues: NewProduct = {
+    name: "",
+    image: [],
+    primary_image: "",
+    slug: "",
+    status: "enabled",
+    type: "one-time",
+    description: "",
+    category_id: "",
+    price: "",
+    subscription_price: {
+        month: {
+            price: 0,
+            label: ""
+        }
+    }
+}
+
+const useProductForm = (defaultValues?: EditProduct) => {
+    const methods = useForm({
+        resolver: zodResolver(productSchema),
+        defaultValues: newProductDefaultValues
+    })
+
+    const { reset, setValue } = methods
+
+    useEffect(() => {
+        if (defaultValues) {
+            const { price, subscription_price, ...rest } = defaultValues
+            const temp: NewSubscriptionPrice = {}
+            if (subscription_price) {
+                Object.entries(subscription_price).forEach(([k, v]) => {
+                    temp[k] = {
+                        ...v,
+                        price: v.price
+                    }
+                })
+            }
+            reset({
+                ...rest,
+                subscription_price: temp,
+                price: price ? showCommonAmount(parseInt(price as string)) : ""
+            })
+        }
+    }, [defaultValues, setValue, reset])
+
+    return methods
+}
+
 const productSchema = z
     .object({
         name: z
@@ -50,7 +99,6 @@ const productSchema = z
                         : 0
                     payload[k] = { ...v, price: price * 100 }
                 })
-
                 return payload
             }),
         status: z
@@ -87,54 +135,5 @@ const productSchema = z
             }
         }
     )
-
-const newProductDefaultValues: NewProduct = {
-    name: "",
-    image: [],
-    primary_image: "",
-    slug: "",
-    status: "enabled",
-    type: "one-time",
-    description: "",
-    category_id: "",
-    price: "",
-    subscription_price: {
-        "1_month": {
-            price: "",
-            label: ""
-        }
-    }
-}
-
-const useProductForm = (defaultValues?: EditProduct) => {
-    const methods = useForm({
-        resolver: zodResolver(productSchema),
-        defaultValues: newProductDefaultValues
-    })
-
-    const { reset, setValue } = methods
-
-    useEffect(() => {
-        if (defaultValues) {
-            const { price, subscription_price, ...rest } = defaultValues
-            const temp: SubscriptionPrice = {}
-            if (subscription_price) {
-                Object.entries(subscription_price).forEach(([k, v]) => {
-                    temp[k] = {
-                        ...v,
-                        price: showCommonAmount(v.price as number)
-                    }
-                })
-            }
-            reset({
-                ...rest,
-                subscription_price: temp,
-                price: price ? showCommonAmount(parseInt(price as string)) : ""
-            })
-        }
-    }, [defaultValues, setValue, reset])
-
-    return methods
-}
 
 export default useProductForm

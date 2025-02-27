@@ -4,9 +4,18 @@ type ProductType = "one-time" | "subscription"
 type SubscriptionPrice = {
     [key: string]: {
         id?: number
-        price: string | number
+        price: number
         label: string
         price_id?: string
+    }
+}
+
+type BillingInterval = "day" | "week" | "month" | "year"
+
+type NewSubscriptionPrice = {
+    [interval: BillingInterval]: {
+        price: number
+        label: string
     }
 }
 
@@ -20,7 +29,7 @@ type NewProduct = {
     description: string
     category_id: string
     price?: string
-    subscription_price?: SubscriptionPrice
+    subscription_price?: NewSubscriptionPrice
 }
 
 type EditProduct = {

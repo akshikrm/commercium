@@ -91,7 +91,7 @@ func (p *PaddlePayment) CreatePrice(payload types.NewPricePayload) *types.NewPri
 	if payload.BillingCycle != nil {
 		priceRequest.BillingCycle = &paddle.Duration{
 			Interval:  paddle.Interval(payload.BillingCycle.Interval),
-			Frequency: payload.BillingCycle.Frequency,
+			Frequency: int(payload.BillingCycle.Frequency),
 		}
 	}
 

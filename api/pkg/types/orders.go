@@ -127,13 +127,12 @@ type PurchaseHandler interface {
 
 type Transaction = *paddle.Transaction
 
-// type BillingCycle = *paddle.Duration
-
 type NewPrice struct {
 	ID        string
 	ProductID uint
 	Amount    uint
 	Label     string
+	Interval  PaddlePriceInterval
 }
 
 type UpdatedPrice struct {

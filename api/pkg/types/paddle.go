@@ -20,7 +20,7 @@ type UnitPrice struct {
 }
 type BillingCycle struct {
 	Interval  string `json:"interval"`
-	Frequency int    `json:"frequency"`
+	Frequency uint   `json:"frequency"`
 }
 
 type Price struct {
