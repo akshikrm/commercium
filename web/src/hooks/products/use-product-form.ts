@@ -1,8 +1,8 @@
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
-// import { useEffect } from "react"
-// import { showCommonAmount } from "@components/prefix"
+import { useEffect } from "react"
+import { convertToCommonAmount } from "@components/prefix"
 
 const newProductDefaultValues: NewProduct = {
     name: "",
@@ -23,30 +23,20 @@ const useProductForm = (defaultValues?: EditProduct) => {
         defaultValues: newProductDefaultValues
     })
 
-    const {
-        // reset,
-        // setValue,
-    } = methods
+    const { reset } = methods
 
-    // useEffect(() => {
-    //     if (defaultValues) {
-    //         const { price, subscription_price, ...rest } = defaultValues
-    //         const temp: NewSubscriptionPrice = {}
-    //         if (subscription_price) {
-    //             Object.entries(subscription_price).forEach(([k, v]) => {
-    //                 temp[k] = {
-    //                     ...v,
-    //                     price: v.price
-    //                 }
-    //             })
-    //         }
-    //         reset({
-    //             ...rest,
-    //             subscription_price: temp,
-    //             price: price ? showCommonAmount(parseInt(price as string)) : ""
-    //         })
-    //     }
-    // }, [defaultValues, setValue, reset])
+    useEffect(() => {
+        if (defaultValues) {
+            const { prices, type, subscription_price, ...rest } = defaultValues
+            console.log(prices)
+            const temp = { ...rest }
+            if (type === "one-time") {
+                temp.price = convertToCommonAmount(prices[0].price)
+            }
+
+            reset(temp)
+        }
+    }, [defaultValues, reset])
 
     return methods
 }

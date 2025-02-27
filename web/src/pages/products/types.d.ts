@@ -40,6 +40,7 @@ type EditProduct = {
     status?: ProductStatus
     type?: ProductType
     description?: string
+    prices: NewSubscriptionPrice[]
     price?: string
     subscription_price?: SubscriptionPrice
     category_id?: string

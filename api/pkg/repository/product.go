@@ -101,6 +101,7 @@ func (m *product) GetOne(id int) (*types.OneProduct, bool) {
 		SELECT
 			p.id,
 			category_id,
+			p.product_id,
 			name,
 			slug,
 			image,
@@ -137,6 +138,7 @@ func (m *product) GetOne(id int) (*types.OneProduct, bool) {
 	err := row.Scan(
 		&product.ID,
 		&product.CategoryID,
+		&product.ProductID,
 		&product.Name,
 		&product.Slug,
 		pq.Array(&product.Image),
