@@ -111,11 +111,17 @@ func (p *PaddlePayment) CreatePrice(payload types.NewPricePayload) *types.NewPri
 		return nil
 	}
 
-	return &types.NewPrice{
+	newPrice := types.NewPrice{
 		ID:     paddlePrice.ID,
 		Label:  *paddlePrice.Name,
 		Amount: uint(convertedAmount),
 	}
+
+	if paddlePrice.BillingCycle != nil {
+		newPrice.Interval = types.PaddlePriceInterval(paddlePrice.BillingCycle.Interval)
+	}
+
+	return &newPrice
 }
 
 func (p *PaddlePayment) UpdatePrice(priceID string, updatePrice *types.UpdatePriceRequest) *types.UpdatedPrice {

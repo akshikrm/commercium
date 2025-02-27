@@ -89,18 +89,6 @@ func (r *product) GetOne(id int) (*types.OneProduct, error) {
 	if !ok {
 		return nil, utils.ServerError
 	}
-	if product.Type == types.OneTimeProduct {
-		product.Price = product.Prices[0].Price
-	} else {
-		for _, price := range product.Prices {
-			product.SubscriptionPrice[price.Interval] = types.ProductPrice{
-				ID:      price.ID,
-				PriceID: price.PriceID,
-				Label:   price.Label,
-				Price:   price.Price,
-			}
-		}
-	}
 	return product, nil
 }
 

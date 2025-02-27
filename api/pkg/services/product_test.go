@@ -8,7 +8,7 @@ import (
 	"testing"
 )
 
-func TestProduct(t *testing.T) {
+func TestCreateProduct(t *testing.T) {
 	config := config.NewTestConfig()
 	store := repository.New(config)
 	services := services.New(store, config)
@@ -57,5 +57,19 @@ func TestProduct(t *testing.T) {
 			t.Errorf("one-time product create failed %s", err)
 		}
 	})
+}
 
+func TestGetProduct(t *testing.T) {
+	config := config.NewTestConfig()
+	store := repository.New(config)
+	services := services.New(store, config)
+
+	productID := 107
+	t.Run("get product by id", func(t *testing.T) {
+		_, err := services.Product.GetOne(productID)
+		if err != nil {
+			t.Errorf("getting product with ID %d failed due to %s", productID, err)
+
+		}
+	})
 }

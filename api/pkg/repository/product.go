@@ -164,18 +164,18 @@ func (m *product) GetOne(id int) (*types.OneProduct, bool) {
 	return &product, true
 }
 
-func (p *product) InsertPrice(createPrice *types.NewPrice) bool {
+func (p *product) InsertPrice(payload *types.NewPrice) bool {
 	query := `
 	INSERT INTO 
 		prices (price, label, price_id, product_id, interval)
 	VALUES
 		($1, $2, $3, $4, $5)`
 	_, err := p.store.Exec(query,
-		createPrice.Amount,
-		createPrice.Label,
-		createPrice.ID,
-		createPrice.ProductID,
-		createPrice.Interval,
+		payload.Amount,
+		payload.Label,
+		payload.ID,
+		payload.ProductID,
+		payload.Interval,
 	)
 	if err != nil {
 		log.Printf("failed to add price to database due to %s", err)
