@@ -127,6 +127,8 @@ type PurchaseHandler interface {
 
 type Transaction = *paddle.Transaction
 
+// type BillingCycle = *paddle.Duration
+
 type NewPrice struct {
 	ID        string
 	ProductID uint
@@ -146,13 +148,20 @@ type NewTransactionPayload struct {
 	BillingPeriod *paddle.TimePeriod
 }
 
+type NewPricePayload struct {
+	ProductID    string
+	Name         string
+	Price        uint
+	BillingCycle *BillingCycle
+}
+
 type PaymentProvider interface {
 	CreateCustomer(*CreateUserRequest) error
 	GetCustomerByEmail(string) (string, error)
 	GetInvoice(string) *string
 	CreateProduct(*NewProductRequest) error
 	CreateTransaction(*NewTransactionPayload) (Transaction, error)
-	CreatePrice(string, string, uint) *NewPrice
+	CreatePrice(NewPricePayload) *NewPrice
 	UpdatePrice(string, *UpdatePriceRequest) *UpdatedPrice
 	CreateTransactionItemsFromCart(carts []*CartList) []paddle.CreateTransactionItems
 }

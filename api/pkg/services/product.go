@@ -30,11 +30,13 @@ func (r *product) Create(newProduct *types.NewProductRequest) error {
 	}
 
 	if savedProduct.Type == types.OneTimeProduct {
-		if price := r.paymentProvider.CreatePrice(
-			savedProduct.ProductID,
-			"one time price",
-			newProduct.Price,
-		); price != nil {
+		newPrice := types.NewPricePayload{
+			ProductID: savedProduct.ProductID,
+			Name:      "one time price",
+			Price:     newProduct.Price,
+		}
+
+		if price := r.paymentProvider.CreatePrice(newPrice); price != nil {
 			price.ProductID = savedProduct.ID
 			if ok := r.repository.InsertPrice(nil, price); ok {
 				return nil
@@ -44,11 +46,16 @@ func (r *product) Create(newProduct *types.NewProductRequest) error {
 	}
 
 	for key, priceItem := range newProduct.SubscriptionPrice {
-		if price := r.paymentProvider.CreatePrice(
-			savedProduct.ProductID,
-			priceItem.Label,
-			priceItem.Price,
-		); price != nil {
+		newPrice := types.NewPricePayload{
+			ProductID: savedProduct.ProductID,
+			Name:      priceItem.Label,
+			Price:     priceItem.Price,
+			BillingCycle: &types.BillingCycle{
+				Interval:  string(priceItem.Interval),
+				Frequency: 12,
+			},
+		}
+		if price := r.paymentProvider.CreatePrice(newPrice); price != nil {
 			price.ProductID = savedProduct.ID
 			if ok := r.repository.InsertPrice(&key, price); !ok {
 				return utils.ServerError
@@ -85,7 +92,6 @@ func (r *product) GetOne(id int) (*types.OneProduct, error) {
 	if product.Type == types.OneTimeProduct {
 		product.Price = product.Prices[0].Price
 	} else {
-		product.SubscriptionPrice = make(types.SubscriptionPrice)
 		for _, price := range product.Prices {
 			product.SubscriptionPrice[price.Interval] = types.ProductPrice{
 				ID:      price.ID,

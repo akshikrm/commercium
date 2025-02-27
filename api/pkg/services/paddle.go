@@ -78,23 +78,25 @@ func (p *PaddlePayment) GetInvoice(txnId string) *string {
 	return &res.URL
 }
 
-func (p *PaddlePayment) CreatePrice(productID, name string, price uint) *types.NewPrice {
+func (p *PaddlePayment) CreatePrice(payload types.NewPricePayload) *types.NewPrice {
 	ctx := context.Background()
 	priceRequest := new(paddle.CreatePriceRequest)
-	priceRequest.ProductID = productID
+	priceRequest.ProductID = payload.ProductID
 	priceRequest.Description = "Price"
-	priceRequest.BillingCycle = &paddle.Duration{
-		Interval:  "month",
-		Frequency: 1,
-	}
-
 	priceRequest.UnitPrice = paddle.Money{
-		Amount:       strconv.Itoa(int(price)),
+		Amount:       strconv.Itoa(int(payload.Price)),
 		CurrencyCode: paddle.CurrencyCodeINR,
 	}
 
-	if name != "" {
-		priceRequest.Name = &name
+	if payload.BillingCycle != nil {
+		priceRequest.BillingCycle = &paddle.Duration{
+			Interval:  paddle.Interval(payload.BillingCycle.Interval),
+			Frequency: payload.BillingCycle.Frequency,
+		}
+	}
+
+	if payload.Name != "" {
+		priceRequest.Name = &payload.Name
 	}
 
 	paddlePrice, err := p.Client.CreatePrice(ctx, priceRequest)
