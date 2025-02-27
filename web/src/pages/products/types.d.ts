@@ -13,10 +13,10 @@ type SubscriptionPrice = {
 type BillingInterval = "day" | "week" | "month" | "year"
 
 type NewSubscriptionPrice = {
-    [interval: BillingInterval]: {
-        price: number
-        label: string
-    }
+    price: number
+    label: string
+    interval: BillingInterval
+    frequency: number
 }
 
 type NewProduct = {
@@ -28,8 +28,8 @@ type NewProduct = {
     type: ProductType
     description: string
     category_id: string
-    price?: string
-    subscription_price?: NewSubscriptionPrice
+    price: string
+    subscription_price: NewSubscriptionPrice[]
 }
 
 type EditProduct = {

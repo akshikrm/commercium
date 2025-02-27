@@ -6,6 +6,7 @@ const icons = {
     download: "material-symbols:download-rounded",
     close: "material-symbols:close-rounded",
     arrowDown: "ep:arrow-down-bold",
+    add: "material-symbols:add-rounded",
     animated: {
         loading: "line-md:loading-twotone-loop"
     }

@@ -1,42 +1,102 @@
-import { Box, IconButton, Stack } from "@mui/material"
-import RHFTextField from "@components/rhf/text-field"
-import RenderIcon from "@components/render-icon"
-import icons from "@/icons"
-import { useCallback } from "react"
-import { useFormContext } from "react-hook-form"
+import { Stack, TextField } from "@mui/material"
+import { ChangeEventHandler, ReactNode } from "react"
+import { FieldError, FieldErrorsImpl, Merge } from "react-hook-form"
 
-const SubscriptionPriceItem = ({ month }: { month: string }) => {
-    const [monthNumber] = month.split("_")
-    const { setValue, getValues } = useFormContext()
+const PaymentIntervals = ({
+    value,
+    onChange,
+    error = false,
+    helperText = null
+}: {
+    value: BillingInterval
+    onChange: ChangeEventHandler<HTMLInputElement>
+    error: boolean
+    helperText: ReactNode
+}) => {
+    return (
+        <TextField
+            label='Interval'
+            select
+            fullWidth
+            name='interval'
+            value={value}
+            onChange={onChange}
+            error={error}
+            helperText={helperText}
+            slotProps={{
+                select: {
+                    native: true
+                }
+            }}
+        >
+            <option value='day'>Day</option>
+            <option value='month'>Month</option>
+            <option value='week'>Week</option>
+            <option value='year'>Year</option>
+        </TextField>
+    )
+}
 
-    const handleDelete = useCallback(() => {
-        const temp = { ...getValues("subscription_price") }
-        delete temp[month]
-        setValue("subscription_price", temp)
-    }, [month])
+type Props = {
+    subscriptionPrice: NewSubscriptionPrice
+    onChange: (v: NewSubscriptionPrice) => void
+    error?: Merge<
+        FieldError,
+        FieldErrorsImpl<{
+            price: number
+            label: string
+            interval: NonNullable<BillingInterval>
+            frequency: number
+        }>
+    >
+}
+
+const SubscrptionPriceForm = ({
+    subscriptionPrice,
+    onChange,
+    error
+}: Props) => {
+    const { price, frequency, interval, label } = subscriptionPrice
+
+    const handleChange: ChangeEventHandler<HTMLInputElement> = e => {
+        const { name, value } = e.target
+        onChange({ ...subscriptionPrice, [name]: value })
+    }
 
     return (
         <Stack direction='row' alignItems='center'>
-            <RHFTextField
-                name={`subscription_price.${month}.price`}
-                label={`Price ${monthNumber} month`}
+            <TextField
+                name='price'
+                value={price > 0 ? price : ""}
+                label='Price'
+                onChange={handleChange}
+                error={Boolean(error?.price)}
+                helperText={error?.price?.message}
             />
-            <RHFTextField
-                name={`subscription_price.${month}.label`}
-                label={`Label ${monthNumber} month`}
+            <TextField
+                name='label'
+                value={label}
+                label='Label'
+                onChange={handleChange}
+                error={Boolean(error?.label)}
+                helperText={error?.label?.message}
             />
-            <Box>
-                <IconButton
-                    disabled={monthNumber === "1"}
-                    color='error'
-                    size='small'
-                    onClick={() => handleDelete()}
-                >
-                    <RenderIcon icon={icons.delete} />
-                </IconButton>
-            </Box>
+            <PaymentIntervals
+                value={interval}
+                onChange={handleChange}
+                error={Boolean(error?.interval)}
+                helperText={error?.interval?.message}
+            />
+            <TextField
+                name='frequency'
+                value={frequency}
+                label='Frequency'
+                onChange={handleChange}
+                error={Boolean(error?.frequency)}
+                helperText={error?.frequency?.message}
+            />
         </Stack>
     )
 }
 
-export default SubscriptionPriceItem
+export default SubscrptionPriceForm
