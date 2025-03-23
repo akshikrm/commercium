@@ -13,12 +13,10 @@ const OrderView = () => {
             const paramID = queryKey[1]
 
             if (paramID) {
-                return await order.gerOrderByID(paramID)
+                return await order.getOrderByID(paramID)
             }
         }
     })
-
-    console.log(data)
 
     return (
         <Card>

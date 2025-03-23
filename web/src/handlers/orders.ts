@@ -66,9 +66,9 @@ export const createTransaction = async () => {
     }
 }
 
-export const getByOrderID = async (orderID: string): Promise<OrderView> => {
+export const getByOrderID = async (orderID: string): Promise<string> => {
     try {
-        const { data } = await server.get(`orders/${orderID}`)
+        const { data } = await server.get(`orders/invoice/${orderID}`)
         return data.data
     } catch (err) {
         const { data } = err as AxiosResponse
