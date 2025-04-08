@@ -48,33 +48,6 @@ func Cors(w http.ResponseWriter) error {
 	return writeJson(w, http.StatusNoContent, errors.New("no content"))
 }
 
-func RouteHandler(f ApiFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		if err := f(w, r); err != nil {
-			handleError(w, err)
-		}
-	}
-}
-
-func handleError(w http.ResponseWriter, err error) {
-	switch err {
-	case utils.InvalidRequest:
-		invalidRequest(w)
-	case utils.NotFound:
-		notFound(w)
-	case utils.InvalidRequest:
-		invalidRequest(w)
-	case utils.Conflict:
-		conflict(w)
-	case utils.Unauthorized:
-		accessDenied(w)
-	case utils.InvalidParam:
-		invalidId(w)
-	default:
-		serverError(w)
-	}
-}
-
 func writeJson(w http.ResponseWriter, status int, value any) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -107,7 +80,7 @@ func parseId(id string) (int, error) {
 
 func DecodeBody(body io.ReadCloser, a any) error {
 	if err := json.NewDecoder(body).Decode(a); err != nil {
-		log.Printf("failed to decode request")
+		log.Printf("failed to decode request due to %s", err)
 		if err == io.EOF {
 			return utils.InvalidRequest
 		}

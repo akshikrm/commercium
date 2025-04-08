@@ -5,6 +5,9 @@ import useUpdateCart from "@hooks/carts/use-update-cart"
 import { Card, IconButton, Stack, TextField, Typography } from "@mui/material"
 import icons from "@/icons"
 import RenderIcon from "@components/render-icon"
+import { Cloudinary } from "@cloudinary/url-gen"
+import { scale } from "@cloudinary/url-gen/actions/resize"
+import Render from "@components/render"
 
 const CartItemList = ({ data }: { data: Cart[] }) => {
     const { mutate: update } = useUpdateCart()
@@ -18,18 +21,26 @@ const CartItemList = ({ data }: { data: Cart[] }) => {
         deleteCart(payload)
     }
 
+    const cld = new Cloudinary({
+        cloud: { cloudName: "commercium" }
+    })
+
     return (
         <Stack>
             <RenderList
                 list={data}
                 render={cart => {
-                    const { id, product, quantity } = cart
-                    const totalAmount = parseFloat(product.price) * quantity
+                    const { id, product, quantity, price } = cart
+                    const img = cld
+                        .image(product.image)
+                        .resize(scale().width(100).height(100))
+
+                    const isNormal = product.type === "one-time"
 
                     return (
                         <Card key={id}>
                             <Stack direction='row' alignItems='center'>
-                                <img src={product.image} width={100} />
+                                <img src={img.toURL()} width={100} />
                                 <Stack spacing={0}>
                                     <Typography
                                         component='div'
@@ -42,23 +53,28 @@ const CartItemList = ({ data }: { data: Cart[] }) => {
                                         ...
                                     </Typography>
                                 </Stack>
+                                <Render
+                                    when={isNormal}
+                                    show={
+                                        <Typography variant='body2'>
+                                            <TextField
+                                                size='small'
+                                                value={quantity}
+                                                type='number'
+                                                onChange={e => {
+                                                    handleUpdate({
+                                                        quantity: parseInt(
+                                                            e.target.value
+                                                        ),
+                                                        cartID: id
+                                                    })
+                                                }}
+                                            />
+                                        </Typography>
+                                    }
+                                />
                                 <Typography variant='body2'>
-                                    <TextField
-                                        size='small'
-                                        value={quantity}
-                                        type='number'
-                                        onChange={e => {
-                                            handleUpdate({
-                                                quantity: parseInt(
-                                                    e.target.value
-                                                ),
-                                                cartID: id
-                                            })
-                                        }}
-                                    />
-                                </Typography>
-                                <Typography variant='body2'>
-                                    <Currency amount={totalAmount} />
+                                    <Currency amount={quantity * price} />
                                 </Typography>
                                 <IconButton
                                     size='small'

@@ -6,11 +6,13 @@ import (
 )
 
 type cart struct {
-	repository types.CartRepository
+	repository      types.CartRepository
+	paymentProvider types.PaymentProvider
 }
 
 func (c *cart) GetAll(userID uint32) ([]*types.CartList, error) {
 	carts, ok := c.repository.GetAll(userID)
+
 	if !ok {
 		return nil, utils.ServerError
 	}
@@ -28,14 +30,15 @@ func (c *cart) GetOne(cid uint32) (*types.CartList, error) {
 	return cart, nil
 }
 
-func (c *cart) Create(newCart *types.CreateCartRequest) error {
-	exists := c.repository.CheckIfEntryExist(newCart.UserID, newCart.ProductID)
+func (c *cart) Create(payload *types.CreateCartRequest) error {
+	exists := c.repository.CheckIfEntryExist(payload.UserID, payload.PriceID)
 	if exists {
-		if ok := c.repository.UpdateQuantity(newCart); !ok {
+		if ok := c.repository.UpdateQuantity(payload); !ok {
 			return utils.ServerError
 		}
+		return nil
 	}
-	if _, ok := c.repository.Create(newCart); !ok {
+	if _, ok := c.repository.Create(payload); !ok {
 		return utils.ServerError
 	}
 	return nil
@@ -69,6 +72,6 @@ func (c *cart) HardDeleteByUserID(customerId string) error {
 	return nil
 }
 
-func newCartService(repository types.CartRepository) *cart {
-	return &cart{repository: repository}
+func newCartService(repository types.CartRepository, paymentProvider types.PaymentProvider) *cart {
+	return &cart{repository: repository, paymentProvider: paymentProvider}
 }

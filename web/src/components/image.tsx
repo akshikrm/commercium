@@ -16,11 +16,11 @@ const Image = ({ publicID, onClick }: Props) => {
 
     return (
         <Stack justifyContent='flex-end'>
-            <Box sx={{ textAlign: "right" }}>
-                <IconButton size='small' onClick={onClick}>
-                    <RenderIcon icon={icons.close} />
-                </IconButton>
-            </Box>
+            {/* <Box sx={{ textAlign: "right" }}> */}
+            {/*     <IconButton size='small' onClick={onClick}> */}
+            {/*         <RenderIcon icon={icons.close} /> */}
+            {/*     </IconButton> */}
+            {/* </Box> */}
             <AdvancedImage cldImg={img} />
         </Stack>
     )

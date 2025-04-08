@@ -4,6 +4,8 @@ import (
 	"context"
 	"net/http"
 	"time"
+
+	"github.com/PaddleHQ/paddle-go-sdk"
 )
 
 type PurchaseRequest struct {
@@ -13,7 +15,13 @@ type PurchaseRequest struct {
 	Price     uint   `json:"price"`
 }
 
+type UpdatePriceRequest struct {
+	Amount uint   `json:"amount"`
+	Label  string `json:"label"`
+}
+
 type NewOrder struct {
+	UserID        uint   `json:"user_id"`
 	TransactionID uint32 `json:"transaction_id"`
 	PriceID       string `json:"price_id"`
 	ProductID     string `json:"product_id"`
@@ -108,10 +116,51 @@ type OrdersRepository interface {
 }
 
 type PurchaseHandler interface {
+	CreateTransaction(context.Context, http.ResponseWriter, *http.Request) error
 	HandleTransactionHook(http.ResponseWriter, *http.Request) error
 	GetAllOrders(context.Context, http.ResponseWriter, *http.Request) error
 	GetShippingInformation(context.Context, http.ResponseWriter, *http.Request) error
 	GetOrderStatus(context.Context, http.ResponseWriter, *http.Request) error
 	GetInvoice(context.Context, http.ResponseWriter, *http.Request) error
 	UpdateShippingStatus(context.Context, http.ResponseWriter, *http.Request) error
+}
+
+type Transaction = *paddle.Transaction
+
+type NewPrice struct {
+	ID        string
+	ProductID uint
+	Amount    uint
+	Label     string
+	Interval  PaddlePriceInterval
+}
+
+type UpdatedPrice struct {
+	ID     string
+	Amount uint
+	Label  string
+}
+
+type NewTransactionPayload struct {
+	CustomerID    string
+	Items         []paddle.CreateTransactionItems
+	BillingPeriod *paddle.TimePeriod
+}
+
+type NewPricePayload struct {
+	ProductID    string
+	Name         string
+	Price        uint
+	BillingCycle *BillingCycle
+}
+
+type PaymentProvider interface {
+	CreateCustomer(*CreateUserRequest) error
+	GetCustomerByEmail(string) (string, error)
+	GetInvoice(string) *string
+	CreateProduct(*NewProductRequest) error
+	CreateTransaction(*NewTransactionPayload) (Transaction, error)
+	CreatePrice(NewPricePayload) *NewPrice
+	UpdatePrice(string, *UpdatePriceRequest) *UpdatedPrice
+	CreateTransactionItemsFromCart(carts []*CartList) []paddle.CreateTransactionItems
 }

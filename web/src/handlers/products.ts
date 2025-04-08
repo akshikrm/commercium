@@ -16,7 +16,7 @@ export const getProducts = async (
 
 export const getProductById = async (
     id: number | string
-): Promise<EditProduct | undefined> => {
+): Promise<OneProductResponse> => {
     try {
         const { data } = await server.get(`/products/${id}`)
         return data.data

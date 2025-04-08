@@ -20,9 +20,8 @@ const useGetCart = (opts: HookOptions = defaultHookOptions) => {
         if (carts.length === 0) {
             return 0
         }
-
         return carts.reduce((acc, curr) => {
-            acc += parseFloat(curr.product.price) * curr.quantity
+            acc += curr.price * curr.quantity
             return acc
         }, 0)
     }, [carts])

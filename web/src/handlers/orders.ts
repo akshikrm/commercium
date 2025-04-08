@@ -43,6 +43,7 @@ export const updateShippingStatus = async (
         })
     }
 }
+
 export const placeOrder = async () => {
     try {
         const { data } = await server.post("/orders")
@@ -54,9 +55,20 @@ export const placeOrder = async () => {
     }
 }
 
-export const getByOrderID = async (orderID: string): Promise<OrderView> => {
+export const createTransaction = async () => {
     try {
-        const { data } = await server.get(`orders/${orderID}`)
+        const { data } = await server.post("/transactions")
+        return data.data
+    } catch (err) {
+        const { data } = err as AxiosResponse
+        console.error(data)
+        return Promise.reject({ messate: "failed to create Transaction" })
+    }
+}
+
+export const getByOrderID = async (orderID: string): Promise<string> => {
+    try {
+        const { data } = await server.get(`orders/invoice/${orderID}`)
         return data.data
     } catch (err) {
         const { data } = err as AxiosResponse

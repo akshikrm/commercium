@@ -1,6 +1,7 @@
 package main
 
 import (
+	config "akshidas/e-com"
 	"akshidas/e-com/pkg/services"
 	"akshidas/e-com/pkg/types"
 	"encoding/json"
@@ -113,13 +114,10 @@ func (s Seeder) seedProducts() {
 	}
 }
 
-func NewSeeder(service *services.Service) *Seeder {
+func NewSeeder(service *services.Service, seederConfig *config.Config) *Seeder {
 	s := new(Seeder)
 	s.service = service
-	s.paddle = services.NewPaddlePayment()
-	if err := s.paddle.Init(); err != nil {
-		panic("failed to initialize paddle")
-	}
+	s.paddle = services.NewPaddlePayment(seederConfig)
 	return s
 }
 

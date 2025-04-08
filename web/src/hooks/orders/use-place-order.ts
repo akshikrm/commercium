@@ -18,6 +18,7 @@ const usePlaceOrder = (purchaseItems: PaddlePurchaseItem[]) => {
     const { paddle, event } = useConnectPaddle(customerID)
 
     const placeOrder = useCallback(async () => {
+        const transactionID = await order.createTransaction()
         try {
             if (paddle) {
                 paddle.Checkout.open({
@@ -25,10 +26,7 @@ const usePlaceOrder = (purchaseItems: PaddlePurchaseItem[]) => {
                         displayMode: "overlay",
                         variant: "multi-page"
                     },
-                    items: purchaseItems,
-                    customer: {
-                        id: customerID
-                    }
+                    transactionId: transactionID
                 })
             }
         } catch (error) {
@@ -56,7 +54,6 @@ const usePlaceOrder = (purchaseItems: PaddlePurchaseItem[]) => {
             const intervalID = setInterval(() => {
                 checkStatus(transaction_id)
             }, 3000)
-
             return () => {
                 clearInterval(intervalID)
             }

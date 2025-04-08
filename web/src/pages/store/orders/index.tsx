@@ -18,11 +18,21 @@ import { useMemo, useState } from "react"
 import { Box, Button, Chip, Popover, Stack, Typography } from "@mui/material"
 import { order } from "@api"
 import useGetStatusColor from "@hooks/shipping/use-get-status-color"
+import Render from "@components/render"
+import useCompleteTransaction from "@hooks/orders/use-complete-transaction"
 
 const Orders = () => {
-    const { data: orders } = useGetOrders()
+    const { data: orders, refetch } = useGetOrders()
     const [orderItems, setOrderItems] = useState<OrderItems[]>([])
     const [menuEl, setMenuEl] = useState<Element | null>(null)
+    const completeOrder = useCompleteTransaction(async () => {
+        await refetch()
+    })
+
+    const handleDownload = async (txnID: string) => {
+        const data = await order.getOrderByID(txnID)
+        window.open(data)
+    }
 
     return (
         <>
@@ -42,7 +52,7 @@ const Orders = () => {
                             <TableCell>Items</TableCell>
                             <TableCell>Price</TableCell>
                             <TableCell>Purchased On</TableCell>
-                            <TableCell>Download</TableCell>
+                            <TableCell>Action</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -83,17 +93,38 @@ const Orders = () => {
                                             )}
                                         </TableCell>
                                         <TableCell>
-                                            <IconButton
-                                                onClick={() =>
-                                                    order.gerOrderByID(
-                                                        row.transaction_id
-                                                    )
+                                            <Render
+                                                when={
+                                                    row.payment_status ===
+                                                    "completed"
                                                 }
-                                            >
-                                                <RenderIcon
-                                                    icon={icons.download}
-                                                />
-                                            </IconButton>
+                                                show={
+                                                    <IconButton
+                                                        onClick={() =>
+                                                            handleDownload(
+                                                                row.transaction_id
+                                                            )
+                                                        }
+                                                    >
+                                                        <RenderIcon
+                                                            icon={
+                                                                icons.download
+                                                            }
+                                                        />
+                                                    </IconButton>
+                                                }
+                                                otherwise={
+                                                    <Button
+                                                        onClick={() => {
+                                                            completeOrder(
+                                                                row.transaction_id
+                                                            )
+                                                        }}
+                                                    >
+                                                        complete
+                                                    </Button>
+                                                }
+                                            />
                                         </TableCell>
                                     </TableRow>
                                 )

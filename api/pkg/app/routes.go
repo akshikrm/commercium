@@ -29,11 +29,12 @@ func ProductRoute(s *Server) routes {
 	handler := s.handlers.Product
 	middleware := s.handlers.Middleware
 	return routes{
-		"GET /products":         middleware.IsAuthenticated(ctx, handler.GetAll),
-		"POST /products":        middleware.IsAdmin(ctx, handler.Create),
-		"GET /products/{id}":    middleware.IsAdmin(ctx, handler.GetOne),
-		"PUT /products/{id}":    middleware.IsAdmin(ctx, handler.Update),
-		"DELETE /products/{id}": middleware.IsAdmin(ctx, handler.Delete),
+		"GET /products":             middleware.IsAuthenticated(ctx, handler.GetAll),
+		"POST /products":            middleware.IsAdmin(ctx, handler.Create),
+		"GET /products/{id}":        middleware.IsAdmin(ctx, handler.GetOne),
+		"PUT /products/{id}":        middleware.IsAdmin(ctx, handler.Update),
+		"PUT /products/prices/{id}": middleware.IsAdmin(ctx, handler.UpdatePrice),
+		"DELETE /products/{id}":     middleware.IsAdmin(ctx, handler.Delete),
 	}
 }
 
@@ -67,7 +68,8 @@ func PurchaseRoute(s *Server) routes {
 	handler := s.handlers.Purchase
 	middleware := s.handlers.Middleware
 	return routes{
-		"POST /transactions":             handler.HandleTransactionHook,
+		"POST /transactions":             middleware.IsAuthenticated(ctx, handler.CreateTransaction),
+		"POST /transactions-hook":        handler.HandleTransactionHook,
 		"GET /orders/invoice/{txnId}":    middleware.IsAuthenticated(ctx, handler.GetInvoice),
 		"GET /orders/status/{txnId}":     middleware.IsAuthenticated(ctx, handler.GetOrderStatus),
 		"GET /orders":                    middleware.IsAuthenticated(ctx, handler.GetAllOrders),

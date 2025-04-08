@@ -13,9 +13,7 @@ const useAddToCart = (opts: HookOptions = defaultHookOptions) => {
     const navigate = useNavigate()
 
     const mutation = useMutation({
-        mutationFn: (newCart: NewCart) => {
-            return cart.create(newCart)
-        },
+        mutationFn: (payload: NewCartEntry) => cart.create(payload),
         onMutate: () => {
             if (opts.showToast) {
                 toast.loading("adding to cart...", { id: TOAST_ID })
@@ -36,8 +34,8 @@ const useAddToCart = (opts: HookOptions = defaultHookOptions) => {
         }
     })
 
-    const addToCart = (payload: NewCart) => mutation.mutate(payload)
-    const buyNow = (payload: NewCart) => {
+    const addToCart = (payload: NewCartEntry) => mutation.mutate(payload)
+    const buyNow = (payload: NewCartEntry) => {
         setIsBuyNow(true)
         mutation.mutate(payload)
     }

@@ -17,7 +17,7 @@ import (
 func TestCart(t *testing.T) {
 	config := config.NewTestConfig()
 	store := repository.New(config)
-	services := services.New(store)
+	services := services.New(store, config)
 	handlers := handlers.New(services)
 
 	t.Run("return user with id 2's cart", func(t *testing.T) {
@@ -36,8 +36,8 @@ func TestCart(t *testing.T) {
 
 	t.Run("Add new cart entry for user 2", func(t *testing.T) {
 		payload := types.CreateCartRequest{
-			ProductID: 1,
-			Quantity:  2,
+			PriceID:  1,
+			Quantity: 2,
 		}
 		test, err := json.Marshal(payload)
 		if err != nil {

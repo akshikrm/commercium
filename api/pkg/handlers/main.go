@@ -20,8 +20,8 @@ func New(service *services.Service) *Handler {
 	handler.Product = newProduct(service.Product)
 	handler.ProductCategory = newProductCategory(service.ProductCategory)
 	handler.Cart = newCart(service.Cart)
-	handler.User = newUser(service.User)
-	handler.Purchase = newPurchase(service.Purchase)
+	handler.User = newUser(service.User, service.PaymentProvider)
+	handler.Purchase = newPurchase(service.Purchase, service.Cart, service.PaymentProvider)
 	handler.Upload = newUpload()
 
 	handler.Middleware = newMiddleWare(service.User)

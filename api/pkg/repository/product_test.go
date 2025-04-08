@@ -19,7 +19,7 @@ func TestCreateProduct(t *testing.T) {
 		PriceID:     "Test",
 		ProductID:   "Test",
 	}
-	_, ok := store.Product.Create(&product)
+	_, ok := store.Product.InsertOne(&product)
 	if !ok {
 		t.Error("failed to create product")
 	}

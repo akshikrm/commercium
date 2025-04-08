@@ -7,10 +7,11 @@ import (
 )
 
 type product struct {
-	repository types.ProductRepository
+	repository      types.ProductRepository
+	paymentProvider types.PaymentProvider
 }
 
-func (r *product) Get(filter url.Values) ([]*types.ProductsList, error) {
+func (r *product) GetAll(filter url.Values) ([]*types.ProductsList, error) {
 	products, ok := r.repository.GetAll(filter)
 	if !ok {
 		return nil, utils.ServerError
@@ -19,18 +20,47 @@ func (r *product) Get(filter url.Values) ([]*types.ProductsList, error) {
 }
 
 func (r *product) Create(newProduct *types.NewProductRequest) error {
-	paddlePayment := NewPaddlePayment()
-	if err := paddlePayment.Init(); err != nil {
+	if err := r.paymentProvider.CreateProduct(newProduct); err != nil {
 		return err
 	}
 
-	if err := paddlePayment.CreateProduct(newProduct); err != nil {
-		return err
-	}
-
-	_, ok := r.repository.Create(newProduct)
+	savedProduct, ok := r.repository.InsertOne(newProduct)
 	if !ok {
 		return utils.ServerError
+	}
+
+	if savedProduct.Type == types.OneTimeProduct {
+		newPrice := types.NewPricePayload{
+			ProductID: savedProduct.ProductID,
+			Name:      "one time price",
+			Price:     newProduct.Price,
+		}
+
+		if price := r.paymentProvider.CreatePrice(newPrice); price != nil {
+			price.ProductID = savedProduct.ID
+			if ok := r.repository.InsertPrice(price); ok {
+				return nil
+			}
+		}
+		return utils.ServerError
+	}
+
+	for _, priceItem := range newProduct.SubscriptionPrice {
+		newPrice := types.NewPricePayload{
+			ProductID: savedProduct.ProductID,
+			Name:      priceItem.Label,
+			Price:     priceItem.Price,
+			BillingCycle: &types.BillingCycle{
+				Interval:  string(priceItem.Interval),
+				Frequency: priceItem.Frequency,
+			},
+		}
+		if price := r.paymentProvider.CreatePrice(newPrice); price != nil {
+			price.ProductID = savedProduct.ID
+			if ok := r.repository.InsertPrice(price); !ok {
+				return utils.ServerError
+			}
+		}
 	}
 	return nil
 }
@@ -41,6 +71,17 @@ func (r *product) Update(id int, newProduct *types.NewProductRequest) (*types.On
 		return nil, utils.ServerError
 	}
 	return updatedProduct, nil
+}
+
+func (r *product) UpdatePrice(priceID string, updatePrice *types.UpdatePriceRequest) error {
+	updatedPrice := r.paymentProvider.UpdatePrice(priceID, updatePrice)
+	if updatePrice == nil {
+		return utils.PaddleError
+	}
+	if ok := r.repository.UpdatePrice(updatedPrice); !ok {
+		return utils.ServerError
+	}
+	return nil
 }
 
 func (r *product) GetOne(id int) (*types.OneProduct, error) {
@@ -59,8 +100,9 @@ func (r *product) Delete(id int) error {
 	return nil
 }
 
-func newProductService(repository types.ProductRepository) *product {
+func newProductService(repository types.ProductRepository, paymentProvider types.PaymentProvider) *product {
 	return &product{
-		repository: repository,
+		repository:      repository,
+		paymentProvider: paymentProvider,
 	}
 }

@@ -1,14 +1,15 @@
 package handlers
 
 import (
-	"akshidas/e-com/pkg/services"
 	"akshidas/e-com/pkg/types"
 	"context"
 	"net/http"
 )
 
 type purchase struct {
-	service types.PurchaseService
+	service         types.PurchaseService
+	cartService     types.CartServicer
+	paymentProvider types.PaymentProvider
 }
 
 func (a *purchase) HandleTransactionHook(w http.ResponseWriter, r *http.Request) error {
@@ -64,10 +65,6 @@ func (a *purchase) GetAllOrders(ctx context.Context, w http.ResponseWriter, r *h
 
 func (a *purchase) GetOrderStatus(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
 	txnId := r.PathValue("txnId")
-	paddle := services.NewPaddlePayment()
-	if err := paddle.Init(); err != nil {
-		return err
-	}
 
 	transactionStatus, err := a.service.GetOrderStatus(txnId)
 	if err != nil {
@@ -78,12 +75,8 @@ func (a *purchase) GetOrderStatus(ctx context.Context, w http.ResponseWriter, r 
 
 func (a *purchase) GetInvoice(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
 	txnId := r.PathValue("txnId")
-	paddle := services.NewPaddlePayment()
-	if err := paddle.Init(); err != nil {
-		return err
-	}
 
-	invoiceURL := paddle.GetInvoice(txnId)
+	invoiceURL := a.paymentProvider.GetInvoice(txnId)
 	return writeJson(w, http.StatusOK, *invoiceURL)
 }
 
@@ -112,8 +105,20 @@ func (a *purchase) UpdateShippingStatus(ctx context.Context, w http.ResponseWrit
 	return writeJson(w, http.StatusOK, "updated shipping status")
 }
 
-func newPurchase(service types.PurchaseService) types.PurchaseHandler {
+func (a *purchase) CreateTransaction(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
+	userID := ctx.Value("userID")
+	txnID, err := a.service.NewTransaction(userID.(uint32))
+	if err != nil {
+		return err
+	}
+	return writeJson(w, http.StatusCreated, txnID)
+}
+
+func newPurchase(service types.PurchaseService, cartService types.CartServicer, paymentProvider types.PaymentProvider) types.PurchaseHandler {
 	handler := new(purchase)
 	handler.service = service
+	handler.cartService = cartService
+	handler.paymentProvider = paymentProvider
+
 	return handler
 }

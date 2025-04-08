@@ -19,8 +19,19 @@ type AllProductResponse struct {
 func TestProduct(t *testing.T) {
 	config := config.NewTestConfig()
 	store := repository.New(config)
-	services := services.New(store)
+	services := services.New(store, config)
 	handlers := handlers.New(services)
+
+	t.Run("create a normal product", func(t *testing.T) {
+		payload := types.NewProductRequest{
+			Name: "test product",
+		}
+		request, _ := http.NewRequest(http.MethodGet, "/products", nil)
+		response := httptest.NewRecorder()
+		ctx := context.Background()
+		ctx = context.WithValue(ctx, "userID", 1)
+		ctx = context.WithValue(ctx, "role", "admin")
+	})
 
 	t.Run("get all products", func(t *testing.T) {
 		request, _ := http.NewRequest(http.MethodGet, "/products", nil)

@@ -1,5 +1,11 @@
-type NewCart = {
-    product_id: number
+type NewCartEntry = {
+    price_id: number
+    quantity: number
+    price: number
+}
+
+type CreateCartPayload = {
+    price_id: number
     quantity: number
 }
 
@@ -14,11 +20,12 @@ type Cart = {
     quantity: number
     created_at: string
     price_id: string
+    price: number
     product: {
         id: number
         name: string
         slug: string
-        price: string
+        type: ProductType
         description: string
         image: string
     }
