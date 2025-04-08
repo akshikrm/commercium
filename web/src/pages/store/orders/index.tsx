@@ -29,6 +29,11 @@ const Orders = () => {
         await refetch()
     })
 
+    const handleDownload = async (txnID: string) => {
+        const data = await order.getOrderByID(txnID)
+        window.open(data)
+    }
+
     return (
         <>
             <HeaderBreadcrumbs
@@ -95,13 +100,11 @@ const Orders = () => {
                                                 }
                                                 show={
                                                     <IconButton
-                                                        onClick={async () => {
-                                                            const data =
-                                                                await order.getOrderByID(
-                                                                    row.transaction_id
-                                                                )
-                                                            window.open(data)
-                                                        }}
+                                                        onClick={() =>
+                                                            handleDownload(
+                                                                row.transaction_id
+                                                            )
+                                                        }
                                                     >
                                                         <RenderIcon
                                                             icon={

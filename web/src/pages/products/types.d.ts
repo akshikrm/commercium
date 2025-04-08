@@ -32,6 +32,22 @@ type NewProduct = {
     subscription_price: NewSubscriptionPrice[]
 }
 
+type OneProductResponse = {
+    id: number
+    category_id: number
+    product_id: number
+    status: string
+    type: string
+    name: string
+    slug: string
+    prices: NewSubscriptionPrice[]
+    image: string[]
+    description: string
+    created_at: string
+    updated_at: string
+    deleted_at: string
+}
+
 type EditProduct = {
     name?: string
     image?: string[]
@@ -40,7 +56,7 @@ type EditProduct = {
     status?: ProductStatus
     type?: ProductType
     description?: string
-    prices: NewSubscriptionPrice[]
+    prices?: NewSubscriptionPrice[]
     price?: string
     subscription_price?: SubscriptionPrice
     category_id?: string

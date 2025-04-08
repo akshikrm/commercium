@@ -90,7 +90,6 @@ func (m *orders) GetOrdersByUserID(id uint32) ([]*types.OrderList, bool) {
 		t.grand_total,
 		JSON_AGG(
 			JSON_BUILD_OBJECT(
-				'id',o.id,
 				'product_id',p.id,
 				'name',p.name,
 				'price',p.price,
@@ -147,6 +146,8 @@ func (m *orders) GetAllOrders() ([]*types.OrderList, bool) {
 	GROUP BY 
 		t.id, t.transaction_id, t.status, t.tax, t.sub_total, t.grand_total, u.id;
 `)
+
+	fmt.Println(query)
 	return m.getAllOrders(query)
 }
 

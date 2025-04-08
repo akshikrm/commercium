@@ -17,7 +17,7 @@ const newProductDefaultValues: NewProduct = {
     subscription_price: []
 }
 
-const useProductForm = (defaultValues?: EditProduct) => {
+const useProductForm = (defaultValues?: OneProductResponse) => {
     const methods = useForm({
         resolver: zodResolver(productSchema),
         defaultValues: newProductDefaultValues
@@ -27,14 +27,18 @@ const useProductForm = (defaultValues?: EditProduct) => {
 
     useEffect(() => {
         if (defaultValues) {
-            const { prices, type, subscription_price, ...rest } = defaultValues
-            console.log(prices)
-            const temp = { ...rest }
-            if (type === "one-time") {
-                temp.price = convertToCommonAmount(prices[0].price)
-            }
-
-            reset(temp)
+            console.log(defaultValues)
+            // const { prices, type, subscription_price, ...rest } = defaultValues
+            // const temp = { ...rest }
+            //
+            // if (type === "one-time") {
+            //     temp.price = convertToCommonAmount(prices[0].price)
+            // } else {
+            // }
+            // reset({
+            //     type,
+            //     ...temp
+            // })
         }
     }, [defaultValues, reset])
 

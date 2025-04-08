@@ -6,7 +6,7 @@ build-seeder:
 	@go build -o seeder ./seed
 
 run: build
-	@ls dist | entr -cr ./dist
+	@ls dist | entr -ncr ./dist
 
 run-file: build
 		@clear

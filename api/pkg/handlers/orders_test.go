@@ -101,7 +101,7 @@ func TestOrderStatus(t *testing.T) {
 	t.Run("get all orders", func(t *testing.T) {
 		req, _ := http.NewRequest(http.MethodGet, "/orders", nil)
 		res := httptest.NewRecorder()
-		ctx = context.WithValue(ctx, "userID", uint32(1))
+		ctx = context.WithValue(ctx, "userID", uint32(12))
 		ctx = context.WithValue(ctx, "role", "admin")
 		handlers.Purchase.GetAllOrders(ctx, res, req)
 		orders := &AllOrdersResponse{}
