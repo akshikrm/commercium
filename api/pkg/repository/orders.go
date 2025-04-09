@@ -137,17 +137,24 @@ func (m *orders) GetAllOrders() ([]*types.OrderList, bool) {
 	t.created_at
 	FROM 
 		transactions AS t 
+
 	JOIN 
 		orders AS o ON t.id=o.transaction_id
 	JOIN 
 		products as p on o.product_id=p.product_id 
 	JOIN 
 		users as u on t.customer_id=u.customer_id 
+	WHERE 
+		t.status IS DISTINCT FROM 'draft'
+	AND		
+		 t.status IS DISTINCT FROM 'ready'
+
+
 	GROUP BY 
-		t.id, t.transaction_id, t.status, t.tax, t.sub_total, t.grand_total, u.id;
+		t.id, t.transaction_id, t.status, t.tax, t.sub_total, t.grand_total, u.id
+		;
 `)
 
-	fmt.Println(query)
 	return m.getAllOrders(query)
 }
 
