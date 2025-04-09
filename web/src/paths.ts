@@ -26,6 +26,9 @@ export const USER_PATHS = {
         root: "/stores"
     },
     cart: { root: "/carts" },
+    subscriptions: {
+        root: "/subscriptions"
+    },
     orders: {
         root: "/orders",
         view: (orderID: string) => `/orders/${orderID}`

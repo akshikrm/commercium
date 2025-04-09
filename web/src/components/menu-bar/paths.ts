@@ -14,6 +14,10 @@ export const USER_MENUS: Paths[] = [
                 path: USER_PATHS.store.root
             },
             {
+                label: "subscription",
+                path: USER_PATHS.subscriptions.root
+            },
+            {
                 label: "orders",
                 path: USER_PATHS.orders.root
             }

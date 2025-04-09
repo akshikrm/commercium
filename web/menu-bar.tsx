@@ -1,6 +1,8 @@
+import React from "react"
 import { Typography, useTheme } from "@mui/material"
 import { Menu, MenuItem, Sidebar, SubMenu } from "react-pro-sidebar"
 import { Link, useLocation } from "react-router"
+import { USER_PATHS } from "./src/paths"
 
 const MenuBar = () => {
     const { pathname } = useLocation()
@@ -66,5 +68,4 @@ const MenuItemLabel = ({ label }: { label: string }) => {
     )
 }
 
-
-export defult MenuBar
+export default MenuBar
