@@ -78,6 +78,11 @@ func PurchaseRoute(s *Server) routes {
 	}
 }
 
+// func SubscriptionsRoute(s *Server) routes {
+// 	ctx := context.Background()
+//
+// }
+
 func UploadRoute(s *Server) routes {
 	ctx := context.Background()
 	handler := s.handlers.Upload
