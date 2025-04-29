@@ -43,6 +43,7 @@ func connect(config *config.Config) *sql.DB {
 	connString := fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=disable",
 		config.Host, config.Port, config.User, config.Name, config.Password)
 	db, err := sql.Open("postgres", connString)
+	fmt.Println(db)
 
 	if err != nil {
 		fmt.Println(err)

@@ -52,7 +52,7 @@ type OrderProduct struct {
 	ProductID      uint32 `json:"product_id"`
 	ShippingStatus string `json:"shipping_status"`
 	Name           string `json:"name"`
-	Price          uint   `json:"price"`
+	Price          string `json:"price"`
 	Quantity       uint   `json:"quantity"`
 }
 
