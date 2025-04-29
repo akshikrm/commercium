@@ -25,19 +25,19 @@ var ROLES = []types.CreateRoleRequest{
 	},
 }
 
-type Seeder struct {
+type seeder struct {
 	service *services.Service
 	paddle  *services.PaddlePayment
 }
 
-func (s *Seeder) INIT() {
+func (s *seeder) INIT() {
 	s.seedRoles()
 	s.seedUsers()
 	s.seedProductCategories()
 	s.seedProducts()
 }
 
-func (s *Seeder) seedRoles() {
+func (s *seeder) seedRoles() {
 	fmt.Print("SEEDING Role...")
 	for _, role := range ROLES {
 		if err := s.service.Role.Create(&role); err != nil {
@@ -48,7 +48,7 @@ func (s *Seeder) seedRoles() {
 	fmt.Println("SUCCESS")
 }
 
-func (s Seeder) seedUsers() {
+func (s seeder) seedUsers() {
 	fmt.Println("SEEDING Users...")
 
 	byteValue := readFile("./seed/mock/users.json")
@@ -81,7 +81,7 @@ func (s Seeder) seedUsers() {
 	}
 }
 
-func (s Seeder) seedProductCategories() {
+func (s seeder) seedProductCategories() {
 	file := readFile("./seed/mock/product-categories.json")
 	productCategories := []types.NewProductCategoryRequest{}
 	json.Unmarshal(file, &productCategories)
@@ -97,16 +97,16 @@ func (s Seeder) seedProductCategories() {
 	}
 }
 
-func (s Seeder) seedProducts() {
+func (s seeder) seedProducts() {
 	fmt.Println("SEEDING products...")
 	file := readFile("./seed/mock/products.json")
 	products := []types.NewProductRequest{}
 	json.Unmarshal(file, &products)
-
 	for _, product := range products {
 		if err := s.service.Product.Create(&product); err != nil {
 			fmt.Printf("SEEDING %s FAILED\n", product.Name)
 			fmt.Printf("ERR: %s\n", err)
+			os.Exit(1)
 		} else {
 			fmt.Printf("SEEDING %s SUCCESS\n", product.Name)
 
@@ -114,8 +114,8 @@ func (s Seeder) seedProducts() {
 	}
 }
 
-func NewSeeder(service *services.Service, seederConfig *config.Config) *Seeder {
-	s := new(Seeder)
+func NewSeeder(service *services.Service, seederConfig *config.Config) *seeder {
+	s := new(seeder)
 	s.service = service
 	s.paddle = services.NewPaddlePayment(seederConfig)
 	return s

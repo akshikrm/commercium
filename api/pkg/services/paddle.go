@@ -169,6 +169,7 @@ func (p *PaddlePayment) CreateProduct(newProductRequest *types.NewProductRequest
 	}
 
 	product, err := p.Client.CreateProduct(ctx, paddleProductRequest)
+	fmt.Println("paddle product", product)
 	if err != nil {
 		log.Printf("failed to add product to paddle due to %s", err)
 		return utils.ServerError
