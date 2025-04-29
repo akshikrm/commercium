@@ -3,6 +3,7 @@ package handlers
 import (
 	"akshidas/e-com/pkg/types"
 	"context"
+	"fmt"
 	"net/http"
 )
 
@@ -19,6 +20,7 @@ func (a *purchase) HandleTransactionHook(w http.ResponseWriter, r *http.Request)
 		return err
 	}
 
+	fmt.Println(body.EventType, "event type")
 	switch body.EventType {
 	case "transaction.created":
 		{

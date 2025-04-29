@@ -6,10 +6,9 @@ import (
 	"akshidas/e-com/pkg/services"
 	"flag"
 	"fmt"
-	"os"
-
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
+	"os"
 )
 
 func main() {
