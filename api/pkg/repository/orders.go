@@ -92,7 +92,7 @@ func (m *orders) GetOrdersByUserID(id uint32) ([]*types.OrderList, bool) {
 			JSON_BUILD_OBJECT(
 				'product_id',p.id,
 				'name',p.name,
-				'price',p.price,
+				'price',o.amount,
 				'quantity', o.quantity,
 				'shipping_status', o.status
 			)
@@ -128,7 +128,7 @@ func (m *orders) GetAllOrders() ([]*types.OrderList, bool) {
 				'id',o.id,
 				'product_id',p.id,
 				'name',p.name,
-				'price',p.price,
+				'price',o.amount,
 				'quantity', o.quantity,
 				'shipping_status', o.status
 			)
